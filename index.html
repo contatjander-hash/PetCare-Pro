@@ -1444,7 +1444,13 @@
             margin-bottom: 2rem;
             border-bottom: 2px solid var(--border);
         }
-
+<div style="margin-bottom: 2rem; border-bottom: 2px solid var(--border); padding-bottom: 1.5rem;">
+    <button onclick="entrarComGoogle()" class="auth-submit" style="background: white; color: #444; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 0; box-shadow: none;">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/button/google/web/single_color_light/24dp.png" width="20">
+        <span style="background: none; color: #444; font-weight: 600;">Entrar com Google</span>
+    </button>
+    <div style="text-align: center; margin-top: 1.5rem; color: var(--text-secondary); font-size: 0.8rem; font-weight: bold; letter-spacing: 1px;">OU USE E-MAIL</div>
+</div>
         .auth-tab {
             flex: 1;
             padding: 1rem;
@@ -3911,60 +3917,48 @@
   });
 </script>
 
-<button onclick="fazerLogin()">Entrar com Google</button>
-    <script type="module">
+<script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-  // --- CONFIGURAÇÃO (COLE SEUS DADOS AQUI) ---
   const firebaseConfig = {
-    apiKey: "SUA_API_KEY_REAL_AQUI", 
+    apiKey: "COLE_AQUI_SUA_API_KEY_QUE_COMECA_COM_AIZA", 
     authDomain: "petcarepro-9233b.firebaseapp.com",
     projectId: "petcarepro-9233b",
     storageBucket: "petcarepro-9233b.appspot.com",
     messagingSenderId: "277665228536",
-    appId: "SEU_APP_ID_REAL_AQUI"
+    appId: "COLE_AQUI_O_SEU_APP_ID"
   };
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
 
-  // Função de Login
   window.entrarComGoogle = async () => {
     try {
       await signInWithPopup(auth, provider);
-      // Fecha o modal removendo a classe 'active'
       document.querySelector('.auth-modal').classList.remove('active');
     } catch (error) {
-      console.error("Erro no login:", error);
-      alert("Falha ao entrar: " + error.message);
+      alert("Erro: " + error.message);
     }
   };
 
-  // Função de Sair
   window.sair = () => signOut(auth);
 
-  // Monitor de Estado (Troca as seções na tela)
   onAuthStateChanged(auth, (user) => {
-    const homeSection = document.querySelector('.home-section');
     const profileSection = document.querySelector('.profile-section');
-    const loginLink = document.querySelector('a[href="#login"]'); // Ajuste o seletor conforme seu menu
-
+    const homeSection = document.querySelector('.home-section');
+    
     if (user) {
-      // Usuário Logado
-      if(homeSection) homeSection.classList.add('hidden');
-      if(profileSection) profileSection.classList.add('active');
-      
-      // Preenche os dados no seu CSS de Perfil
-      document.querySelector('.profile-name').innerText = user.displayName;
-      document.querySelector('.profile-email').innerText = user.email;
-      const avatar = document.querySelector('.profile-avatar');
-      if(avatar) avatar.innerHTML = `<img src="${user.photoURL}" style="width:100%; border-radius:50%">`;
-      
+      if(homeSection) homeSection.style.display = 'none';
+      if(profileSection) {
+        profileSection.classList.add('active');
+        document.querySelector('.profile-name').innerText = user.displayName;
+        document.querySelector('.profile-email').innerText = user.email;
+        document.querySelector('.profile-avatar').innerHTML = `<img src="${user.photoURL}" style="width:100%; border-radius:50%">`;
+      }
     } else {
-      // Usuário Deslogado
-      if(homeSection) homeSection.classList.remove('hidden');
+      if(homeSection) homeSection.style.display = 'block';
       if(profileSection) profileSection.classList.remove('active');
     }
   });
