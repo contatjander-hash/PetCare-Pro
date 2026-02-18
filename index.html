@@ -3852,32 +3852,56 @@
             }
         });
     </script>
-    <script type="module">
-  // 1. Importe o Auth
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+<button id="btn-login" onclick="entrarComGoogle()" style="padding: 10px 20px; border-radius: 8px; cursor: pointer; background-color: #4285F4; color: white; border: none; font-weight: bold;">
+  Entrar com Google no Petcarepro
+</button>
 
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  // --- CONFIGURAÇÃO DO SEU PROJETO PETCAREPRO ---
   const firebaseConfig = {
-    // ... suas chaves aqui ...
+    apiKey: "COLE_SUA_API_KEY_AQUI", // <--- BUSQUE NO CONSOLE DO FIREBASE
+    authDomain: "petcarepro-9233b.firebaseapp.com",
+    projectId: "petcarepro-9233b",
+    storageBucket: "petcarepro-9233b.appspot.com",
+    messagingSenderId: "277665228536",
+    appId: "COLE_SEU_APP_ID_AQUI" // <--- BUSQUE NO CONSOLE DO FIREBASE
   };
 
-  // 2. Inicialize
+  // Inicializa o Firebase
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
 
-  // 3. Função para Logar
-  window.fazerLogin = () => {
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        const user = result.user;
-        console.log("Usuário logado:", user.displayName);
-        alert("Bem-vindo, " + user.displayName + "!");
-      })
-      .catch((error) => {
-        console.error("Erro no login:", error.message);
-      });
+  // Função Global de Login
+  window.entrarComGoogle = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      console.log("Sucesso! Usuário:", result.user.displayName);
+      
+      // Redireciona para o seu profile na Vercel
+      window.location.hash = "profile";
+      
+    } catch (error) {
+      console.error("Erro no Login:", error.code);
+      if (error.code === 'auth/unauthorized-domain') {
+        alert("Ops! Adicione 'petcarenew.vercel.app' nos domínios autorizados do Firebase.");
+      } else {
+        alert("Erro: " + error.message);
+      }
+    }
   };
+
+  // Observador: Mantém o usuário logado ao atualizar a página
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      console.log("Petcarepro: Sessão ativa para", user.displayName);
+      // Se quiser que ele vá direto pro perfil se já estiver logado:
+      // window.location.hash = "profile";
+    }
+  });
 </script>
 
 <button onclick="fazerLogin()">Entrar com Google</button>
