@@ -3485,6 +3485,10 @@
         function logout() {
             if (confirm('Tem certeza que deseja sair da sua conta?')) {
                 localStorage.removeItem('petcare_user');
+                // Desloga do Firebase também (se estiver logado com Google)
+                import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js")
+                  .then(({ getAuth, signOut }) => signOut(getAuth()))
+                  .catch(() => {});
                 location.reload();
             }
         }
@@ -3939,21 +3943,35 @@
   const provider = new GoogleAuthProvider();
 
   window.entrarComGoogle = async () => {
-    const btn = document.querySelector('.google-signin-btn');
-    if (btn) {
-      btn.disabled = true;
-      btn.style.opacity = '0.7';
-    }
+    const btns = document.querySelectorAll('.google-signin-btn');
+    btns.forEach(b => { b.disabled = true; b.style.opacity = '0.7'; });
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      console.log("Login com sucesso:", user.displayName);
 
-      // Fecha modal de auth se estiver aberto
+      // Salva no mesmo formato que o app espera
+      const userData = {
+        id: user.uid,
+        name: user.displayName || 'Usuário Google',
+        email: user.email,
+        phone: user.phoneNumber || '',
+        cpf: '',
+        photo: user.photoURL || '',
+        createdAt: new Date().toISOString(),
+        plan: 'Gratuito',
+        code: null,
+        loginMethod: 'google'
+      };
+
+      localStorage.setItem('petcare_user', JSON.stringify(userData));
+
+      // Fecha modal e atualiza o perfil
       closeAuthModal();
+      loadUserProfile();
 
-      // Redireciona para o perfil
-      window.location.hash = "profile";
+      // Mostra boas-vindas
+      const firstName = (user.displayName || 'Usuário').split(' ')[0];
+      showToast(`✅ Bem-vindo, ${firstName}! 🐾`);
 
     } catch (error) {
       console.error("Erro no Login:", error.code);
@@ -3963,16 +3981,31 @@
         alert("Erro ao entrar com Google: " + error.message);
       }
     } finally {
-      if (btn) {
-        btn.disabled = false;
-        btn.style.opacity = '1';
-      }
+      btns.forEach(b => { b.disabled = false; b.style.opacity = '1'; });
     }
   };
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      console.log("Sessão ativa:", user.displayName);
+      // Se o Firebase tem sessão mas o localStorage foi limpo, restaura
+      const savedUser = localStorage.getItem('petcare_user');
+      if (!savedUser) {
+        const userData = {
+          id: user.uid,
+          name: user.displayName || 'Usuário Google',
+          email: user.email,
+          phone: user.phoneNumber || '',
+          cpf: '',
+          photo: user.photoURL || '',
+          createdAt: new Date().toISOString(),
+          plan: 'Gratuito',
+          code: null,
+          loginMethod: 'google'
+        };
+        localStorage.setItem('petcare_user', JSON.stringify(userData));
+        // Atualiza UI se perfil estiver visível
+        if (typeof loadUserProfile === 'function') loadUserProfile();
+      }
     }
   });
 </script>
