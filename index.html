@@ -1438,19 +1438,69 @@
             font-size: 0.95rem;
         }
 
+        .google-signin-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            width: 100%;
+            padding: 0.85rem 1.5rem;
+            background: #ffffff;
+            color: #3c4043;
+            border: 1.5px solid #dadce0;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-top: 1.25rem;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        .google-signin-btn:hover {
+            background: #f8f9fa;
+            border-color: #bdc1c6;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .google-signin-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .google-signin-btn svg {
+            flex-shrink: 0;
+        }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.25rem 0 0;
+            color: var(--text-tertiary);
+            font-size: 0.85rem;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
         .auth-tabs {
             display: flex;
             gap: 1rem;
             margin-bottom: 2rem;
             border-bottom: 2px solid var(--border);
         }
-<div style="margin-bottom: 2rem; border-bottom: 2px solid var(--border); padding-bottom: 1.5rem;">
-    <button onclick="entrarComGoogle()" class="auth-submit" style="background: white; color: #444; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 0; box-shadow: none;">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/button/google/web/single_color_light/24dp.png" width="20">
-        <span style="background: none; color: #444; font-weight: 600;">Entrar com Google</span>
-    </button>
-    <div style="text-align: center; margin-top: 1.5rem; color: var(--text-secondary); font-size: 0.8rem; font-weight: bold; letter-spacing: 1px;">OU USE E-MAIL</div>
-</div>
+
         .auth-tab {
             flex: 1;
             padding: 1rem;
@@ -2976,13 +3026,6 @@
             <div class="auth-tabs">
                 <button class="auth-tab active" onclick="showAuthTab('login')">Entrar</button>
                 <button class="auth-tab" onclick="showAuthTab('register')">Cadastrar</button>
-            <div style="margin-bottom: 2rem; border-bottom: 2px solid var(--border); padding-bottom: 1.5rem;">
-    <button onclick="entrarComGoogle()" class="auth-submit" style="background: white; color: #444; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 0;">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/button/google/web/single_color_light/24dp.png" width="20">
-        <span style="background: none; color: #444;">Entrar com Google</span>
-    </button>
-    <div style="text-align: center; margin-top: 1.5rem; color: var(--text-secondary); font-size: 0.8rem; font-weight: bold;">OU COM SEU E-MAIL</div>
-</div>
             </div>
 
             <!-- Login Form -->
@@ -2996,6 +3039,16 @@
                     <input type="password" id="loginPassword" required placeholder="••••••••">
                 </div>
                 <button type="submit" class="auth-submit">Entrar</button>
+                <div class="auth-divider">ou</div>
+                <button type="button" class="google-signin-btn" onclick="entrarComGoogle()">
+                    <svg width="20" height="20" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                    </svg>
+                    Continuar com Google
+                </button>
             </form>
 
             <!-- Register Form -->
@@ -3021,6 +3074,16 @@
                     <input type="password" id="registerPassword" required placeholder="••••••••" minlength="6">
                 </div>
                 <button type="submit" class="auth-submit">Criar Conta</button>
+                <div class="auth-divider">ou</div>
+                <button type="button" class="google-signin-btn" onclick="entrarComGoogle()">
+                    <svg width="20" height="20" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                    </svg>
+                    Cadastrar com Google
+                </button>
             </form>
         </div>
     </div>
@@ -3855,113 +3918,64 @@
             }
         });
 
-        // Close PIX modal on ESC key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                const pixModal = document.getElementById('pixPaymentModal');
-                if (pixModal.classList.contains('active')) {
-                    closePixPayment();
-                }
-            }
-        });
     </script>
-<button id="btn-login" onclick="entrarComGoogle()" style="padding: 10px 20px; border-radius: 8px; cursor: pointer; background-color: #4285F4; color: white; border: none; font-weight: bold;">
-  Entrar com Google no Petcarepro
-</button>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-  // --- CONFIGURAÇÃO DO SEU PROJETO PETCAREPRO ---
   const firebaseConfig = {
-    apiKey: "COLE_SUA_API_KEY_AQUI", // <--- BUSQUE NO CONSOLE DO FIREBASE
+    apiKey: "AIzaSyAWEcycTgntSuRKabqWNULjwtLjKnoHApM",
     authDomain: "petcarepro-9233b.firebaseapp.com",
     projectId: "petcarepro-9233b",
-    storageBucket: "petcarepro-9233b.appspot.com",
+    storageBucket: "petcarepro-9233b.firebasestorage.app",
     messagingSenderId: "277665228536",
-    appId: "COLE_SEU_APP_ID_AQUI" // <--- BUSQUE NO CONSOLE DO FIREBASE
+    appId: "1:277665228536:web:d837f12786040186e43d0d",
+    measurementId: "G-C9MKCJCECH"
   };
 
-  // Inicializa o Firebase
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
 
-  // Função Global de Login
   window.entrarComGoogle = async () => {
+    const btn = document.querySelector('.google-signin-btn');
+    if (btn) {
+      btn.disabled = true;
+      btn.style.opacity = '0.7';
+    }
     try {
       const result = await signInWithPopup(auth, provider);
-      console.log("Sucesso! Usuário:", result.user.displayName);
-      
-      // Redireciona para o seu profile na Vercel
+      const user = result.user;
+      console.log("Login com sucesso:", user.displayName);
+
+      // Fecha modal de auth se estiver aberto
+      closeAuthModal();
+
+      // Redireciona para o perfil
       window.location.hash = "profile";
-      
+
     } catch (error) {
       console.error("Erro no Login:", error.code);
       if (error.code === 'auth/unauthorized-domain') {
-        alert("Ops! Adicione 'petcarenew.vercel.app' nos domínios autorizados do Firebase.");
-      } else {
-        alert("Erro: " + error.message);
+        alert("⚠️ Adicione o domínio atual nos domínios autorizados do Firebase Console.");
+      } else if (error.code !== 'auth/popup-closed-by-user') {
+        alert("Erro ao entrar com Google: " + error.message);
+      }
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.style.opacity = '1';
       }
     }
   };
 
-  // Observador: Mantém o usuário logado ao atualizar a página
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      console.log("Petcarepro: Sessão ativa para", user.displayName);
-      // Se quiser que ele vá direto pro perfil se já estiver logado:
-      // window.location.hash = "profile";
+      console.log("Sessão ativa:", user.displayName);
     }
   });
 </script>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "COLE_AQUI_SUA_API_KEY_QUE_COMECA_COM_AIZA", 
-    authDomain: "petcarepro-9233b.firebaseapp.com",
-    projectId: "petcarepro-9233b",
-    storageBucket: "petcarepro-9233b.appspot.com",
-    messagingSenderId: "277665228536",
-    appId: "COLE_AQUI_O_SEU_APP_ID"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const provider = new GoogleAuthProvider();
-
-  window.entrarComGoogle = async () => {
-    try {
-      await signInWithPopup(auth, provider);
-      document.querySelector('.auth-modal').classList.remove('active');
-    } catch (error) {
-      alert("Erro: " + error.message);
-    }
-  };
-
-  window.sair = () => signOut(auth);
-
-  onAuthStateChanged(auth, (user) => {
-    const profileSection = document.querySelector('.profile-section');
-    const homeSection = document.querySelector('.home-section');
-    
-    if (user) {
-      if(homeSection) homeSection.style.display = 'none';
-      if(profileSection) {
-        profileSection.classList.add('active');
-        document.querySelector('.profile-name').innerText = user.displayName;
-        document.querySelector('.profile-email').innerText = user.email;
-        document.querySelector('.profile-avatar').innerHTML = `<img src="${user.photoURL}" style="width:100%; border-radius:50%">`;
-      }
-    } else {
-      if(homeSection) homeSection.style.display = 'block';
-      if(profileSection) profileSection.classList.remove('active');
-    }
-  });
-</script>
 </body>
 </html>
