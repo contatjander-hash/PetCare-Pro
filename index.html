@@ -2,9 +2,37 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐾 PetCare Pro - Saúde Completa do seu Pet</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>PetCare - Acompanhamento do seu Pet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-primary: #fef8f3;
+            --bg-secondary: #ffffff;
+            --bg-accent: #fff5ed;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --text-tertiary: #999999;
+            --accent: #ff6b35;
+            --accent-light: #ff8c61;
+            --accent-dark: #e55a2b;
+            --purple: #8b5cf6;
+            --purple-light: #a78bfa;
+            --blue: #3b82f6;
+            --green: #10b981;
+            --yellow: #fbbf24;
+            --pink: #ec4899;
+            --border: #ffe4d6;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --shadow: rgba(255, 107, 53, 0.1);
+            --shadow-md: rgba(255, 107, 53, 0.2);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,1490 +40,3803 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
+            padding: 0 2rem;
         }
 
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
+        /* Header */
+        header {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 245, 237, 0.98) 100%);
+            border-bottom: 2px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
         }
 
-        .header h1 {
-            font-size: 2.8em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.95;
-        }
-
-        .user-info {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 15px 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
+        nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: white;
-            backdrop-filter: blur(10px);
+            padding: 1.5rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        .user-profile {
+        .logo {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.75rem;
+            font-weight: 400;
+            letter-spacing: -0.02em;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .user-photo {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            border: 3px solid white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        .logo::before {
+            content: '🐾';
+            font-size: 1.5rem;
+            animation: bounce 2s ease-in-out infinite;
+            -webkit-text-fill-color: initial;
         }
 
-        .login-container {
-            background: white;
-            border-radius: 20px;
-            padding: 50px;
-            text-align: center;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-            max-width: 450px;
-            margin: 100px auto;
-        }
-
-        .login-container h2 {
-            margin-bottom: 15px;
-            color: #333;
-            font-size: 2em;
-        }
-
-        .login-container p {
-            margin-bottom: 30px;
-            color: #666;
-            font-size: 1.05em;
-        }
-
-        .tabs {
+        .nav-links {
             display: flex;
-            gap: 8px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.15);
-            padding: 10px;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
+            gap: 2rem;
+            list-style: none;
         }
 
-        .tab {
-            padding: 12px 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            cursor: pointer;
-            font-size: 15px;
-            transition: all 0.3s;
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-secondary);
             font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+            position: relative;
         }
 
-        .tab:hover {
-            background: rgba(255, 255, 255, 0.35);
-            transform: translateY(-2px);
+        .nav-links a:hover {
+            color: var(--text-primary);
         }
 
-        .tab.active {
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -0.5rem;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        /* Video Hero Section */
+        .video-hero {
+            position: relative;
+            height: 70vh;
+            min-height: 500px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        }
+
+        .video-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #4facfe);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        .video-background::before,
+        .video-background::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .video-background::before {
+            background: rgba(255, 107, 53, 0.6);
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .video-background::after {
+            background: rgba(236, 72, 153, 0.6);
+            bottom: 20%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        .floating-paws {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .paw {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.2;
+            animation: floatPaw 20s linear infinite;
+        }
+
+        .paw:nth-child(1) { left: 10%; animation-duration: 15s; animation-delay: 0s; }
+        .paw:nth-child(2) { left: 30%; animation-duration: 18s; animation-delay: 2s; }
+        .paw:nth-child(3) { left: 50%; animation-duration: 22s; animation-delay: 4s; }
+        .paw:nth-child(4) { left: 70%; animation-duration: 16s; animation-delay: 6s; }
+        .paw:nth-child(5) { left: 90%; animation-duration: 20s; animation-delay: 8s; }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes floatPaw {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.7) 0%, rgba(118, 75, 162, 0.7) 50%, rgba(240, 147, 251, 0.7) 100%);
+            z-index: 1;
+            mix-blend-mode: multiply;
+        }
+
+        .video-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: white;
+            padding: 2rem;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .video-content h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 4rem;
+            font-weight: 400;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 1s ease-out 0.2s backwards;
+        }
+
+        .video-content p {
+            font-size: 1.5rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.95;
+            font-weight: 300;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            animation: fadeInUp 1s ease-out 0.4s backwards;
+        }
+
+        .cta-button {
             background: white;
-            color: #667eea;
+            color: var(--purple);
+            padding: 1rem 3rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 1s ease-out 0.6s backwards;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        .scroll-indicator span {
+            display: block;
+            width: 30px;
+            height: 50px;
+            border: 2px solid white;
+            border-radius: 25px;
+            position: relative;
+        }
+
+        .scroll-indicator span::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            animation: scrollDot 2s ease-in-out infinite;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 4rem 0 3rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        /* Inspirational Photos Section */
+        .inspiration-section {
+            padding: 4rem 0;
+            background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+        }
+
+        /* Pricing Section */
+        .pricing-section {
+            padding: 5rem 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pricing-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .pricing-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+
+        .pricing-header h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .pricing-header p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s ease;
+            animation: fadeInScale 0.8s ease-out backwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pricing-card:nth-child(1) { animation-delay: 0.3s; }
+        .pricing-card:nth-child(2) { 
+            animation-delay: 0.4s;
+            border: 3px solid var(--yellow);
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: 20px;
+            right: -35px;
+            background: var(--yellow);
+            color: #1a1a1a;
+            padding: 0.5rem 3rem;
+            transform: rotate(45deg);
+            font-weight: 700;
+            font-size: 0.85rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .plan-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .plan-price {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .price-value {
+            font-family: 'DM Serif Display', serif;
+            font-size: 3.5rem;
+            color: var(--accent);
+            font-weight: 400;
+            line-height: 1;
+        }
+
+        .price-currency {
+            font-size: 1.5rem;
+            vertical-align: super;
+        }
+
+        .price-period {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .plan-features li {
+            padding: 0.75rem 0;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .plan-features li::before {
+            content: '✓';
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--green) 0%, #34d399 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: bold;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            flex-shrink: 0;
         }
 
-        .card {
-            background: white;
-            border-radius: 18px;
-            padding: 30px;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
-            margin-bottom: 20px;
+        .plan-cta {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--pink) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Outfit', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        .plan-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        .pix-note {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #fff5ed;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .pix-note strong {
+            color: var(--accent);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Animated Pet Carousel */
+        .pet-carousel {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .carousel-track {
+            display: flex;
+            gap: 2rem;
+            animation: scroll 20s linear infinite;
+            width: max-content;
+        }
+
+        .carousel-item {
+            width: 180px;
+            height: 180px;
+            border-radius: 20px;
+            overflow: hidden;
+            flex-shrink: 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: jump 2s ease-in-out infinite;
+        }
+
+        .carousel-item:nth-child(1) { animation-delay: 0s; }
+        .carousel-item:nth-child(2) { animation-delay: 0.3s; }
+        .carousel-item:nth-child(3) { animation-delay: 0.6s; }
+        .carousel-item:nth-child(4) { animation-delay: 0.9s; }
+        .carousel-item:nth-child(5) { animation-delay: 1.2s; }
+
+        .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        @keyframes scroll {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(calc(-180px * 5 - 10rem));
+            }
+        }
+
+        @keyframes jump {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-title p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .photo-gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .inspiration-photo {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            aspect-ratio: 4/5;
+            box-shadow: 0 8px 24px var(--shadow);
+            transition: all 0.4s ease;
+            animation: fadeInScale 0.8s ease-out backwards;
+        }
+
+        .inspiration-photo:nth-child(1) { animation-delay: 0.1s; }
+        .inspiration-photo:nth-child(2) { animation-delay: 0.2s; }
+        .inspiration-photo:nth-child(3) { animation-delay: 0.3s; }
+        .inspiration-photo:nth-child(4) { 
+            animation-delay: 0.4s;
             display: none;
         }
 
-        .card.active {
+        .inspiration-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
             display: block;
-            animation: fadeIn 0.3s;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
+        .inspiration-photo:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 12px 40px var(--shadow-md);
         }
 
-        .pet-selector {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
+        .inspiration-photo:hover img {
+            transform: scale(1.1);
         }
 
-        .pet-card-mini {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .photo-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem;
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
             color: white;
-            padding: 15px 20px;
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+        }
+
+        .inspiration-photo:hover .photo-caption {
+            transform: translateY(0);
+        }
+
+        .photo-caption h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+
+        .photo-caption p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Hero Section */
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-text h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 3.5rem;
+            font-weight: 400;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.03em;
+        }
+
+        .hero-text p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .pet-profile-card {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-accent) 100%);
+            border-radius: 24px;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px var(--shadow);
+            animation: fadeInScale 0.8s ease-out 0.2s backwards;
+        }
+
+        .pet-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--pink) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 8px 24px var(--shadow-md);
+            animation: float 3s ease-in-out infinite;
+            position: relative;
+        }
+
+        .pet-avatar::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--yellow), var(--purple), var(--blue));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .pet-avatar:hover::after {
+            opacity: 1;
+            animation: rotate 3s linear infinite;
+        }
+
+        .pet-info h2 {
+            text-align: center;
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pet-info p {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Dashboard Grid */
+        .dashboard {
+            padding: 3rem 0;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 2px solid var(--border);
+            box-shadow: 0 4px 16px var(--shadow);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease-out backwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--purple), var(--blue));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(1)::before { background: linear-gradient(90deg, var(--accent), var(--pink)); }
+        
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .card:nth-child(2)::before { background: linear-gradient(90deg, var(--purple), var(--blue)); }
+        
+        .card:nth-child(3) { animation-delay: 0.3s; }
+        .card:nth-child(3)::before { background: linear-gradient(90deg, var(--green), var(--blue)); }
+        
+        .card:nth-child(4) { animation-delay: 0.4s; }
+        .card:nth-child(4)::before { background: linear-gradient(90deg, var(--yellow), var(--accent)); }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 32px var(--shadow-md);
+            border-color: var(--accent);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        .card:nth-child(1) .card-icon {
+            animation-delay: 0.5s;
+        }
+        .card:nth-child(2) .card-icon {
+            animation-delay: 0.7s;
+        }
+        .card:nth-child(3) .card-icon {
+            animation-delay: 0.9s;
+        }
+        .card:nth-child(4) .card-icon {
+            animation-delay: 1.1s;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
             border-radius: 12px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            font-size: 0.95rem;
+            font-family: 'Outfit', sans-serif;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+            position: relative;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-accent);
+        }
+
+        /* Lists */
+        .item-list {
+            list-style: none;
+        }
+
+        .item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .item:last-child {
+            border-bottom: none;
+        }
+
+        .item:hover {
+            background: var(--bg-accent);
+        }
+
+        .item-info h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+        }
+
+        .item-info p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .item-status {
+            padding: 0.35rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-upcoming {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-done {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-overdue {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Weight Chart */
+        .weight-chart {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: var(--bg-accent);
+            border-radius: 12px;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.5rem;
+            height: 120px;
+            margin-top: 1rem;
+        }
+
+        .bar {
+            flex: 1;
+            background: linear-gradient(to top, var(--accent) 0%, var(--accent-light) 50%, var(--yellow) 100%);
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            transition: all 0.3s;
+            animation: growUp 0.8s ease-out backwards;
+            box-shadow: 0 -2px 10px rgba(255, 107, 53, 0.3);
+        }
+
+        .bar:nth-child(1) { 
+            animation-delay: 0.1s;
+            background: linear-gradient(to top, #f59e0b 0%, #fbbf24 100%);
+        }
+        .bar:nth-child(2) { 
+            animation-delay: 0.2s;
+            background: linear-gradient(to top, var(--accent) 0%, var(--pink) 100%);
+        }
+        .bar:nth-child(3) { 
+            animation-delay: 0.3s;
+            background: linear-gradient(to top, var(--purple) 0%, var(--purple-light) 100%);
+        }
+        .bar:nth-child(4) { 
+            animation-delay: 0.4s;
+            background: linear-gradient(to top, var(--blue) 0%, #60a5fa 100%);
+        }
+        .bar:nth-child(5) { 
+            animation-delay: 0.5s;
+            background: linear-gradient(to top, var(--green) 0%, #34d399 100%);
+        }
+        .bar:nth-child(6) { 
+            animation-delay: 0.6s;
+            background: linear-gradient(to top, var(--pink) 0%, #f472b6 100%);
+        }
+
+        .bar:hover {
+            opacity: 0.8;
+            transform: scaleY(1.08);
+            filter: brightness(1.1);
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
+            white-space: nowrap;
+        }
+
+        /* Photo Gallery */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .photo-placeholder {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, var(--bg-accent) 0%, var(--border) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: fadeInScale 0.6s ease-out backwards;
+            border: 2px dashed var(--border);
+        }
+
+        .photo-placeholder:nth-child(1) { 
+            animation-delay: 0.1s;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        }
+        .photo-placeholder:nth-child(2) { 
+            animation-delay: 0.2s;
+            background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%);
+        }
+        .photo-placeholder:nth-child(3) { 
+            animation-delay: 0.3s;
+            background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+        }
+
+        .photo-placeholder:hover {
+            transform: scale(1.05) rotate(2deg);
+            box-shadow: 0 8px 20px var(--shadow-md);
+        }
+
+        .photo-upload {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--pink) 100%);
+            color: white;
+            font-size: 3rem;
+            font-weight: 300;
+            border: 2px solid var(--accent);
+        }
+
+        .photo-upload:hover {
+            transform: scale(1.1) rotate(-2deg);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 2.5rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: scaleIn 0.3s ease-out;
+        }
+
+        .pet-photo-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .pet-photo-option {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
             border: 3px solid transparent;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px var(--shadow);
         }
 
-        .pet-card-mini:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        .pet-photo-option img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        .pet-card-mini.selected {
-            border-color: #ffd700;
-            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
+        .pet-photo-option:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px var(--shadow-md);
+        }
+
+        .pet-photo-option.selected {
+            border-color: var(--accent);
+            transform: scale(1.05);
+            box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.2);
+        }
+
+        .pet-photo-option::after {
+            content: '✓';
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            width: 28px;
+            height: 28px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s ease;
+        }
+
+        .pet-photo-option.selected::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .photo-label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: block;
+        }
+
+        /* PIX Payment Modal */
+        .pix-payment-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .pix-payment-modal.active {
+            display: flex;
+        }
+
+        .pix-modal-content {
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 2rem 2.5rem 2.5rem 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            animation: scaleIn 0.3s ease-out;
+            text-align: center;
+            position: relative;
+        }
+
+        /* Custom scrollbar for PIX modal */
+        .pix-modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .pix-modal-content::-webkit-scrollbar-track {
+            background: var(--bg-accent);
+            border-radius: 10px;
+        }
+
+        .pix-modal-content::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+
+        .pix-modal-content::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-dark);
+        }
+
+        .pix-modal-header {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .pix-modal-header h3 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            padding-right: 2rem;
+        }
+
+        .pix-modal-header .close-btn {
+            position: absolute;
+            top: -0.5rem;
+            right: -0.5rem;
+        }
+
+        .pix-plan-info {
+            background: var(--bg-accent);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .pix-plan-info .plan-selected {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .pix-plan-info .amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            font-family: 'DM Serif Display', serif;
+        }
+
+        .qr-code-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .qr-code-container img {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .qr-placeholder {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .qr-placeholder-icon {
+            font-size: 3rem;
+        }
+
+        .qr-placeholder-text {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 0 1rem;
+        }
+
+        .pix-copy-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .pix-copy-label {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .pix-copy-container {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--bg-accent);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 2px dashed var(--border);
+        }
+
+        .pix-code-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            background: white;
+            color: var(--text-primary);
+        }
+
+        .copy-button {
+            padding: 0.75rem 1.5rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        .copy-button:hover {
+            background: var(--accent-dark);
+            transform: translateY(-2px);
+        }
+
+        .copy-button.copied {
+            background: var(--green);
+        }
+
+        .pix-instructions {
+            background: #e0f2fe;
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .pix-instructions h4 {
+            color: var(--blue);
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .pix-instructions ol {
+            padding-left: 1.25rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .pix-instructions li {
+            margin-bottom: 0.4rem;
+        }
+
+        .pix-modal-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .pix-modal-actions .btn {
+            flex: 1;
+        }
+
+        .btn-close-pix {
+            background: var(--bg-accent);
+            color: var(--text-primary);
+        }
+
+        .btn-close-pix:hover {
+            background: var(--border);
+        }
+
+        .pix-warning {
+            background: #fff5ed;
+            border-left: 4px solid var(--warning);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+            text-align: left;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .pix-warning strong {
+            color: var(--warning);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Login/Register Modal */
+        .auth-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 4000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .auth-modal.active {
+            display: flex;
+        }
+
+        .auth-container {
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: scaleIn 0.3s ease-out;
+            position: relative;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-header h2 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .auth-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
         }
 
         .form-group {
-            margin-bottom: 22px;
+            margin-bottom: 1.5rem;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            color: #333;
             font-weight: 600;
-            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .auth-submit {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--pink) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .auth-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        /* Profile Section */
+        .profile-section {
+            display: none;
+            padding: 3rem 0;
+        }
+
+        .profile-section.active {
+            display: block;
+        }
+
+        .profile-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--pink) 100%);
+            border-radius: 24px;
+            padding: 3rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .profile-name {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-email {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .profile-card {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .profile-card h3 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .profile-info {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        /* Home Section */
+        .home-section {
+            display: block;
+        }
+
+        .home-section.hidden {
+            display: none;
+        }
+
+        /* Payment Wall/Lock System */
+        .payment-wall {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .payment-wall.hidden {
+            display: none;
+        }
+
+        .payment-wall-content {
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 2rem 1.5rem;
+            max-width: 450px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        .lock-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        .payment-wall-content h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .payment-wall-content p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .unlock-section {
+            background: var(--bg-accent);
+            padding: 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+        }
+
+        .unlock-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .unlock-input {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            text-align: center;
+            font-family: monospace;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            margin-bottom: 0.875rem;
+            text-transform: uppercase;
+        }
+
+        .unlock-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .unlock-button {
+            width: 100%;
+            padding: 0.875rem;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--pink) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Outfit', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .unlock-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        .unlock-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s;
+        }
+
+        .payment-options {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-option-btn {
+            width: 100%;
+            padding: 1.25rem;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-align: left;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .payment-option-btn:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .payment-option-icon {
+            font-size: 3rem;
+            flex-shrink: 0;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-accent);
+            border-radius: 12px;
+        }
+
+        .payment-option-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .payment-option-info h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .payment-option-info p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        .payment-option-price {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--accent);
+            font-family: 'DM Serif Display', serif;
+            text-align: right;
+            line-height: 1;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: var(--text-tertiary);
+            font-size: 0.85rem;
+        }
+            color: var(--accent);
+            font-family: 'DM Serif Display', serif;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 2rem 0;
+            color: var(--text-tertiary);
+            font-size: 0.9rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .divider span {
+            padding: 0 1rem;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* Blur effect for locked content */
+        .content-locked {
+            filter: blur(8px);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+            padding: 0.5rem;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text-primary);
         }
 
         .form-group input,
         .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 13px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 15px;
-            transition: all 0.3s;
-            font-family: inherit;
+            padding: 0.875rem;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: var(--bg-primary);
         }
 
         .form-group input:focus,
         .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(45, 45, 45, 0.1);
         }
 
-        .btn {
-            padding: 13px 28px;
-            border: none;
-            border-radius: 10px;
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 600;
-            margin-right: 10px;
-            margin-bottom: 10px;
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-google {
-            background: white;
-            color: #333;
-            border: 2px solid #e0e0e0;
+        .form-actions {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            width: 100%;
-            font-size: 16px;
+            gap: 1rem;
+            margin-top: 2rem;
         }
 
-        .btn-google:hover {
-            border-color: #667eea;
-            transform: translateY(-2px);
+        .form-actions .btn {
+            flex: 1;
         }
 
-        .btn-danger {
-            background: #ff4757;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #ee5a6f;
-        }
-
-        .btn-secondary {
-            background: #f0f0f0;
-            color: #333;
-        }
-
-        .btn-secondary:hover {
-            background: #e0e0e0;
-        }
-
-        .btn-success {
-            background: #2ecc71;
-            color: white;
-        }
-
-        .pet-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 18px;
-            margin-bottom: 25px;
-        }
-
-        .pet-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 20px;
-        }
-
-        .pet-photo {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-
-        .pet-info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .info-item {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 15px;
-            border-radius: 10px;
-            backdrop-filter: blur(5px);
-        }
-
-        .info-label {
-            font-size: 12px;
-            opacity: 0.9;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .info-value {
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .timeline {
-            position: relative;
-            padding-left: 35px;
-        }
-
-        .timeline-item {
-            position: relative;
-            padding: 18px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            margin-bottom: 18px;
-            border-left: 4px solid #667eea;
-        }
-
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -40px;
-            top: 22px;
-            width: 14px;
-            height: 14px;
-            background: #667eea;
-            border-radius: 50%;
-            border: 3px solid white;
-            box-shadow: 0 0 0 4px #667eea33;
-        }
-
-        .timeline-date {
-            font-size: 13px;
-            color: #667eea;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .timeline-type {
-            display: inline-block;
-            padding: 4px 10px;
-            background: #667eea;
-            color: white;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: bold;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 18px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 28px;
-            border-radius: 15px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 52px;
-            font-weight: bold;
-            margin: 12px 0;
-        }
-
-        .stat-label {
-            font-size: 13px;
-            opacity: 0.9;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
+        /* Empty State */
         .empty-state {
             text-align: center;
-            padding: 70px 20px;
-            color: #999;
+            padding: 2rem;
+            color: var(--text-secondary);
         }
 
         .empty-state-icon {
-            font-size: 72px;
-            margin-bottom: 20px;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
         }
 
-        .badge {
-            display: inline-block;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-
-        .badge-pending {
-            background: #ffeaa7;
-            color: #d63031;
-        }
-
-        .badge-done {
-            background: #55efc4;
-            color: #00b894;
-        }
-
-        .badge-info {
-            background: #74b9ff;
-            color: #0984e3;
-        }
-
-        .form-section {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 50px;
-            color: white;
-            font-size: 22px;
-        }
-
-        .setup-note {
-            background: #fff3cd;
-            border: 2px solid #ffc107;
-            padding: 25px;
-            border-radius: 12px;
-            margin: 25px 0;
-        }
-
-        .setup-note h3 {
-            color: #856404;
-            margin-bottom: 15px;
-            font-size: 1.3em;
-        }
-
-        .setup-note ol {
-            margin-left: 25px;
-            color: #856404;
-        }
-
-        .setup-note li {
-            margin: 12px 0;
-            line-height: 1.6;
-        }
-
-        .setup-note code {
-            background: #f8f9fa;
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-family: monospace;
-            font-size: 0.9em;
-        }
-
-        .photo-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .photo-item {
-            position: relative;
-            border-radius: 10px;
-            overflow: hidden;
-            aspect-ratio: 1;
-        }
-
-        .photo-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .reminder-card {
-            background: #fff;
-            border-left: 5px solid #667eea;
-            padding: 18px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2em;
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
             }
-            
-            .stat-value {
-                font-size: 40px;
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: scaleX(0);
+            }
+            to {
+                transform: scaleX(1);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes growUp {
+            from {
+                transform: scaleY(0);
+            }
+            to {
+                transform: scaleY(1);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes scrollDot {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(0);
+            }
+            40% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 968px) {
+            .video-hero {
+                height: 60vh;
+                min-height: 400px;
             }
 
-            .login-container {
-                padding: 35px 25px;
+            .video-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .video-content p {
+                font-size: 1.2rem;
+            }
+
+            .pricing-header h2 {
+                font-size: 2.5rem;
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+                max-width: 500px;
+            }
+
+            .photo-gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+
+            .inspiration-photo:nth-child(4) {
+                display: block;
+            }
+
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .video-hero {
+                height: 50vh;
+                min-height: 350px;
+            }
+
+            .video-content h1 {
+                font-size: 2rem;
+                line-height: 1.2;
+            }
+
+            .video-content p {
+                font-size: 1rem;
+                padding: 0 1rem;
+            }
+
+            .cta-button {
+                padding: 0.875rem 2rem;
+                font-size: 1rem;
+            }
+
+            .pricing-header h2 {
+                font-size: 2rem;
+            }
+
+            .pricing-header p {
+                font-size: 1rem;
+                padding: 0 1rem;
+            }
+
+            .price-value {
+                font-size: 2.5rem;
+            }
+
+            .pricing-grid {
+                gap: 1.5rem;
+            }
+
+            .pricing-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .carousel-item {
+                width: 140px;
+                height: 140px;
+            }
+
+            .pix-modal-content {
+                padding: 1.5rem;
+                max-height: 90vh;
+                width: 95%;
+                border-radius: 20px;
+            }
+
+            .pix-modal-header h3 {
+                font-size: 1.5rem;
+            }
+
+            .amount {
+                font-size: 2rem;
+            }
+
+            .qr-placeholder {
+                width: 180px;
+                height: 180px;
+            }
+
+            .qr-code-container img {
+                width: 180px;
+                height: 180px;
+            }
+
+            .pix-code-input {
+                font-size: 0.75rem;
+            }
+
+            .pix-modal-actions {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .pix-modal-actions .btn {
+                width: 100%;
+                padding: 1rem;
+                font-size: 1rem;
+            }
+
+            .photo-gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            nav {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .nav-links {
+                flex-direction: row;
+                justify-content: center;
+                width: 100%;
+            }
+
+            .hero-text h1 {
+                font-size: 2rem;
+            }
+
+            .hero-text p {
+                font-size: 1rem;
+            }
+
+            .section-title h2 {
+                font-size: 2rem;
+            }
+
+            .section-title p {
+                font-size: 1rem;
+                padding: 0 1rem;
+            }
+
+            .photo-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .dashboard-grid {
+                gap: 1.5rem;
+            }
+
+            .card {
+                padding: 1.5rem;
             }
         }
     </style>
 </head>
 <body>
-    <div id="app" class="container">
-        <div class="loading">⏳ Carregando...</div>
-    </div>
+    <header>
+        <nav>
+            <div class="logo">PetCare</div>
+            <ul class="nav-links">
+                <li><a href="#home" class="nav-link active" onclick="showSection('home')">🏠 Início</a></li>
+                <li><a href="#profile" class="nav-link" onclick="showSection('profile')">👤 Perfil</a></li>
+            </ul>
+        </nav>
+    </header>
 
-    <!-- Firebase SDKs -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where, setDoc, Timestamp, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    <main id="mainContent">
+        <!-- Home Section (All existing content) -->
+        <div class="home-section" id="homeSection">
+        <!-- Video Hero Section -->
+        <section class="video-hero">
+            <div class="video-background">
+                <div class="floating-paws">
+                    <div class="paw">🐾</div>
+                    <div class="paw">🐾</div>
+                    <div class="paw">🐾</div>
+                    <div class="paw">🐾</div>
+                    <div class="paw">🐾</div>
+                </div>
+            </div>
+            <div class="video-overlay"></div>
+            <div class="video-content">
+                <h1>Amor, Cuidado e Felicidade</h1>
+                <p>Cada momento com seu pet é precioso. Mantenha a saúde e bem-estar dele em dia com carinho e organização.</p>
+                <button class="cta-button" onclick="document.querySelector('.hero').scrollIntoView({ behavior: 'smooth' })">
+                    Começar Agora ✨
+                </button>
+            </div>
+            <div class="scroll-indicator">
+                <span></span>
+            </div>
+        </section>
 
-        // Firebase configurado e pronto para usar! 🔥
-        const firebaseConfig = {
-            apiKey: "AIzaSyDjmtbKAx8Tk8dbp5fioLPTrpBqhckSWqw",
-            authDomain: "appp-d4fac.firebaseapp.com",
-            projectId: "appp-d4fac",
-            storageBucket: "appp-d4fac.firebasestorage.app",
-            messagingSenderId: "682468199421",
-            appId: "1:682468199421:web:513cebafa9826e298b6794",
-            measurementId: "G-2P06KD3N2D"
-        };
-
-        // Verificar se o Firebase está configurado
-        const isConfigured = true; // ✅ Firebase configurado!
-
-        let app, auth, db, currentUser;
-
-        if (isConfigured) {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-        }
-
-        // Estado global seguindo o schema fornecido
-        let pets = [];
-        let selectedPet = null;
-        let medicalRecords = [];
-        let growthMeasurements = [];
-        let reminders = [];
-        let photos = [];
-        let activeTab = 'pets';
-
-        // Renderizar interface
-        function render() {
-            const appDiv = document.getElementById('app');
-            
-            if (!isConfigured) {
-                appDiv.innerHTML = `
-                    <div class="header">
-                        <h1>🐾 PetCare Pro</h1>
-                        <p>Configure o Firebase para começar</p>
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <h1>Cuide do seu melhor amigo</h1>
+                        <p>Acompanhe vacinas, consultas, alimentação e todos os momentos especiais do seu pet em um só lugar.</p>
+                        <button class="btn" id="addPetBtn">Adicionar Meu Pet 🐾</button>
                     </div>
-                    <div class="card active">
-                        <div class="setup-note">
-                            <h3>⚙️ Como Configurar o Firebase</h3>
-                            <ol>
-                                <li>Acesse <a href="https://console.firebase.google.com" target="_blank" style="color: #667eea; font-weight: bold;">console.firebase.google.com</a></li>
-                                <li>Crie um novo projeto Firebase (grátis)</li>
-                                <li>Vá em <strong>Authentication</strong> → <strong>Sign-in method</strong> → Ative <strong>Google</strong></li>
-                                <li>Vá em <strong>Firestore Database</strong> → <strong>Create database</strong> → Modo <strong>Test</strong></li>
-                                <li>Em <strong>Project Settings</strong>, role até <strong>Your apps</strong></li>
-                                <li>Clique no ícone <code>&lt;/&gt;</code> (Web) e registre um app</li>
-                                <li>Copie o objeto <code>firebaseConfig</code></li>
-                                <li>Cole no código HTML (substitua "SUA_API_KEY_AQUI")</li>
-                                <li>Salve e recarregue! 🎉</li>
-                            </ol>
-                            <p style="margin-top: 20px; padding: 15px; background: #e8f4fd; border-radius: 8px;">
-                                <strong>💡 Dica:</strong> O Firebase é grátis para até 50k leituras/dia! Perfeito para uso pessoal.
-                            </p>
+                    <div class="pet-profile-card">
+                        <div class="pet-avatar">🐕</div>
+                        <div class="pet-info">
+                            <h2 id="petName">Seu Pet</h2>
+                            <p id="petDetails">Clique em "Adicionar Pet" para começar</p>
                         </div>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Inspirational Photos Section -->
+        <section class="inspiration-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Momentos que Importam</h2>
+                    <p>A conexão entre você e seu pet é única e especial</p>
+                </div>
+                <div class="photo-gallery-grid">
+                    <div class="inspiration-photo">
+                        <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=600&q=80" alt="Mulher brincando com cachorro no parque" loading="lazy">
+                        <div class="photo-caption">
+                            <h3>Diversão ao Ar Livre</h3>
+                            <p>Momentos de alegria e brincadeira</p>
+                        </div>
+                    </div>
+                    <div class="inspiration-photo">
+                        <img src="https://images.unsplash.com/photo-1581888227599-779811939961?w=600&q=80" alt="Pessoa abraçando cachorro feliz" loading="lazy">
+                        <div class="photo-caption">
+                            <h3>Amor Verdadeiro</h3>
+                            <p>Conexão que aquece o coração</p>
+                        </div>
+                    </div>
+                    <div class="inspiration-photo">
+                        <img src="https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=600&q=80" alt="Homem e cachorro se divertindo" loading="lazy">
+                        <div class="photo-caption">
+                            <h3>Companheirismo</h3>
+                            <p>Juntos em cada aventura</p>
+                        </div>
+                    </div>
+                    <div class="inspiration-photo">
+                        <img src="https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=600&q=80" alt="Criança brincando com cachorro" loading="lazy">
+                        <div class="photo-caption">
+                            <h3>Crescendo Juntos</h3>
+                            <p>Amizade que dura para sempre</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="dashboard">
+            <div class="container">
+                <div class="dashboard-grid">
+                    <!-- Vacinas e Consultas -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <span class="card-icon">💉</span>
+                                Vacinas & Consultas
+                            </h3>
+                            <button class="btn-secondary" id="addVaccineBtn">+ Adicionar</button>
+                        </div>
+                        <ul class="item-list" id="vaccineList">
+                            <li class="empty-state">
+                                <div class="empty-state-icon">📋</div>
+                                <p>Nenhum registro ainda</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Medicamentos -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <span class="card-icon">💊</span>
+                                Medicamentos
+                            </h3>
+                            <button class="btn-secondary" id="addMedicineBtn">+ Adicionar</button>
+                        </div>
+                        <ul class="item-list" id="medicineList">
+                            <li class="empty-state">
+                                <div class="empty-state-icon">⏰</div>
+                                <p>Nenhum lembrete configurado</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Peso e Alimentação -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <span class="card-icon">⚖️</span>
+                                Peso & Alimentação
+                            </h3>
+                            <button class="btn-secondary" id="addWeightBtn">+ Registrar</button>
+                        </div>
+                        <div class="weight-chart">
+                            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Últimos 6 meses</p>
+                            <div class="chart-bars" id="weightChart">
+                                <div class="bar" style="height: 60%;">
+                                    <span class="bar-label">Set</span>
+                                </div>
+                                <div class="bar" style="height: 65%;">
+                                    <span class="bar-label">Out</span>
+                                </div>
+                                <div class="bar" style="height: 70%;">
+                                    <span class="bar-label">Nov</span>
+                                </div>
+                                <div class="bar" style="height: 75%;">
+                                    <span class="bar-label">Dez</span>
+                                </div>
+                                <div class="bar" style="height: 80%;">
+                                    <span class="bar-label">Jan</span>
+                                </div>
+                                <div class="bar" style="height: 85%;">
+                                    <span class="bar-label">Fev</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Galeria de Fotos -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <span class="card-icon">📸</span>
+                                Galeria
+                            </h3>
+                        </div>
+                        <div class="photo-grid">
+                            <div class="photo-placeholder">🖼️</div>
+                            <div class="photo-placeholder">🖼️</div>
+                            <div class="photo-placeholder photo-upload" id="uploadPhotoBtn">+</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section class="pricing-section">
+            <div class="container pricing-content">
+                <div class="pricing-header">
+                    <h2>Escolha Seu Plano</h2>
+                    <p>Cuide do seu pet com todo amor que ele merece</p>
+                </div>
+                <div class="pricing-grid">
+                    <!-- Plano Mensal -->
+                    <div class="pricing-card">
+                        <h3 class="plan-name">Plano Mensal</h3>
+                        <div class="plan-price">
+                            <div class="price-value">
+                                <span class="price-currency">R$</span>34,90
+                            </div>
+                            <span class="price-period">por mês</span>
+                        </div>
+                        <ul class="plan-features">
+                            <li>Registro ilimitado de vacinas</li>
+                            <li>Controle de medicamentos</li>
+                            <li>Acompanhamento de peso</li>
+                            <li>Galeria de fotos</li>
+                            <li>Lembretes automáticos</li>
+                        </ul>
+                        <button class="plan-cta" onclick="openPixPayment('mensal', '34,90')">Assinar Mensal</button>
+                        <div class="pix-note">
+                            <strong>💳 Pagamento via PIX</strong>
+                            Renove todo mês com PIX de R$ 34,90 para continuar usando todas as funcionalidades.
+                        </div>
+                    </div>
+
+                    <!-- Plano Único -->
+                    <div class="pricing-card">
+                        <div class="popular-badge">50% OFF</div>
+                        <h3 class="plan-name">Plano Anual</h3>
+                        <div class="plan-price">
+                            <div class="price-value">
+                                <span class="price-currency">R$</span>209,40
+                            </div>
+                            <span class="price-period">por ano</span>
+                        </div>
+                        <ul class="plan-features">
+                            <li>Acesso completo por 1 ano</li>
+                            <li>Registro ilimitado de vacinas</li>
+                            <li>Controle de medicamentos</li>
+                            <li>Acompanhamento de peso</li>
+                            <li>Galeria de fotos</li>
+                            <li>Lembretes automáticos</li>
+                            <li>Suporte prioritário</li>
+                            <li>🎉 Economia de 50%</li>
+                        </ul>
+                        <button class="plan-cta" onclick="openPixPayment('anual', '209,40')">Garantir 50% OFF</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Animated Pet Carousel -->
+            <div class="pet-carousel">
+                <div class="carousel-track">
+                    <div class="carousel-item">
+                        <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=300&q=80" alt="Cachorro feliz">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?w=300&q=80" alt="Gato fofo">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://images.unsplash.com/photo-1560807707-8cc77767d783?w=300&q=80" alt="Golden Retriever">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://images.unsplash.com/photo-1574158622682-e40e69881006?w=300&q=80" alt="Cachorro sorrindo">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=300&q=80" alt="Cachorro brincando">
+                    </div>
+                    <!-- Duplicate for seamless loop -->
+                    <div class="carousel-item">
+                        <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=300&q=80" alt="Cachorro feliz">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?w=300&q=80" alt="Gato fofo">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://images.unsplash.com/photo-1560807707-8cc77767d783?w=300&q=80" alt="Golden Retriever">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://images.unsplash.com/photo-1574158622682-e40e69881006?w=300&q=80" alt="Cachorro sorrindo">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=300&q=80" alt="Cachorro brincando">
+                    </div>
+                </div>
+            </div>
+        </section>
+        </div>
+        <!-- End Home Section -->
+
+        <!-- Profile Section -->
+        <div class="profile-section" id="profileSection">
+            <div class="profile-container">
+                <div class="profile-header">
+                    <div class="profile-avatar" id="profileAvatar">👤</div>
+                    <div class="profile-name" id="profileName">Visitante</div>
+                    <div class="profile-email" id="profileEmail">Faça login para salvar seus dados</div>
+                </div>
+
+                <!-- Guest Mode - Login Prompt -->
+                <div class="profile-card" id="guestPrompt">
+                    <h3>🔐 Entre ou Cadastre-se</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.6;">
+                        Crie sua conta para salvar os dados do seu pet, receber lembretes e aproveitar todos os recursos do PetCare!
+                    </p>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <button class="btn" onclick="openAuthModal('login')" style="flex: 1; min-width: 200px;">
+                            🔑 Fazer Login
+                        </button>
+                        <button class="btn" onclick="openAuthModal('register')" style="flex: 1; min-width: 200px; background: linear-gradient(135deg, var(--purple) 0%, var(--pink) 100%);">
+                            ✨ Criar Conta Grátis
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Logged In Content - Hidden by default -->
+                <div id="loggedInContent" style="display: none;">
+                    <div class="profile-card">
+                        <h3>📋 Informações Pessoais</h3>
+                        <div class="profile-info">
+                            <div class="info-item">
+                                <span class="info-label">Nome Completo</span>
+                                <span class="info-value" id="infoName">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Email</span>
+                                <span class="info-value" id="infoEmail">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Telefone</span>
+                                <span class="info-value" id="infoPhone">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">CPF</span>
+                                <span class="info-value" id="infoCpf">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-card">
+                        <h3>💳 Assinatura</h3>
+                        <div class="profile-info">
+                            <div class="info-item">
+                                <span class="info-label">Plano Atual</span>
+                                <span class="info-value" id="infoPlan">Gratuito</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Status</span>
+                                <span class="info-value" id="infoStatus">
+                                    <span style="color: #10b981;">✓ Ativo</span>
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Código de Acesso</span>
+                                <span class="info-value" id="infoCode">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-card">
+                        <h3>🐾 Meus Pets</h3>
+                        <div class="profile-info" id="userPets">
+                            <div class="info-item">
+                                <span class="info-value" style="color: var(--text-secondary);">Nenhum pet cadastrado ainda</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="logout-btn" onclick="logout()">
+                        🚪 Sair da Conta
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- End Profile Section -->
+    </main>
+
+    <!-- Payment Wall Modal (Shows when trying to use premium features) -->
+    <div class="payment-wall hidden" id="paymentWall">
+        <div class="payment-wall-content">
+            <div class="lock-icon">🔒</div>
+            <h2>Desbloqueie o PetCare</h2>
+            <p>Para adicionar seu pet e usar todas as funcionalidades, escolha um plano</p>
+
+            <div class="payment-options">
+                <button class="payment-option-btn" onclick="selectPlan('mensal')">
+                    <div class="payment-option-icon">📅</div>
+                    <div class="payment-option-info">
+                        <h4>Plano Mensal</h4>
+                        <p>Renovação mensal via PIX</p>
+                    </div>
+                    <div class="payment-option-price">R$<br>34,90</div>
+                </button>
+
+                <button class="payment-option-btn" onclick="selectPlan('anual')">
+                    <div class="payment-option-icon">⭐</div>
+                    <div class="payment-option-info">
+                        <h4>Plano Anual</h4>
+                        <p>50% OFF • Melhor custo</p>
+                    </div>
+                    <div class="payment-option-price">R$<br>209,40</div>
+                </button>
+            </div>
+
+            <div class="divider">
+                <span>Já pagou?</span>
+            </div>
+
+            <div class="unlock-section">
+                <h3>Digite seu código de acesso</h3>
+                <input 
+                    type="text" 
+                    class="unlock-input" 
+                    id="unlockCode" 
+                    placeholder="CÓDIGO"
+                    maxlength="12"
+                >
+                <button class="unlock-button" onclick="unlockApp()">
+                    🔓 Desbloquear Acesso
+                </button>
+                <div class="error-message" id="errorMessage">
+                    ❌ Código inválido. Tente novamente.
+                </div>
+            </div>
+
+            <button class="btn btn-close-pix" onclick="closePaymentWall()" style="margin-top: 1.5rem; width: 100%;">
+                Voltar
+            </button>
+
+            <p style="font-size: 0.85rem; color: var(--text-tertiary); margin-top: 1.5rem;">
+                Após o pagamento, você receberá o código de acesso por email
+            </p>
+        </div>
+    </div>
+
+    <!-- PIX Payment Modal -->
+    <div class="pix-payment-modal" id="pixPaymentModal">
+        <div class="pix-modal-content">
+            <div class="pix-modal-header">
+                <h3>Pagamento via PIX</h3>
+                <button class="close-btn" onclick="closePixPayment()">&times;</button>
+            </div>
+
+            <div class="pix-plan-info">
+                <div class="plan-selected" id="selectedPlanName">Plano Mensal</div>
+                <div class="amount" id="pixAmount">R$ 34,90</div>
+            </div>
+
+            <div class="qr-code-container">
+                <div class="qr-placeholder">
+                    <div class="qr-placeholder-icon">📱</div>
+                    <div class="qr-placeholder-text">Escaneie o QR Code<br>com o app do seu banco</div>
+                </div>
+                <!-- Substitua a div acima por uma imagem real do QR Code quando disponível -->
+                <!-- <img src="seu-qr-code.png" alt="QR Code PIX"> -->
+            </div>
+
+            <div class="pix-copy-section">
+                <div class="pix-copy-label">Ou use o PIX Copia e Cola:</div>
+                <div class="pix-copy-container">
+                    <input 
+                        type="text" 
+                        class="pix-code-input" 
+                        id="pixCode" 
+                        value="00020126580014br.gov.bcb.pix0136sua-chave-pix-aqui@example.com520400005303986540514.905802BR5925SEU NOME OU EMPRESA6009SAO PAULO62070503***63041234"
+                        readonly
+                    >
+                    <button class="copy-button" onclick="copyPixCode()">
+                        <span id="copyButtonText">Copiar</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="pix-instructions">
+                <h4>📋 Como pagar:</h4>
+                <ol>
+                    <li>Abra o app do seu banco</li>
+                    <li>Escolha a opção PIX</li>
+                    <li>Escaneie o QR Code ou cole o código</li>
+                    <li>Confirme o pagamento de <strong id="instructionAmount">R$ 34,90</strong></li>
+                    <li>Pronto! Seu acesso será liberado automaticamente</li>
+                </ol>
+            </div>
+
+            <div class="pix-warning" id="pixWarning" style="display: none;">
+                <strong>⚠️ Lembre-se:</strong>
+                Este é o plano mensal. Para continuar usando após 30 dias, você precisará fazer um novo pagamento de R$ 34,90 via PIX.
+            </div>
+
+            <div class="pix-modal-actions">
+                <button class="btn btn-close-pix" onclick="closePixPayment()">← Voltar aos Planos</button>
+                <button class="btn" onclick="confirmPayment()">✓ Confirmar Pagamento</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal - Adicionar Vacina/Consulta -->
+    <div class="modal" id="vaccineModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Adicionar Vacina/Consulta</h3>
+                <button class="close-btn" onclick="closeModal('vaccineModal')">&times;</button>
+            </div>
+            <form id="vaccineForm">
+                <div class="form-group">
+                    <label>Tipo</label>
+                    <select id="vaccineType" required>
+                        <option value="">Selecione...</option>
+                        <option value="vaccine">Vacina</option>
+                        <option value="checkup">Consulta</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Nome</label>
+                    <input type="text" id="vaccineName" placeholder="Ex: V10, Consulta de rotina" required>
+                </div>
+                <div class="form-group">
+                    <label>Data</label>
+                    <input type="date" id="vaccineDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Observações</label>
+                    <textarea id="vaccineNotes" placeholder="Informações adicionais..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('vaccineModal')">Cancelar</button>
+                    <button type="submit" class="btn">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal - Adicionar Medicamento -->
+    <div class="modal" id="medicineModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Adicionar Medicamento</h3>
+                <button class="close-btn" onclick="closeModal('medicineModal')">&times;</button>
+            </div>
+            <form id="medicineForm">
+                <div class="form-group">
+                    <label>Nome do Medicamento</label>
+                    <input type="text" id="medicineName" placeholder="Ex: Vermífugo" required>
+                </div>
+                <div class="form-group">
+                    <label>Dosagem</label>
+                    <input type="text" id="medicineDosage" placeholder="Ex: 1 comprimido" required>
+                </div>
+                <div class="form-group">
+                    <label>Frequência</label>
+                    <select id="medicineFrequency" required>
+                        <option value="">Selecione...</option>
+                        <option value="daily">Diário</option>
+                        <option value="weekly">Semanal</option>
+                        <option value="monthly">Mensal</option>
+                        <option value="custom">Personalizado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Próxima Dose</label>
+                    <input type="datetime-local" id="medicineNextDose" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('medicineModal')">Cancelar</button>
+                    <button type="submit" class="btn">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal - Adicionar Peso -->
+    <div class="modal" id="weightModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Registrar Peso</h3>
+                <button class="close-btn" onclick="closeModal('weightModal')">&times;</button>
+            </div>
+            <form id="weightForm">
+                <div class="form-group">
+                    <label>Peso (kg)</label>
+                    <input type="number" id="weightValue" step="0.1" placeholder="Ex: 12.5" required>
+                </div>
+                <div class="form-group">
+                    <label>Data</label>
+                    <input type="date" id="weightDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Alimentação Diária</label>
+                    <input type="text" id="foodAmount" placeholder="Ex: 200g de ração, 2x ao dia">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('weightModal')">Cancelar</button>
+                    <button type="submit" class="btn">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal - Adicionar Pet -->
+    <div class="modal" id="petModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Adicionar Pet</h3>
+                <button class="close-btn" onclick="closeModal('petModal')">&times;</button>
+            </div>
+            <form id="petForm">
+                <div class="form-group">
+                    <label class="photo-label">Escolha uma foto que represente seu pet</label>
+                    <div class="pet-photo-selector">
+                        <div class="pet-photo-option" data-photo="dog1">
+                            <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=300&q=80" alt="Cachorro feliz" loading="lazy">
+                        </div>
+                        <div class="pet-photo-option" data-photo="dog2">
+                            <img src="https://images.unsplash.com/photo-1560807707-8cc77767d783?w=300&q=80" alt="Golden Retriever" loading="lazy">
+                        </div>
+                        <div class="pet-photo-option" data-photo="dog3">
+                            <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?w=300&q=80" alt="Cachorro sorrindo" loading="lazy">
+                        </div>
+                        <div class="pet-photo-option" data-photo="cat1">
+                            <img src="https://images.unsplash.com/photo-1574158622682-e40e69881006?w=300&q=80" alt="Gato fofo" loading="lazy">
+                        </div>
+                        <div class="pet-photo-option" data-photo="cat2">
+                            <img src="https://images.unsplash.com/photo-1615789591457-74a63395c990?w=300&q=80" alt="Gato branco" loading="lazy">
+                        </div>
+                        <div class="pet-photo-option" data-photo="cat3">
+                            <img src="https://images.unsplash.com/photo-1606214174585-fe31582dc6ee?w=300&q=80" alt="Gato laranja" loading="lazy">
+                        </div>
+                    </div>
+                    <input type="hidden" id="petPhoto" name="petPhoto">
+                </div>
+                <div class="form-group">
+                    <label>Nome</label>
+                    <input type="text" id="petNameInput" placeholder="Ex: Rex" required>
+                </div>
+                <div class="form-group">
+                    <label>Espécie</label>
+                    <select id="petSpecies" required>
+                        <option value="">Selecione...</option>
+                        <option value="dog">Cachorro 🐕</option>
+                        <option value="cat">Gato 🐱</option>
+                        <option value="bird">Pássaro 🐦</option>
+                        <option value="other">Outro 🐾</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Raça</label>
+                    <input type="text" id="petBreed" placeholder="Ex: Labrador">
+                </div>
+                <div class="form-group">
+                    <label>Data de Nascimento</label>
+                    <input type="date" id="petBirthdate" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('petModal')">Cancelar</button>
+                    <button type="submit" class="btn">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Login/Register Modal -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-container">
+            <button class="close-btn" onclick="closeAuthModal()" style="position: absolute; top: 1.5rem; right: 1.5rem;">&times;</button>
+            
+            <div class="auth-header">
+                <h2>Bem-vindo ao PetCare! 🐾</h2>
+                <p>Faça login ou crie sua conta</p>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="showAuthTab('login')">Entrar</button>
+                <button class="auth-tab" onclick="showAuthTab('register')">Cadastrar</button>
+            </div>
+
+            <!-- Login Form -->
+            <form class="auth-form active" id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" required placeholder="seu@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="loginPassword" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="auth-submit">Entrar</button>
+            </form>
+
+            <!-- Register Form -->
+            <form class="auth-form" id="registerForm" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" id="registerName" required placeholder="Seu nome completo">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="registerEmail" required placeholder="seu@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Telefone</label>
+                    <input type="tel" id="registerPhone" required placeholder="(00) 00000-0000">
+                </div>
+                <div class="form-group">
+                    <label>CPF</label>
+                    <input type="text" id="registerCpf" required placeholder="000.000.000-00">
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="registerPassword" required placeholder="••••••••" minlength="6">
+                </div>
+                <button type="submit" class="auth-submit">Criar Conta</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Data storage
+        let petData = {
+            name: '',
+            species: '',
+            breed: '',
+            birthdate: '',
+            photo: '',
+            vaccines: [],
+            medicines: [],
+            weights: []
+        };
+
+        // Photo selection
+        document.querySelectorAll('.pet-photo-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.pet-photo-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                this.classList.add('selected');
+                document.getElementById('petPhoto').value = this.dataset.photo;
+            });
+        });
+
+        // Load data from localStorage
+        function loadData() {
+            const saved = localStorage.getItem('petData');
+            if (saved) {
+                petData = JSON.parse(saved);
+                updatePetProfile();
+                renderVaccines();
+                renderMedicines();
+                renderWeights();
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('petData', JSON.stringify(petData));
+        }
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Update pet profile
+        function updatePetProfile() {
+            if (petData.name) {
+                const speciesEmoji = {
+                    'dog': '🐕',
+                    'cat': '🐱',
+                    'bird': '🐦',
+                    'other': '🐾'
+                };
+                
+                const photoUrls = {
+                    'dog1': 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=300&q=80',
+                    'dog2': 'https://images.unsplash.com/photo-1560807707-8cc77767d783?w=300&q=80',
+                    'dog3': 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=300&q=80',
+                    'cat1': 'https://images.unsplash.com/photo-1574158622682-e40e69881006?w=300&q=80',
+                    'cat2': 'https://images.unsplash.com/photo-1615789591457-74a63395c990?w=300&q=80',
+                    'cat3': 'https://images.unsplash.com/photo-1606214174585-fe31582dc6ee?w=300&q=80'
+                };
+                
+                document.getElementById('petName').textContent = petData.name;
+                
+                const avatarEl = document.querySelector('.pet-avatar');
+                if (petData.photo && photoUrls[petData.photo]) {
+                    avatarEl.style.backgroundImage = `url(${photoUrls[petData.photo]})`;
+                    avatarEl.style.backgroundSize = 'cover';
+                    avatarEl.style.backgroundPosition = 'center';
+                    avatarEl.textContent = '';
+                } else {
+                    avatarEl.style.backgroundImage = 'none';
+                    avatarEl.textContent = speciesEmoji[petData.species] || '🐾';
+                }
+                
+                const birthDate = new Date(petData.birthdate);
+                const age = Math.floor((new Date() - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
+                document.getElementById('petDetails').textContent = `${petData.breed || petData.species} • ${age} ${age === 1 ? 'ano' : 'anos'}`;
+            }
+        }
+
+        // Render vaccines
+        function renderVaccines() {
+            const list = document.getElementById('vaccineList');
+            
+            if (petData.vaccines.length === 0) {
+                list.innerHTML = `
+                    <li class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <p>Nenhum registro ainda</p>
+                    </li>
                 `;
                 return;
             }
+
+            list.innerHTML = petData.vaccines.map((v, index) => {
+                const date = new Date(v.date);
+                const today = new Date();
+                const isPast = date < today;
+                const status = isPast ? 'status-done' : 'status-upcoming';
+                const statusText = isPast ? 'Realizado' : 'Agendado';
+
+                return `
+                    <li class="item">
+                        <div class="item-info">
+                            <h4>${v.name}</h4>
+                            <p>${date.toLocaleDateString('pt-BR')} • ${v.type === 'vaccine' ? 'Vacina' : 'Consulta'}</p>
+                        </div>
+                        <span class="item-status ${status}">${statusText}</span>
+                    </li>
+                `;
+            }).join('');
+        }
+
+        // Render medicines
+        function renderMedicines() {
+            const list = document.getElementById('medicineList');
             
-            if (!currentUser) {
-                renderLogin();
-            } else {
-                renderApp();
+            if (petData.medicines.length === 0) {
+                list.innerHTML = `
+                    <li class="empty-state">
+                        <div class="empty-state-icon">⏰</div>
+                        <p>Nenhum lembrete configurado</p>
+                    </li>
+                `;
+                return;
             }
-        }
 
-        function renderLogin() {
-            const appDiv = document.getElementById('app');
-            appDiv.innerHTML = `
-                <div class="header">
-                    <h1>🐾 PetCare Pro</h1>
-                    <p>Sistema completo de saúde e bem-estar para seu pet</p>
-                </div>
-                <div class="login-container">
-                    <div style="font-size: 64px; margin-bottom: 20px;">🐕🐈</div>
-                    <h2>Bem-vindo!</h2>
-                    <p>Gerencie a saúde completa do seu pet com registros médicos, crescimento, lembretes e muito mais!</p>
-                    <button class="btn btn-google" onclick="handleGoogleLogin()">
-                        <svg width="20" height="20" viewBox="0 0 48 48">
-                            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                        </svg>
-                        Entrar com Google
-                    </button>
-                </div>
-            `;
-        }
+            list.innerHTML = petData.medicines.map(m => {
+                const nextDose = new Date(m.nextDose);
+                const today = new Date();
+                const isOverdue = nextDose < today;
+                const status = isOverdue ? 'status-overdue' : 'status-upcoming';
+                const statusText = isOverdue ? 'Atrasado' : 'Próximo';
 
-        function renderApp() {
-            const appDiv = document.getElementById('app');
-            appDiv.innerHTML = `
-                <div class="header">
-                    <h1>🐾 PetCare Pro</h1>
-                    <p>Sistema completo de saúde e bem-estar</p>
-                </div>
-
-                <div class="user-info">
-                    <div class="user-profile">
-                        <img src="${currentUser.photoURL}" alt="${currentUser.displayName}" class="user-photo">
-                        <div>
-                            <strong style="display: block;">${currentUser.displayName}</strong>
-                            <small style="opacity: 0.8;">${currentUser.email}</small>
+                return `
+                    <li class="item">
+                        <div class="item-info">
+                            <h4>${m.name}</h4>
+                            <p>${m.dosage} • ${nextDose.toLocaleDateString('pt-BR')}</p>
                         </div>
-                    </div>
-                    <button class="btn btn-danger" onclick="handleLogout()" style="padding: 10px 20px; font-size: 14px;">
-                        🚪 Sair
-                    </button>
-                </div>
-
-                ${pets.length > 0 ? `
-                    <div class="pet-selector">
-                        ${pets.map(pet => `
-                            <div class="pet-card-mini ${selectedPet?.id === pet.id ? 'selected' : ''}" 
-                                 onclick="selectPet('${pet.id}')">
-                                <strong style="font-size: 18px;">${pet.species === 'dog' ? '🐕' : '🐈'} ${pet.name}</strong>
-                                <div style="font-size: 12px; margin-top: 5px; opacity: 0.9;">${pet.breed}</div>
-                            </div>
-                        `).join('')}
-                        <div class="pet-card-mini" onclick="switchTab('pets')" 
-                             style="background: rgba(255,255,255,0.3); border: 2px dashed white;">
-                            <strong style="font-size: 18px;">➕ Adicionar Pet</strong>
-                        </div>
-                    </div>
-                ` : ''}
-
-                <div class="tabs">
-                    <button class="tab ${activeTab === 'pets' ? 'active' : ''}" onclick="switchTab('pets')">🐾 Meus Pets</button>
-                    <button class="tab ${activeTab === 'medical' ? 'active' : ''}" onclick="switchTab('medical')" ${!selectedPet ? 'disabled' : ''}>💉 Registros Médicos</button>
-                    <button class="tab ${activeTab === 'growth' ? 'active' : ''}" onclick="switchTab('growth')" ${!selectedPet ? 'disabled' : ''}>📊 Crescimento</button>
-                    <button class="tab ${activeTab === 'reminders' ? 'active' : ''}" onclick="switchTab('reminders')" ${!selectedPet ? 'disabled' : ''}>⏰ Lembretes</button>
-                    <button class="tab ${activeTab === 'photos' ? 'active' : ''}" onclick="switchTab('photos')" ${!selectedPet ? 'disabled' : ''}>📸 Fotos</button>
-                    <button class="tab ${activeTab === 'dashboard' ? 'active' : ''}" onclick="switchTab('dashboard')" ${!selectedPet ? 'disabled' : ''}>📈 Dashboard</button>
-                </div>
-
-                <div id="pets" class="card ${activeTab === 'pets' ? 'active' : ''}"></div>
-                <div id="medical" class="card ${activeTab === 'medical' ? 'active' : ''}"></div>
-                <div id="growth" class="card ${activeTab === 'growth' ? 'active' : ''}"></div>
-                <div id="reminders" class="card ${activeTab === 'reminders' ? 'active' : ''}"></div>
-                <div id="photos" class="card ${activeTab === 'photos' ? 'active' : ''}"></div>
-                <div id="dashboard" class="card ${activeTab === 'dashboard' ? 'active' : ''}"></div>
-            `;
-
-            renderTabContent();
+                        <span class="item-status ${status}">${statusText}</span>
+                    </li>
+                `;
+            }).join('');
         }
 
-        function renderTabContent() {
-            if (activeTab === 'pets') renderPetsTab();
-            else if (activeTab === 'medical') renderMedicalTab();
-            else if (activeTab === 'growth') renderGrowthTab();
-            else if (activeTab === 'reminders') renderRemindersTab();
-            else if (activeTab === 'photos') renderPhotosTab();
-            else if (activeTab === 'dashboard') renderDashboardTab();
+        // Render weights
+        function renderWeights() {
+            // This would update the chart with actual data
+            // For now, keeping the demo chart
         }
 
-        // ================== PETS TAB ==================
-        function renderPetsTab() {
-            const container = document.getElementById('pets');
+        // Event Listeners
+        document.getElementById('addPetBtn').addEventListener('click', () => {
+            openModal('petModal');
+        });
+
+        document.getElementById('addVaccineBtn').addEventListener('click', () => {
+            openModal('vaccineModal');
+        });
+
+        document.getElementById('addMedicineBtn').addEventListener('click', () => {
+            openModal('medicineModal');
+        });
+
+        document.getElementById('addWeightBtn').addEventListener('click', () => {
+            openModal('weightModal');
+        });
+
+        // Form submissions
+        document.getElementById('petForm').addEventListener('submit', (e) => {
+            e.preventDefault();
             
-            const petsList = pets.length === 0 ? `
-                <div class="empty-state">
-                    <div class="empty-state-icon">🐾</div>
-                    <h3>Nenhum pet cadastrado</h3>
-                    <p>Adicione seu primeiro pet para começar!</p>
-                </div>
-            ` : `
-                <div class="grid-2">
-                    ${pets.map(pet => {
-                        const age = calculateAge(pet.dateOfBirth);
-                        return `
-                            <div class="pet-card">
-                                <div class="pet-header">
-                                    <div>
-                                        <h3 style="font-size: 28px; margin-bottom: 8px;">
-                                            ${pet.species === 'dog' ? '🐕' : '🐈'} ${pet.name}
-                                        </h3>
-                                        <div style="opacity: 0.9;">${pet.breed}</div>
-                                    </div>
-                                    ${pet.photoUrl ? `<img src="${pet.photoUrl}" class="pet-photo">` : ''}
-                                </div>
-                                <div class="pet-info-grid">
-                                    <div class="info-item">
-                                        <div class="info-label">Idade</div>
-                                        <div class="info-value">${age}</div>
-                                    </div>
-                                    ${pet.gender ? `
-                                        <div class="info-item">
-                                            <div class="info-label">Sexo</div>
-                                            <div class="info-value">${pet.gender === 'male' ? 'Macho ♂️' : 'Fêmea ♀️'}</div>
-                                        </div>
-                                    ` : ''}
-                                    ${pet.color ? `
-                                        <div class="info-item">
-                                            <div class="info-label">Cor</div>
-                                            <div class="info-value">${pet.color}</div>
-                                        </div>
-                                    ` : ''}
-                                </div>
-                                ${pet.notes ? `<p style="margin-top: 15px; opacity: 0.9; font-size: 14px;">📝 ${pet.notes}</p>` : ''}
-                                <div style="margin-top: 15px;">
-                                    <button class="btn btn-primary" onclick="selectPet('${pet.id}'); switchTab('dashboard')">
-                                        Ver Detalhes
-                                    </button>
-                                    <button class="btn btn-danger" onclick="deletePet('${pet.id}')">
-                                        🗑️ Excluir
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            `;
-
-            container.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap;">
-                    <h2>🐾 Meus Pets</h2>
-                    <button class="btn btn-primary" onclick="togglePetForm()">➕ Adicionar Pet</button>
-                </div>
-
-                <div id="petForm" class="form-section hidden">
-                    <h3 style="margin-bottom: 20px;">Cadastrar Novo Pet</h3>
-                    <form id="petFormElement">
-                        <div class="grid-2">
-                            <div class="form-group">
-                                <label>Nome do Pet *</label>
-                                <input type="text" id="petName" placeholder="Ex: Rex, Luna..." required>
-                            </div>
-                            <div class="form-group">
-                                <label>Espécie *</label>
-                                <select id="petSpecies" required>
-                                    <option value="">Selecione...</option>
-                                    <option value="dog">🐕 Cachorro</option>
-                                    <option value="cat">🐈 Gato</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="grid-2">
-                            <div class="form-group">
-                                <label>Raça *</label>
-                                <input type="text" id="petBreed" placeholder="Ex: Labrador, SRD..." required>
-                            </div>
-                            <div class="form-group">
-                                <label>Data de Nascimento *</label>
-                                <input type="date" id="petDob" required>
-                            </div>
-                        </div>
-
-                        <div class="grid-2">
-                            <div class="form-group">
-                                <label>Sexo</label>
-                                <select id="petGender">
-                                    <option value="">Selecione...</option>
-                                    <option value="male">Macho</option>
-                                    <option value="female">Fêmea</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Cor</label>
-                                <input type="text" id="petColor" placeholder="Ex: Marrom, Preto...">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Observações</label>
-                            <textarea id="petNotes" placeholder="Informações adicionais sobre o pet..." rows="3"></textarea>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">💾 Salvar Pet</button>
-                        <button type="button" class="btn btn-secondary" onclick="togglePetForm()">❌ Cancelar</button>
-                    </form>
-                </div>
-
-                ${petsList}
-            `;
-
-            document.getElementById('petFormElement').onsubmit = savePet;
-        }
-
-        window.togglePetForm = function() {
-            document.getElementById('petForm').classList.toggle('hidden');
-        };
-
-        async function savePet(e) {
-            e.preventDefault();
-            const data = {
-                owner: currentUser.uid,
-                name: document.getElementById('petName').value,
-                species: document.getElementById('petSpecies').value,
-                breed: document.getElementById('petBreed').value,
-                dateOfBirth: document.getElementById('petDob').value,
-                gender: document.getElementById('petGender').value || null,
-                color: document.getElementById('petColor').value || null,
-                notes: document.getElementById('petNotes').value || null,
-                createdAt: Timestamp.now()
-            };
-
-            try {
-                const docRef = await addDoc(collection(db, 'pets'), data);
-                alert('✅ Pet cadastrado com sucesso!');
-                await loadData();
-                togglePetForm();
-                e.target.reset();
-                renderPetsTab();
-            } catch (error) {
-                console.error('Erro:', error);
-                alert('❌ Erro ao cadastrar pet');
-            }
-        }
-
-        window.deletePet = async function(petId) {
-            if (confirm('⚠️ Tem certeza? Isso excluirá TODOS os dados deste pet!')) {
-                try {
-                    await deleteDoc(doc(db, 'pets', petId));
-                    // Também excluir registros relacionados
-                    alert('✅ Pet excluído!');
-                    await loadData();
-                    if (selectedPet?.id === petId) {
-                        selectedPet = null;
-                    }
-                    renderApp();
-                } catch (error) {
-                    alert('❌ Erro ao excluir');
-                }
-            }
-        };
-
-        function calculateAge(dateOfBirth) {
-            const dob = new Date(dateOfBirth);
-            const today = new Date();
-            const months = (today.getFullYear() - dob.getFullYear()) * 12 + today.getMonth() - dob.getMonth();
+            petData.name = document.getElementById('petNameInput').value;
+            petData.species = document.getElementById('petSpecies').value;
+            petData.breed = document.getElementById('petBreed').value;
+            petData.birthdate = document.getElementById('petBirthdate').value;
+            petData.photo = document.getElementById('petPhoto').value;
             
-            if (months < 12) {
-                return `${months} ${months === 1 ? 'mês' : 'meses'}`;
-            } else {
-                const years = Math.floor(months / 12);
-                const remainingMonths = months % 12;
-                if (remainingMonths === 0) {
-                    return `${years} ${years === 1 ? 'ano' : 'anos'}`;
-                }
-                return `${years}a ${remainingMonths}m`;
-            }
-        }
-
-        // ================== MEDICAL RECORDS TAB ==================
-        function renderMedicalTab() {
-            const container = document.getElementById('medical');
-            if (!selectedPet) {
-                container.innerHTML = '<div class="empty-state"><h3>Selecione um pet primeiro</h3></div>';
-                return;
-            }
-
-            const petRecords = medicalRecords.filter(r => r.pet === selectedPet.id)
-                .sort((a, b) => new Date(b.recordDate) - new Date(a.recordDate));
-
-            const recordsList = petRecords.length === 0 ? `
-                <div class="empty-state">
-                    <div class="empty-state-icon">💉</div>
-                    <h3>Nenhum registro médico</h3>
-                    <p>Adicione vacinas, vermífugos, consultas e mais!</p>
-                </div>
-            ` : `
-                <div class="timeline">
-                    ${petRecords.map(record => {
-                        const typeLabels = {
-                            vaccine: 'Vacina 💉',
-                            deworming: 'Vermífugo 💊',
-                            checkup: 'Consulta 🏥',
-                            surgery: 'Cirurgia 🔪',
-                            medication: 'Medicação 💊',
-                            other: 'Outro 📋'
-                        };
-                        return `
-                            <div class="timeline-item">
-                                <div class="timeline-type">${typeLabels[record.recordType] || record.recordType}</div>
-                                <div class="timeline-date">
-                                    ${new Date(record.recordDate).toLocaleDateString('pt-BR')}
-                                    ${record.nextDueDate ? `<span class="badge badge-pending">Próxima: ${new Date(record.nextDueDate).toLocaleDateString('pt-BR')}</span>` : ''}
-                                </div>
-                                <h4 style="font-size: 18px; margin-bottom: 10px;">${record.description}</h4>
-                                ${record.dosage ? `<p style="color: #666; margin-bottom: 5px;">💊 Dosagem: ${record.dosage}</p>` : ''}
-                                ${record.veterinarian ? `<p style="color: #666; margin-bottom: 5px;">👨‍⚕️ Veterinário: ${record.veterinarian}</p>` : ''}
-                                ${record.clinicName ? `<p style="color: #666; margin-bottom: 10px;">🏥 Clínica: ${record.clinicName}</p>` : ''}
-                                <button class="btn btn-danger" style="font-size: 12px; padding: 6px 12px;" onclick="deleteMedicalRecord('${record.id}')">
-                                    🗑️ Excluir
-                                </button>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            `;
-
-            container.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap;">
-                    <h2>💉 Registros Médicos - ${selectedPet.name}</h2>
-                    <button class="btn btn-primary" onclick="toggleMedicalForm()">➕ Novo Registro</button>
-                </div>
-
-                <div id="medicalForm" class="form-section hidden">
-                    <h3 style="margin-bottom: 20px;">Adicionar Registro Médico</h3>
-                    <form id="medicalFormElement">
-                        <div class="grid-2">
-                            <div class="form-group">
-                                <label>Tipo de Registro *</label>
-                                <select id="recordType" required>
-                                    <option value="">Selecione...</option>
-                                    <option value="vaccine">💉 Vacina</option>
-                                    <option value="deworming">💊 Vermífugo</option>
-                                    <option value="checkup">🏥 Consulta/Check-up</option>
-                                    <option value="surgery">🔪 Cirurgia</option>
-                                    <option value="medication">💊 Medicação</option>
-                                    <option value="other">📋 Outro</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Data do Registro *</label>
-                                <input type="date" id="recordDate" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Descrição *</label>
-                            <input type="text" id="recordDescription" placeholder="Ex: V10, Antirrábica, Consulta de rotina..." required>
-                        </div>
-
-                        <div class="grid-2">
-                            <div class="form-group">
-                                <label>Dosagem</label>
-                                <input type="text" id="recordDosage" placeholder="Ex: 1ml, 2 comprimidos...">
-                            </div>
-                            <div class="form-group">
-                                <label>Próxima Dose/Consulta</label>
-                                <input type="date" id="recordNextDue">
-                            </div>
-                        </div>
-
-                        <div class="grid-2">
-                            <div class="form-group">
-                                <label>Veterinário</label>
-                                <input type="text" id="recordVet" placeholder="Dr(a). ...">
-                            </div>
-                            <div class="form-group">
-                                <label>Clínica</label>
-                                <input type="text" id="recordClinic" placeholder="Nome da clínica...">
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">💾 Salvar Registro</button>
-                        <button type="button" class="btn btn-secondary" onclick="toggleMedicalForm()">❌ Cancelar</button>
-                    </form>
-                </div>
-
-                ${recordsList}
-            `;
-
-            document.getElementById('medicalFormElement').onsubmit = saveMedicalRecord;
-        }
-
-        window.toggleMedicalForm = function() {
-            document.getElementById('medicalForm').classList.toggle('hidden');
-        };
-
-        async function saveMedicalRecord(e) {
-            e.preventDefault();
-            const data = {
-                pet: selectedPet.id,
-                recordType: document.getElementById('recordType').value,
-                recordDate: document.getElementById('recordDate').value,
-                description: document.getElementById('recordDescription').value,
-                dosage: document.getElementById('recordDosage').value || null,
-                nextDueDate: document.getElementById('recordNextDue').value || null,
-                veterinarian: document.getElementById('recordVet').value || null,
-                clinicName: document.getElementById('recordClinic').value || null,
-                createdAt: Timestamp.now()
-            };
-
-            try {
-                await addDoc(collection(db, 'medicalRecords'), data);
-                alert('✅ Registro salvo!');
-                await loadData();
-                toggleMedicalForm();
-                e.target.reset();
-                renderMedicalTab();
-            } catch (error) {
-                console.error('Erro:', error);
-                alert('❌ Erro ao salvar');
-            }
-        }
-
-        window.deleteMedicalRecord = async function(recordId) {
-            if (confirm('Tem certeza?')) {
-                try {
-                    await deleteDoc(doc(db, 'medicalRecords', recordId));
-                    await loadData();
-                    renderMedicalTab();
-                } catch (error) {
-                    alert('❌ Erro ao excluir');
-                }
-            }
-        };
-
-        // ================== GROWTH TAB ==================
-        function renderGrowthTab() {
-            const container = document.getElementById('growth');
-            if (!selectedPet) {
-                container.innerHTML = '<div class="empty-state"><h3>Selecione um pet primeiro</h3></div>';
-                return;
-            }
-
-            const petMeasurements = growthMeasurements.filter(m => m.pet === selectedPet.id)
-                .sort((a, b) => new Date(b.measurementDate) - new Date(a.measurementDate));
-
-            const measurementsList = petMeasurements.length === 0 ? `
-                <div class="empty-state">
-                    <div class="empty-state-icon">📊</div>
-                    <h3>Nenhuma medição registrada</h3>
-                    <p>Acompanhe o crescimento do seu pet!</p>
-                </div>
-            ` : `
-                <div class="timeline">
-                    ${petMeasurements.map((m, index) => {
-                        const prev = petMeasurements[index + 1];
-                        let weightDiff = '';
-                        if (prev) {
-                            const diff = (m.weight - prev.weight).toFixed(1);
-                            if (diff != 0) {
-                                const badgeClass = diff > 0 ? 'badge-info' : 'badge-done';
-                                const arrow = diff > 0 ? '↑' : '↓';
-                                weightDiff = `<span class="badge ${badgeClass}">${arrow} ${Math.abs(diff)} kg</span>`;
-                            }
-                        }
-                        return `
-                            <div class="timeline-item">
-                                <div class="timeline-date">
-                                    ${new Date(m.measurementDate).toLocaleDateString('pt-BR')}
-                                    ${weightDiff}
-                                </div>
-                                <h4 style="font-size: 28px; margin-bottom: 10px;">⚖️ ${m.weight} kg</h4>
-                                ${m.height ? `<p style="color: #666; margin-bottom: 10px;">📏 Altura: ${m.height} cm</p>` : ''}
-                                ${m.notes ? `<p style="color: #666; margin-bottom: 10px;">📝 ${m.notes}</p>` : ''}
-                                <button class="btn btn-danger" style="font-size: 12px; padding: 6px 12px;" onclick="deleteGrowthMeasurement('${m.id}')">
-                                    🗑️ Excluir
-                                </button>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            `;
-
-            container.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap;">
-                    <h2>📊 Crescimento - ${selectedPet.name}</h2>
-                    <button class="btn btn-primary" onclick="toggleGrowthForm()">➕ Nova Medição</button>
-                </div>
-
-                <div id="growthForm" class="form-section hidden">
-                    <h3 style="margin-bottom: 20px;">Registrar Medição</h3>
-                    <form id="growthFormElement">
-                        <div class="grid-2">
-                            <div class="form-group">
-                                <label>Data da Medição *</label>
-                                <input type="date" id="measurementDate" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Peso (kg) *</label>
-                                <input type="number" id="measurementWeight" step="0.1" placeholder="Ex: 25.5" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Altura (cm)</label>
-                            <input type="number" id="measurementHeight" step="0.1" placeholder="Ex: 60.5">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Observações</label>
-                            <textarea id="measurementNotes" placeholder="Mudanças na dieta, exercícios..." rows="3"></textarea>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">💾 Salvar Medição</button>
-                        <button type="button" class="btn btn-secondary" onclick="toggleGrowthForm()">❌ Cancelar</button>
-                    </form>
-                </div>
-
-                ${measurementsList}
-            `;
-
-            document.getElementById('growthFormElement').onsubmit = saveGrowthMeasurement;
-        }
-
-        window.toggleGrowthForm = function() {
-            document.getElementById('growthForm').classList.toggle('hidden');
-        };
-
-        async function saveGrowthMeasurement(e) {
-            e.preventDefault();
-            const data = {
-                pet: selectedPet.id,
-                measurementDate: document.getElementById('measurementDate').value,
-                weight: parseFloat(document.getElementById('measurementWeight').value),
-                height: document.getElementById('measurementHeight').value ? parseFloat(document.getElementById('measurementHeight').value) : null,
-                notes: document.getElementById('measurementNotes').value || null,
-                createdAt: Timestamp.now()
-            };
-
-            try {
-                await addDoc(collection(db, 'growthMeasurements'), data);
-                alert('✅ Medição registrada!');
-                await loadData();
-                toggleGrowthForm();
-                e.target.reset();
-                renderGrowthTab();
-            } catch (error) {
-                console.error('Erro:', error);
-                alert('❌ Erro ao salvar');
-            }
-        }
-
-        window.deleteGrowthMeasurement = async function(id) {
-            if (confirm('Tem certeza?')) {
-                try {
-                    await deleteDoc(doc(db, 'growthMeasurements', id));
-                    await loadData();
-                    renderGrowthTab();
-                } catch (error) {
-                    alert('❌ Erro ao excluir');
-                }
-            }
-        };
-
-        // ================== REMINDERS TAB ==================
-        function renderRemindersTab() {
-            const container = document.getElementById('reminders');
-            if (!selectedPet) {
-                container.innerHTML = '<div class="empty-state"><h3>Selecione um pet primeiro</h3></div>';
-                return;
-            }
-
-            const petReminders = reminders.filter(r => r.pet === selectedPet.id)
-                .sort((a, b) => new Date(a.reminderDate) - new Date(b.reminderDate));
-
-            const remindersList = petReminders.length === 0 ? `
-                <div class="empty-state">
-                    <div class="empty-state-icon">⏰</div>
-                    <h3>Nenhum lembrete</h3>
-                    <p>Crie lembretes para não esquecer nada!</p>
-                </div>
-            ` : `
-                ${petReminders.map(reminder => {
-                    const date = new Date(reminder.reminderDate);
-                    const isUpcoming = date > new Date();
-                    return `
-                        <div class="reminder-card" style="border-left-color: ${isUpcoming ? '#667eea' : '#95a5a6'};">
-                            <div style="display: flex; justify-content: space-between; align-items: start;">
-                                <div>
-                                    <h4 style="font-size: 18px; margin-bottom: 8px;">${reminder.title}</h4>
-                                    <p style="color: #667eea; font-weight: bold; margin-bottom: 5px;">
-                                        📅 ${date.toLocaleDateString('pt-BR')} às ${date.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}
-                                    </p>
-                                    ${reminder.description ? `<p style="color: #666; margin-bottom: 10px;">${reminder.description}</p>` : ''}
-                                    ${reminder.isRecurring ? '<span class="badge badge-info">🔄 Recorrente</span>' : ''}
-                                </div>
-                                <button class="btn btn-danger" style="font-size: 12px; padding: 6px 12px;" onclick="deleteReminder('${reminder.id}')">
-                                    🗑️
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                }).join('')}
-            `;
-
-            container.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap;">
-                    <h2>⏰ Lembretes - ${selectedPet.name}</h2>
-                    <button class="btn btn-primary" onclick="toggleReminderForm()">➕ Novo Lembrete</button>
-                </div>
-
-                <div id="reminderForm" class="form-section hidden">
-                    <h3 style="margin-bottom: 20px;">Criar Lembrete</h3>
-                    <form id="reminderFormElement">
-                        <div class="form-group">
-                            <label>Título *</label>
-                            <input type="text" id="reminderTitle" placeholder="Ex: Aplicar vermífugo" required>
-                        </div>
-
-                        <div class="grid-2">
-                            <div class="form-group">
-                                <label>Data *</label>
-                                <input type="date" id="reminderDate" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Hora *</label>
-                                <input type="time" id="reminderTime" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Descrição</label>
-                            <textarea id="reminderDescription" placeholder="Detalhes do lembrete..." rows="3"></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                                <input type="checkbox" id="reminderRecurring">
-                                <span>🔄 Lembrete recorrente</span>
-                            </label>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">💾 Criar Lembrete</button>
-                        <button type="button" class="btn btn-secondary" onclick="toggleReminderForm()">❌ Cancelar</button>
-                    </form>
-                </div>
-
-                ${remindersList}
-            `;
-
-            document.getElementById('reminderFormElement').onsubmit = saveReminder;
-        }
-
-        window.toggleReminderForm = function() {
-            document.getElementById('reminderForm').classList.toggle('hidden');
-        };
-
-        async function saveReminder(e) {
-            e.preventDefault();
-            const date = document.getElementById('reminderDate').value;
-            const time = document.getElementById('reminderTime').value;
-            const reminderDate = new Date(`${date}T${time}`);
-
-            const data = {
-                user: currentUser.uid,
-                pet: selectedPet.id,
-                title: document.getElementById('reminderTitle').value,
-                reminderDate: Timestamp.fromDate(reminderDate),
-                description: document.getElementById('reminderDescription').value || null,
-                isRecurring: document.getElementById('reminderRecurring').checked,
-                createdAt: Timestamp.now()
-            };
-
-            try {
-                await addDoc(collection(db, 'reminders'), data);
-                alert('✅ Lembrete criado!');
-                await loadData();
-                toggleReminderForm();
-                e.target.reset();
-                renderRemindersTab();
-            } catch (error) {
-                console.error('Erro:', error);
-                alert('❌ Erro ao criar lembrete');
-            }
-        }
-
-        window.deleteReminder = async function(id) {
-            if (confirm('Tem certeza?')) {
-                try {
-                    await deleteDoc(doc(db, 'reminders', id));
-                    await loadData();
-                    renderRemindersTab();
-                } catch (error) {
-                    alert('❌ Erro ao excluir');
-                }
-            }
-        };
-
-        // ================== PHOTOS TAB ==================
-        function renderPhotosTab() {
-            const container = document.getElementById('photos');
-            if (!selectedPet) {
-                container.innerHTML = '<div class="empty-state"><h3>Selecione um pet primeiro</h3></div>';
-                return;
-            }
-
-            container.innerHTML = `
-                <h2>📸 Galeria de Fotos - ${selectedPet.name}</h2>
-                <p style="color: #666; margin: 20px 0;">Funcionalidade de upload de fotos em desenvolvimento...</p>
-                <p style="color: #666;">💡 Em breve você poderá adicionar fotos do seu pet!</p>
-            `;
-        }
-
-        // ================== DASHBOARD TAB ==================
-        function renderDashboardTab() {
-            const container = document.getElementById('dashboard');
-            if (!selectedPet) {
-                container.innerHTML = '<div class="empty-state"><h3>Selecione um pet primeiro</h3></div>';
-                return;
-            }
-
-            const petRecords = medicalRecords.filter(r => r.pet === selectedPet.id);
-            const petMeasurements = growthMeasurements.filter(m => m.pet === selectedPet.id);
-            const petReminders = reminders.filter(r => r.pet === selectedPet.id);
-            const upcomingReminders = petReminders.filter(r => new Date(r.reminderDate.toDate()) > new Date());
-
-            const latestWeight = petMeasurements.length > 0 ? 
-                petMeasurements.sort((a, b) => new Date(b.measurementDate) - new Date(a.measurementDate))[0].weight : 
-                'N/A';
-
-            container.innerHTML = `
-                <h2>📈 Dashboard - ${selectedPet.name}</h2>
-                
-                <div class="pet-card" style="margin: 25px 0;">
-                    <div class="pet-header">
-                        <div>
-                            <h3 style="font-size: 32px; margin-bottom: 10px;">
-                                ${selectedPet.species === 'dog' ? '🐕' : '🐈'} ${selectedPet.name}
-                            </h3>
-                            <div style="font-size: 18px; opacity: 0.9;">${selectedPet.breed}</div>
-                        </div>
-                        ${selectedPet.photoUrl ? `<img src="${selectedPet.photoUrl}" class="pet-photo" style="width: 100px; height: 100px;">` : ''}
-                    </div>
-                    <div class="pet-info-grid">
-                        <div class="info-item">
-                            <div class="info-label">Idade</div>
-                            <div class="info-value">${calculateAge(selectedPet.dateOfBirth)}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Peso Atual</div>
-                            <div class="info-value">${latestWeight !== 'N/A' ? latestWeight + ' kg' : 'N/A'}</div>
-                        </div>
-                        ${selectedPet.gender ? `
-                            <div class="info-item">
-                                <div class="info-label">Sexo</div>
-                                <div class="info-value">${selectedPet.gender === 'male' ? 'Macho ♂️' : 'Fêmea ♀️'}</div>
-                            </div>
-                        ` : ''}
-                        ${selectedPet.color ? `
-                            <div class="info-item">
-                                <div class="info-label">Cor</div>
-                                <div class="info-value">${selectedPet.color}</div>
-                            </div>
-                        ` : ''}
-                    </div>
-                </div>
-
-                <h3 style="margin-bottom: 20px;">📊 Estatísticas</h3>
-                <div class="grid-3" style="margin-bottom: 30px;">
-                    <div class="stat-card">
-                        <div class="stat-label">Registros Médicos</div>
-                        <div class="stat-value">${petRecords.length}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Medições</div>
-                        <div class="stat-value">${petMeasurements.length}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Lembretes</div>
-                        <div class="stat-value">${petReminders.length}</div>
-                    </div>
-                </div>
-
-                ${upcomingReminders.length > 0 ? `
-                    <h3 style="margin-bottom: 15px;">⏰ Próximos Lembretes</h3>
-                    ${upcomingReminders.slice(0, 3).map(reminder => {
-                        const date = reminder.reminderDate.toDate();
-                        return `
-                            <div class="reminder-card">
-                                <h4 style="font-size: 16px; margin-bottom: 5px;">${reminder.title}</h4>
-                                <p style="color: #667eea; font-weight: bold;">
-                                    📅 ${date.toLocaleDateString('pt-BR')} às ${date.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}
-                                </p>
-                            </div>
-                        `;
-                    }).join('')}
-                ` : ''}
-            `;
-        }
-
-        // ================== LOAD DATA FROM FIRESTORE ==================
-        async function loadData() {
-            if (!currentUser) return;
-
-            try {
-                // Carregar pets
-                const petsSnap = await getDocs(query(collection(db, 'pets'), where('owner', '==', currentUser.uid)));
-                pets = petsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-                if (pets.length > 0 && !selectedPet) {
-                    selectedPet = pets[0];
-                }
-
-                // Carregar registros médicos
-                const recordsSnap = await getDocs(collection(db, 'medicalRecords'));
-                medicalRecords = recordsSnap.docs
-                    .map(doc => ({ id: doc.id, ...doc.data() }))
-                    .filter(r => pets.some(p => p.id === r.pet));
-
-                // Carregar medições
-                const measurementsSnap = await getDocs(collection(db, 'growthMeasurements'));
-                growthMeasurements = measurementsSnap.docs
-                    .map(doc => ({ id: doc.id, ...doc.data() }))
-                    .filter(m => pets.some(p => p.id === m.pet));
-
-                // Carregar lembretes
-                const remindersSnap = await getDocs(query(collection(db, 'reminders'), where('user', '==', currentUser.uid)));
-                reminders = remindersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-            } catch (error) {
-                console.error('Erro ao carregar dados:', error);
-            }
-        }
-
-        // ================== AUTH & NAVIGATION ==================
-        window.handleGoogleLogin = async function() {
-            const provider = new GoogleAuthProvider();
-            try {
-                const result = await signInWithPopup(auth, provider);
-                // Criar registro do usuário
-                await setDoc(doc(db, 'users', result.user.uid), {
-                    displayName: result.user.displayName,
-                    email: result.user.email,
-                    photoUrl: result.user.photoURL,
-                    createdAt: Timestamp.now()
-                }, { merge: true });
-            } catch (error) {
-                console.error('Erro no login:', error);
-                alert('❌ Erro ao fazer login');
-            }
-        };
-
-        window.handleLogout = async function() {
-            if (confirm('Tem certeza que deseja sair?')) {
-                try {
-                    await signOut(auth);
-                    pets = [];
-                    selectedPet = null;
-                    medicalRecords = [];
-                    growthMeasurements = [];
-                    reminders = [];
-                    photos = [];
-                } catch (error) {
-                    console.error('Erro ao sair:', error);
-                }
-            }
-        };
-
-        window.switchTab = function(tab) {
-            activeTab = tab;
-            renderApp();
-        };
-
-        window.selectPet = function(petId) {
-            selectedPet = pets.find(p => p.id === petId);
-            renderApp();
-        };
-
-        // Observar mudanças de autenticação
-        if (isConfigured) {
-            onAuthStateChanged(auth, async (user) => {
-                currentUser = user;
-                if (user) {
-                    await loadData();
-                }
-                render();
+            saveData();
+            updatePetProfile();
+            closeModal('petModal');
+            e.target.reset();
+            // Reset photo selection
+            document.querySelectorAll('.pet-photo-option').forEach(opt => {
+                opt.classList.remove('selected');
             });
-        } else {
-            render();
+        });
+
+        document.getElementById('vaccineForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            petData.vaccines.push({
+                type: document.getElementById('vaccineType').value,
+                name: document.getElementById('vaccineName').value,
+                date: document.getElementById('vaccineDate').value,
+                notes: document.getElementById('vaccineNotes').value
+            });
+            
+            saveData();
+            renderVaccines();
+            closeModal('vaccineModal');
+            e.target.reset();
+        });
+
+        document.getElementById('medicineForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            petData.medicines.push({
+                name: document.getElementById('medicineName').value,
+                dosage: document.getElementById('medicineDosage').value,
+                frequency: document.getElementById('medicineFrequency').value,
+                nextDose: document.getElementById('medicineNextDose').value
+            });
+            
+            saveData();
+            renderMedicines();
+            closeModal('medicineModal');
+            e.target.reset();
+        });
+
+        document.getElementById('weightForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            petData.weights.push({
+                value: parseFloat(document.getElementById('weightValue').value),
+                date: document.getElementById('weightDate').value,
+                food: document.getElementById('foodAmount').value
+            });
+            
+            saveData();
+            renderWeights();
+            closeModal('weightModal');
+            e.target.reset();
+        });
+
+        // Close modal on outside click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal(modal.id);
+                }
+            });
+        });
+
+        // Initialize
+        loadData();
+        checkUserSession();
+
+        // Check if user is logged in (but don't force login)
+        function checkUserSession() {
+            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+            
+            if (user) {
+                // User is logged in - load their profile
+                loadUserProfile();
+            } else {
+                // User not logged in - show guest mode in profile
+                showGuestMode();
+            }
         }
+
+        function showGuestMode() {
+            // Update profile to show login prompt
+            const profileSection = document.getElementById('profileSection');
+            if (profileSection) {
+                document.getElementById('profileName').textContent = 'Visitante';
+                document.getElementById('profileEmail').textContent = 'Faça login para salvar seus dados';
+                document.getElementById('profileAvatar').textContent = '👤';
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Get stored users
+            const users = JSON.parse(localStorage.getItem('petcare_users') || '[]');
+            
+            // Find user
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                // Login successful
+                localStorage.setItem('petcare_user', JSON.stringify(user));
+                closeAuthModal();
+                loadUserProfile();
+                alert('✅ Login realizado com sucesso!');
+            } else {
+                alert('❌ Email ou senha incorretos!');
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const phone = document.getElementById('registerPhone').value;
+            const cpf = document.getElementById('registerCpf').value;
+            const password = document.getElementById('registerPassword').value;
+            
+            // Get existing users
+            const users = JSON.parse(localStorage.getItem('petcare_users') || '[]');
+            
+            // Check if email already exists
+            if (users.find(u => u.email === email)) {
+                alert('❌ Este email já está cadastrado!');
+                return;
+            }
+            
+            // Create new user
+            const newUser = {
+                id: Date.now().toString(),
+                name,
+                email,
+                phone,
+                cpf,
+                password,
+                createdAt: new Date().toISOString(),
+                plan: 'Gratuito',
+                code: null
+            };
+            
+            // Save user
+            users.push(newUser);
+            localStorage.setItem('petcare_users', JSON.stringify(users));
+            localStorage.setItem('petcare_user', JSON.stringify(newUser));
+            
+            // Close modal and load profile
+            closeAuthModal();
+            loadUserProfile();
+            alert('✅ Conta criada com sucesso! Bem-vindo ao PetCare! 🐾');
+        }
+
+        function loadUserProfile() {
+            const user = JSON.parse(localStorage.getItem('petcare_user'));
+            if (!user) {
+                // Show guest prompt
+                document.getElementById('guestPrompt').style.display = 'block';
+                document.getElementById('loggedInContent').style.display = 'none';
+                document.getElementById('profileName').textContent = 'Visitante';
+                document.getElementById('profileEmail').textContent = 'Faça login para salvar seus dados';
+                document.getElementById('profileAvatar').textContent = '👤';
+                return;
+            }
+            
+            // Hide guest prompt, show logged in content
+            document.getElementById('guestPrompt').style.display = 'none';
+            document.getElementById('loggedInContent').style.display = 'block';
+            
+            // Update profile section
+            document.getElementById('profileName').textContent = user.name;
+            document.getElementById('profileEmail').textContent = user.email;
+            document.getElementById('profileAvatar').textContent = user.name.charAt(0).toUpperCase();
+            
+            document.getElementById('infoName').textContent = user.name;
+            document.getElementById('infoEmail').textContent = user.email;
+            document.getElementById('infoPhone').textContent = user.phone;
+            document.getElementById('infoCpf').textContent = user.cpf;
+            
+            // Check if has premium access
+            const isPaid = localStorage.getItem('petcare_paid') === 'true';
+            const code = localStorage.getItem('petcare_code');
+            
+            if (isPaid && code) {
+                document.getElementById('infoPlan').innerHTML = '<span style="color: #10b981;">Premium</span>';
+                document.getElementById('infoCode').textContent = code;
+            } else {
+                document.getElementById('infoPlan').textContent = 'Gratuito';
+                document.getElementById('infoCode').innerHTML = '<a href="#pricing" onclick="showSection(\'home\'); setTimeout(() => document.querySelector(\'.pricing-section\').scrollIntoView({behavior: \'smooth\'}), 100)" style="color: var(--accent); cursor: pointer;">Assinar agora</a>';
+            }
+            
+            // Load user pets
+            if (petData.name) {
+                document.getElementById('userPets').innerHTML = `
+                    <div class="info-item">
+                        <span class="info-label">🐾 ${petData.name}</span>
+                        <span class="info-value">${petData.species} • ${petData.breed || 'Sem raça definida'}</span>
+                    </div>
+                `;
+            }
+        }
+
+        function logout() {
+            if (confirm('Tem certeza que deseja sair da sua conta?')) {
+                localStorage.removeItem('petcare_user');
+                location.reload();
+            }
+        }
+
+        // Navigation
+        function showSection(section) {
+            // Update nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.closest('.nav-link')?.classList.add('active');
+            
+            // Show/hide sections
+            if (section === 'home') {
+                document.getElementById('homeSection').classList.remove('hidden');
+                document.getElementById('profileSection').classList.remove('active');
+            } else if (section === 'profile') {
+                document.getElementById('homeSection').classList.add('hidden');
+                document.getElementById('profileSection').classList.add('active');
+                loadUserProfile();
+            }
+        }
+
+        // Auth Modal
+        function openAuthModal(tab = 'login') {
+            document.getElementById('authModal').classList.add('active');
+            
+            // Set active tab
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            
+            if (tab === 'login') {
+                document.querySelector('.auth-tab:first-child').classList.add('active');
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                document.querySelector('.auth-tab:last-child').classList.add('active');
+                document.getElementById('registerForm').classList.add('active');
+            }
+        }
+
+        function showAuthTab(tab) {
+            // Update tabs
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show forms
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            if (tab === 'login') {
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                document.getElementById('registerForm').classList.add('active');
+            }
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('active');
+        }
+
+        // Check if user has premium access
+        function hasPremiumAccess() {
+            return localStorage.getItem('petcare_paid') === 'true';
+        }
+
+        // Show payment wall
+        function showPaymentWall() {
+            // Check if user is logged in
+            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+            
+            if (!user) {
+                // Not logged in - show auth modal first
+                alert('⚠️ Você precisa criar uma conta para usar os recursos premium!\n\nCrie sua conta gratuitamente agora! 🐾');
+                openAuthModal('register');
+                return;
+            }
+            
+            // User is logged in - show payment wall
+            document.getElementById('paymentWall').classList.remove('hidden');
+        }
+
+        // Close payment wall
+        function closePaymentWall() {
+            document.getElementById('paymentWall').classList.add('hidden');
+        }
+
+        // Override addPetBtn to check payment first
+        document.getElementById('addPetBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (hasPremiumAccess()) {
+                openModal('petModal');
+            } else {
+                showPaymentWall();
+            }
+        });
+
+        // Override other premium buttons
+        document.getElementById('addVaccineBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (hasPremiumAccess()) {
+                openModal('vaccineModal');
+            } else {
+                showPaymentWall();
+            }
+        });
+
+        document.getElementById('addMedicineBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (hasPremiumAccess()) {
+                openModal('medicineModal');
+            } else {
+                showPaymentWall();
+            }
+        });
+
+        document.getElementById('addWeightBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (hasPremiumAccess()) {
+                openModal('weightModal');
+            } else {
+                showPaymentWall();
+            }
+        });
+
+        // Photo Gallery System
+        let photoGallery = JSON.parse(localStorage.getItem('petcare_photos') || '[]');
+
+        document.getElementById('uploadPhotoBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (hasPremiumAccess()) {
+                // Create hidden file input
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.multiple = true;
+                
+                input.onchange = (event) => {
+                    const files = event.target.files;
+                    if (files.length === 0) return;
+                    
+                    // Process each file
+                    Array.from(files).forEach(file => {
+                        // Check file size (max 5MB)
+                        if (file.size > 5 * 1024 * 1024) {
+                            alert(`❌ A foto ${file.name} é muito grande! Máximo 5MB.`);
+                            return;
+                        }
+                        
+                        // Read file as base64
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const photo = {
+                                id: Date.now() + Math.random(),
+                                data: e.target.result,
+                                name: file.name,
+                                date: new Date().toISOString()
+                            };
+                            
+                            // Add to gallery
+                            photoGallery.push(photo);
+                            localStorage.setItem('petcare_photos', JSON.stringify(photoGallery));
+                            
+                            // Update display
+                            displayPhotos();
+                            
+                            // Show success message
+                            showToast('✅ Foto adicionada com sucesso!');
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                };
+                
+                input.click();
+            } else {
+                showPaymentWall();
+            }
+        });
+
+        function displayPhotos() {
+            const container = document.querySelector('.photo-gallery-grid');
+            
+            // Clear existing photos (except upload button)
+            const existingPhotos = container.querySelectorAll('.photo-item');
+            existingPhotos.forEach(photo => photo.remove());
+            
+            // Add photos from gallery
+            photoGallery.forEach(photo => {
+                const photoEl = document.createElement('div');
+                photoEl.className = 'photo-placeholder photo-item';
+                photoEl.style.backgroundImage = `url(${photo.data})`;
+                photoEl.style.backgroundSize = 'cover';
+                photoEl.style.backgroundPosition = 'center';
+                photoEl.style.cursor = 'pointer';
+                
+                // Click to view full size
+                photoEl.onclick = () => viewPhoto(photo);
+                
+                // Insert before upload button
+                const uploadBtn = document.getElementById('uploadPhotoBtn');
+                container.insertBefore(photoEl, uploadBtn);
+            });
+            
+            // Update counter
+            updatePhotoCounter();
+        }
+
+        function updatePhotoCounter() {
+            const counter = document.querySelector('.card-header .badge');
+            if (counter) {
+                counter.textContent = photoGallery.length;
+            }
+        }
+
+        function viewPhoto(photo) {
+            // Create modal to view photo
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.style.zIndex = '5000';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 800px; padding: 0; background: transparent;">
+                    <div style="position: relative;">
+                        <img src="${photo.data}" style="width: 100%; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
+                        <button onclick="this.closest('.modal').remove()" style="position: absolute; top: 1rem; right: 1rem; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.7); color: white; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+                        <button onclick="deletePhoto('${photo.id}')" style="position: absolute; bottom: 1rem; right: 1rem; padding: 0.75rem 1.5rem; background: #ef4444; color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer;">🗑️ Excluir</button>
+                    </div>
+                </div>
+            `;
+            
+            modal.onclick = (e) => {
+                if (e.target === modal) modal.remove();
+            };
+            
+            document.body.appendChild(modal);
+        }
+
+        function deletePhoto(photoId) {
+            if (confirm('Tem certeza que deseja excluir esta foto?')) {
+                photoGallery = photoGallery.filter(p => p.id != photoId);
+                localStorage.setItem('petcare_photos', JSON.stringify(photoGallery));
+                displayPhotos();
+                
+                // Close modal
+                const modal = document.querySelector('.modal');
+                if (modal) modal.remove();
+                
+                showToast('🗑️ Foto excluída!');
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 2rem;
+                right: 2rem;
+                background: linear-gradient(135deg, var(--accent) 0%, var(--pink) 100%);
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 12px;
+                font-weight: 600;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                z-index: 6000;
+                animation: slideInRight 0.3s ease-out;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOutRight 0.3s ease-out';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Load photos on init
+        displayPhotos();
+
+        function selectPlan(planType) {
+            // Close payment wall
+            closePaymentWall();
+            
+            // Open PIX payment modal
+            const amount = planType === 'mensal' ? '34,90' : '209,40';
+            openPixPayment(planType, amount);
+        }
+
+        function unlockApp() {
+            const codeInput = document.getElementById('unlockCode');
+            const errorMessage = document.getElementById('errorMessage');
+            const code = codeInput.value.toUpperCase().trim();
+
+            // Lista de códigos válidos (você gerencia estes códigos)
+            const validCodes = [
+                'TESTE-2024',      // Código de teste
+                'PETCARE-DEMO',    // Código demo
+                'MENSAL-ABC123',   // Exemplo de código mensal
+                'UNICO-XYZ789',    // Exemplo de código único
+            ];
+
+            if (validCodes.includes(code)) {
+                // Código válido - desbloqueia app
+                localStorage.setItem('petcare_paid', 'true');
+                localStorage.setItem('petcare_code', code);
+                
+                // Close payment wall
+                closePaymentWall();
+
+                // Success message
+                alert('✅ Acesso Premium liberado com sucesso!\n\nBem-vindo ao PetCare! 🐾\n\nAgora você pode adicionar seu pet e usar todas as funcionalidades.');
+                
+                // Clear input
+                codeInput.value = '';
+                errorMessage.classList.remove('show');
+            } else {
+                // Código inválido
+                errorMessage.classList.add('show');
+                codeInput.value = '';
+                codeInput.focus();
+                
+                setTimeout(() => {
+                    errorMessage.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // Allow unlock on Enter key
+        document.getElementById('unlockCode')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                unlockApp();
+            }
+        });
+
+        // Close payment wall on outside click
+        document.getElementById('paymentWall')?.addEventListener('click', (e) => {
+            if (e.target.id === 'paymentWall') {
+                closePaymentWall();
+            }
+        });
+
+        // PIX Payment Functions
+        function openPixPayment(planType, amount) {
+            const modal = document.getElementById('pixPaymentModal');
+            const planName = planType === 'mensal' ? 'Plano Mensal' : 'Plano Anual';
+            const warning = document.getElementById('pixWarning');
+            
+            document.getElementById('selectedPlanName').textContent = planName;
+            document.getElementById('pixAmount').textContent = 'R$ ' + amount;
+            document.getElementById('instructionAmount').textContent = 'R$ ' + amount;
+            
+            // Show warning only for monthly plan
+            if (planType === 'mensal') {
+                warning.style.display = 'block';
+            } else {
+                warning.style.display = 'none';
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closePixPayment() {
+            document.getElementById('pixPaymentModal').classList.remove('active');
+            // Reset copy button
+            const copyBtn = document.getElementById('copyButtonText');
+            copyBtn.textContent = 'Copiar';
+            copyBtn.parentElement.classList.remove('copied');
+            
+            // Optional: scroll back to pricing section
+            // document.querySelector('.pricing-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copyPixCode() {
+            const pixCode = document.getElementById('pixCode');
+            const copyBtn = document.getElementById('copyButtonText');
+            const copyButton = copyBtn.parentElement;
+            
+            // Copy to clipboard
+            pixCode.select();
+            pixCode.setSelectionRange(0, 99999); // For mobile
+            navigator.clipboard.writeText(pixCode.value);
+            
+            // Visual feedback
+            copyBtn.textContent = '✓ Copiado!';
+            copyButton.classList.add('copied');
+            
+            // Reset after 3 seconds
+            setTimeout(() => {
+                copyBtn.textContent = 'Copiar';
+                copyButton.classList.remove('copied');
+            }, 3000);
+        }
+
+        function confirmPayment() {
+            // Aqui você pode adicionar lógica para verificar o pagamento
+            // Por exemplo, enviar para um servidor ou API
+            
+            const confirmed = confirm('Você confirmou que realizou o pagamento via PIX?\n\n✅ Após a confirmação, você receberá seu código de acesso.');
+            
+            if (confirmed) {
+                // Simula geração de código (em produção, isso viria do servidor)
+                const accessCode = generateAccessCode();
+                
+                // Mostra o código para o usuário
+                alert(`✅ Pagamento Confirmado!\n\n🔑 Seu código de acesso:\n${accessCode}\n\n📧 Este código também foi enviado para seu email.\n\nUse-o para desbloquear o app!`);
+                
+                // Salva no localStorage (em produção, seria validado no servidor)
+                localStorage.setItem('petcare_paid', 'true');
+                localStorage.setItem('petcare_code', accessCode);
+                
+                closePixPayment();
+                
+                // Recarrega para aplicar desbloqueio
+                window.location.reload();
+            }
+            // Se não confirmou, permanece no modal para revisar
+        }
+
+        // Gera código de acesso aleatório
+        function generateAccessCode() {
+            const prefix = 'PETCARE';
+            const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+            return `${prefix}-${random}`;
+        }
+
+        // Close PIX modal on outside click
+        document.getElementById('pixPaymentModal').addEventListener('click', (e) => {
+            if (e.target.id === 'pixPaymentModal') {
+                closePixPayment();
+            }
+        });
+
+        // Close PIX modal on ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const pixModal = document.getElementById('pixPaymentModal');
+                if (pixModal.classList.contains('active')) {
+                    closePixPayment();
+                }
+            }
+        });
     </script>
 </body>
 </html>
