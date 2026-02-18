@@ -2096,6 +2096,41 @@
         }
 
         /* Responsive */
+        
+        /* Desktop - Pricing section optimization */
+        @media (min-width: 1024px) {
+            .pricing-section {
+                padding: 5rem 0;
+            }
+            
+            .pricing-card {
+                max-width: 750px !important;
+                margin: 0 auto !important;
+                padding: 3.5rem !important;
+            }
+            
+            .pricing-card .plan-price .price-value {
+                font-size: 5.5rem !important;
+            }
+            
+            .pricing-card .plan-features {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+                text-align: left;
+                margin: 2rem 0;
+            }
+            
+            .pricing-card .plan-features li {
+                font-size: 1.15rem;
+            }
+            
+            .pricing-card .plan-cta {
+                font-size: 1.5rem !important;
+                padding: 1.5rem !important;
+            }
+        }
+        
         @media (max-width: 1400px) {
             .dashboard-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -2477,54 +2512,43 @@
         <section class="pricing-section">
             <div class="container pricing-content">
                 <div class="pricing-header">
-                    <h2>Escolha Seu Plano</h2>
-                    <p>Cuide do seu pet com todo amor que ele merece</p>
+                    <h2>Desbloqueie Todos os Recursos</h2>
+                    <p>Acesso completo e vitalício por apenas</p>
                 </div>
                 <div class="pricing-grid">
-                    <!-- Plano Mensal -->
-                    <div class="pricing-card">
-                        <h3 class="plan-name">Plano Mensal</h3>
+                    <!-- Single Pricing Card -->
+                    <div class="pricing-card" style="max-width: 500px; margin: 0 auto; border: 3px solid #10b981;">
+                        <div class="popular-badge" style="background: #ef4444;">🔥 OFERTA ESPECIAL</div>
+                        <h3 class="plan-name">Acesso Vitalício</h3>
                         <div class="plan-price">
                             <div class="price-value">
-                                <span class="price-currency">R$</span>34,90
+                                <span class="price-currency">R$</span>
+                                <span style="text-decoration: line-through; opacity: 0.5; font-size: 0.6em; display: block; margin-bottom: 0.5rem;">45,90</span>
+                                <span style="color: #10b981;">25,90</span>
                             </div>
-                            <span class="price-period">por mês</span>
+                            <span class="price-period">pagamento único</span>
+                        </div>
+                        <div style="background: rgba(16, 185, 129, 0.1); padding: 1rem; border-radius: 12px; margin: 1.5rem 0;">
+                            <p style="color: #10b981; font-weight: 700; font-size: 1.2rem; margin: 0;">
+                                💰 Economize R$ 20,00
+                            </p>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
+                                De R$ 45,90 por apenas R$ 25,90
+                            </p>
                         </div>
                         <ul class="plan-features">
-                            <li>Registro ilimitado de vacinas</li>
-                            <li>Controle de medicamentos</li>
-                            <li>Acompanhamento de peso</li>
-                            <li>Galeria de fotos</li>
-                            <li>Lembretes automáticos</li>
+                            <li>✅ Acesso completo e vitalício</li>
+                            <li>✅ Registro ilimitado de vacinas</li>
+                            <li>✅ Controle de medicamentos</li>
+                            <li>✅ Acompanhamento de peso</li>
+                            <li>✅ Galeria de fotos ilimitada</li>
+                            <li>✅ Lembretes automáticos</li>
+                            <li>✅ Sem mensalidades</li>
+                            <li>✅ Atualizações gratuitas para sempre</li>
                         </ul>
-                        <button class="plan-cta" onclick="openPixPayment('mensal', '34,90')">Assinar Mensal</button>
-                        <div class="pix-note">
-                            <strong>💳 Pagamento via PIX</strong>
-                            Renove todo mês com PIX de R$ 34,90 para continuar usando todas as funcionalidades.
-                        </div>
-                    </div>
-
-                    <!-- Plano Único -->
-                    <div class="pricing-card">
-                        <div class="popular-badge">50% OFF</div>
-                        <h3 class="plan-name">Plano Anual</h3>
-                        <div class="plan-price">
-                            <div class="price-value">
-                                <span class="price-currency">R$</span>209,40
-                            </div>
-                            <span class="price-period">por ano</span>
-                        </div>
-                        <ul class="plan-features">
-                            <li>Acesso completo por 1 ano</li>
-                            <li>Registro ilimitado de vacinas</li>
-                            <li>Controle de medicamentos</li>
-                            <li>Acompanhamento de peso</li>
-                            <li>Galeria de fotos</li>
-                            <li>Lembretes automáticos</li>
-                            <li>Suporte prioritário</li>
-                            <li>🎉 Economia de 50%</li>
-                        </ul>
-                        <button class="plan-cta" onclick="openPixPayment('anual', '209,40')">Garantir 50% OFF</button>
+                        <button class="plan-cta" onclick="openPixPayment('unico', '25,90')" style="font-size: 1.3rem; padding: 1.25rem;">
+                            🚀 Garantir por R$ 25,90
+                        </button>
                     </div>
                 </div>
             </div>
@@ -2661,25 +2685,19 @@
         <div class="payment-wall-content">
             <div class="lock-icon">🔒</div>
             <h2>Desbloqueie o PetCare</h2>
-            <p>Para adicionar seu pet e usar todas as funcionalidades, escolha um plano</p>
+            <p>Acesso completo e vitalício por apenas R$ 25,90</p>
 
             <div class="payment-options">
-                <button class="payment-option-btn" onclick="selectPlan('mensal')">
-                    <div class="payment-option-icon">📅</div>
+                <button class="payment-option-btn" onclick="selectPlan('unico')" style="border: 3px solid #10b981;">
+                    <div class="payment-option-icon" style="background: #10b981; color: white;">🔥</div>
                     <div class="payment-option-info">
-                        <h4>Plano Mensal</h4>
-                        <p>Renovação mensal via PIX</p>
+                        <h4>Oferta Especial</h4>
+                        <p>Acesso vitalício • Sem mensalidades</p>
                     </div>
-                    <div class="payment-option-price">R$<br>34,90</div>
-                </button>
-
-                <button class="payment-option-btn" onclick="selectPlan('anual')">
-                    <div class="payment-option-icon">⭐</div>
-                    <div class="payment-option-info">
-                        <h4>Plano Anual</h4>
-                        <p>50% OFF • Melhor custo</p>
+                    <div class="payment-option-price" style="color: #10b981;">
+                        <span style="text-decoration: line-through; font-size: 0.6em; opacity: 0.5; display: block;">R$ 45,90</span>
+                        R$<br>25,90
                     </div>
-                    <div class="payment-option-price">R$<br>209,40</div>
                 </button>
             </div>
 
@@ -3679,9 +3697,9 @@
             // Close payment wall
             closePaymentWall();
             
-            // Open PIX payment modal
-            const amount = planType === 'mensal' ? '34,90' : '209,40';
-            openPixPayment(planType, amount);
+            // Open PIX payment modal with special price
+            const amount = '25,90';
+            openPixPayment('unico', amount);
         }
 
         function unlockApp() {
@@ -3740,19 +3758,15 @@
         // PIX Payment Functions
         function openPixPayment(planType, amount) {
             const modal = document.getElementById('pixPaymentModal');
-            const planName = planType === 'mensal' ? 'Plano Mensal' : 'Plano Anual';
+            const planName = 'Acesso Vitalício - Oferta Especial';
             const warning = document.getElementById('pixWarning');
             
             document.getElementById('selectedPlanName').textContent = planName;
             document.getElementById('pixAmount').textContent = 'R$ ' + amount;
             document.getElementById('instructionAmount').textContent = 'R$ ' + amount;
             
-            // Show warning only for monthly plan
-            if (planType === 'mensal') {
-                warning.style.display = 'block';
-            } else {
-                warning.style.display = 'none';
-            }
+            // Hide warning (no monthly renewal)
+            warning.style.display = 'none';
             
             modal.classList.add('active');
         }
@@ -3839,27 +3853,33 @@
         });
     </script>
     <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+  // 1. Importe o Auth
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
   const firebaseConfig = {
-    apiKey: "AIzaSyAWEcycTgntSuRKabqWNULjwtLjKnoHApM",
-    authDomain: "petcarepro-9233b.firebaseapp.com",
-    projectId: "petcarepro-9233b",
-    storageBucket: "petcarepro-9233b.firebasestorage.app",
-    messagingSenderId: "277665228536",
-    appId: "1:277665228536:web:d837f12786040186e43d0d",
-    measurementId: "G-C9MKCJCECH"
+    // ... suas chaves aqui ...
   };
 
-  // Initialize Firebase
+  // 2. Inicialize
   const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  // 3. Função para Logar
+  window.fazerLogin = () => {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const user = result.user;
+        console.log("Usuário logado:", user.displayName);
+        alert("Bem-vindo, " + user.displayName + "!");
+      })
+      .catch((error) => {
+        console.error("Erro no login:", error.message);
+      });
+  };
 </script>
+
+<button onclick="fazerLogin()">Entrar com Google</button>
 </body>
 </html>
