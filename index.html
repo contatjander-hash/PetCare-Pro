@@ -280,37 +280,6 @@
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
         }
 
-        .scroll-indicator {
-            position: absolute;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 2;
-            animation: bounce 2s ease-in-out infinite;
-        }
-
-        .scroll-indicator span {
-            display: block;
-            width: 30px;
-            height: 50px;
-            border: 2px solid white;
-            border-radius: 25px;
-            position: relative;
-        }
-
-        .scroll-indicator span::before {
-            content: '';
-            position: absolute;
-            top: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 6px;
-            height: 6px;
-            background: white;
-            border-radius: 50%;
-            animation: scrollDot 2s ease-in-out infinite;
-        }
-
         /* Hero Section */
         .hero {
             padding: 4rem 0 3rem;
@@ -1521,6 +1490,31 @@
             box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
         }
 
+        /* Password Strength Indicator */
+        .strength-bar {
+            flex: 1;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .strength-bar.weak {
+            background: #ef4444;
+        }
+
+        .strength-bar.medium {
+            background: #f59e0b;
+        }
+
+        .strength-bar.good {
+            background: #10b981;
+        }
+
+        .strength-bar.strong {
+            background: #10b981;
+        }
+
         /* Profile Section */
         .profile-section {
             display: none;
@@ -2096,6 +2090,41 @@
         }
 
         /* Responsive */
+        
+        /* Desktop - Pricing section optimization */
+        @media (min-width: 1024px) {
+            .pricing-section {
+                padding: 5rem 0;
+            }
+            
+            .pricing-card {
+                max-width: 750px !important;
+                margin: 0 auto !important;
+                padding: 3.5rem !important;
+            }
+            
+            .pricing-card .plan-price .price-value {
+                font-size: 5.5rem !important;
+            }
+            
+            .pricing-card .plan-features {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+                text-align: left;
+                margin: 2rem 0;
+            }
+            
+            .pricing-card .plan-features li {
+                font-size: 1.15rem;
+            }
+            
+            .pricing-card .plan-cta {
+                font-size: 1.5rem !important;
+                padding: 1.5rem !important;
+            }
+        }
+        
         @media (max-width: 1400px) {
             .dashboard-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -2290,7 +2319,7 @@
 <body>
     <header>
         <nav>
-            <div class="logo">PetCare</div>
+            <div class="logo" onclick="scrollToTop()" style="cursor: pointer;">PetCare</div>
             <ul class="nav-links">
                 <li><a href="#home" class="nav-link active" onclick="showSection('home')">🏠 Início</a></li>
                 <li><a href="#profile" class="nav-link" onclick="showSection('profile')">👤 Perfil</a></li>
@@ -2319,9 +2348,6 @@
                 <button class="cta-button" onclick="document.querySelector('.hero').scrollIntoView({ behavior: 'smooth' })">
                     Começar Agora ✨
                 </button>
-            </div>
-            <div class="scroll-indicator">
-                <span></span>
             </div>
         </section>
 
@@ -2464,8 +2490,6 @@
                             </h3>
                         </div>
                         <div class="photo-grid">
-                            <div class="photo-placeholder">🖼️</div>
-                            <div class="photo-placeholder">🖼️</div>
                             <div class="photo-placeholder photo-upload" id="uploadPhotoBtn">+</div>
                         </div>
                     </div>
@@ -2474,57 +2498,46 @@
         </section>
 
         <!-- Pricing Section -->
-        <section class="pricing-section">
+        <section class="pricing-section" id="pricingSection">
             <div class="container pricing-content">
                 <div class="pricing-header">
-                    <h2>Escolha Seu Plano</h2>
-                    <p>Cuide do seu pet com todo amor que ele merece</p>
+                    <h2>Desbloqueie Todos os Recursos</h2>
+                    <p>Acesso completo e vitalício por apenas</p>
                 </div>
                 <div class="pricing-grid">
-                    <!-- Plano Mensal -->
-                    <div class="pricing-card">
-                        <h3 class="plan-name">Plano Mensal</h3>
+                    <!-- Single Pricing Card -->
+                    <div class="pricing-card" style="max-width: 500px; margin: 0 auto; border: 3px solid #10b981;">
+                        <div class="popular-badge" style="background: #ef4444;">🔥 OFERTA ESPECIAL</div>
+                        <h3 class="plan-name">Acesso Vitalício</h3>
                         <div class="plan-price">
                             <div class="price-value">
-                                <span class="price-currency">R$</span>34,90
+                                <span class="price-currency">R$</span>
+                                <span style="text-decoration: line-through; opacity: 0.5; font-size: 0.6em; display: block; margin-bottom: 0.5rem;">45,90</span>
+                                <span style="color: #10b981;">25,90</span>
                             </div>
-                            <span class="price-period">por mês</span>
+                            <span class="price-period">pagamento único</span>
+                        </div>
+                        <div style="background: rgba(16, 185, 129, 0.1); padding: 1rem; border-radius: 12px; margin: 1.5rem 0;">
+                            <p style="color: #10b981; font-weight: 700; font-size: 1.2rem; margin: 0;">
+                                💰 Economize R$ 20,00
+                            </p>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
+                                De R$ 45,90 por apenas R$ 25,90
+                            </p>
                         </div>
                         <ul class="plan-features">
-                            <li>Registro ilimitado de vacinas</li>
-                            <li>Controle de medicamentos</li>
-                            <li>Acompanhamento de peso</li>
-                            <li>Galeria de fotos</li>
-                            <li>Lembretes automáticos</li>
+                            <li>✅ Acesso completo e vitalício</li>
+                            <li>✅ Registro ilimitado de vacinas</li>
+                            <li>✅ Controle de medicamentos</li>
+                            <li>✅ Acompanhamento de peso</li>
+                            <li>✅ Galeria de fotos ilimitada</li>
+                            <li>✅ Lembretes automáticos</li>
+                            <li>✅ Sem mensalidades</li>
+                            <li>✅ Atualizações gratuitas para sempre</li>
                         </ul>
-                        <button class="plan-cta" onclick="openPixPayment('mensal', '34,90')">Assinar Mensal</button>
-                        <div class="pix-note">
-                            <strong>💳 Pagamento via PIX</strong>
-                            Renove todo mês com PIX de R$ 34,90 para continuar usando todas as funcionalidades.
-                        </div>
-                    </div>
-
-                    <!-- Plano Único -->
-                    <div class="pricing-card">
-                        <div class="popular-badge">50% OFF</div>
-                        <h3 class="plan-name">Plano Anual</h3>
-                        <div class="plan-price">
-                            <div class="price-value">
-                                <span class="price-currency">R$</span>209,40
-                            </div>
-                            <span class="price-period">por ano</span>
-                        </div>
-                        <ul class="plan-features">
-                            <li>Acesso completo por 1 ano</li>
-                            <li>Registro ilimitado de vacinas</li>
-                            <li>Controle de medicamentos</li>
-                            <li>Acompanhamento de peso</li>
-                            <li>Galeria de fotos</li>
-                            <li>Lembretes automáticos</li>
-                            <li>Suporte prioritário</li>
-                            <li>🎉 Economia de 50%</li>
-                        </ul>
-                        <button class="plan-cta" onclick="openPixPayment('anual', '209,40')">Garantir 50% OFF</button>
+                        <button class="plan-cta" onclick="openPixPayment('unico', '25,90')" style="font-size: 1.3rem; padding: 1.25rem;">
+                            🚀 Garantir por R$ 25,90
+                        </button>
                     </div>
                 </div>
             </div>
@@ -2573,7 +2586,13 @@
         <div class="profile-section" id="profileSection">
             <div class="profile-container">
                 <div class="profile-header">
-                    <div class="profile-avatar" id="profileAvatar">👤</div>
+                    <div class="profile-avatar" id="profileAvatar" onclick="uploadProfilePhoto()" style="cursor: pointer; position: relative;" title="Clique para alterar foto">
+                        👤
+                        <div style="position: absolute; bottom: 0; right: 0; background: var(--accent); border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 3px solid white;">
+                            📸
+                        </div>
+                    </div>
+                    <input type="file" id="profilePhotoInput" accept="image/*" style="display: none;">
                     <div class="profile-name" id="profileName">Visitante</div>
                     <div class="profile-email" id="profileEmail">Faça login para salvar seus dados</div>
                 </div>
@@ -2661,25 +2680,19 @@
         <div class="payment-wall-content">
             <div class="lock-icon">🔒</div>
             <h2>Desbloqueie o PetCare</h2>
-            <p>Para adicionar seu pet e usar todas as funcionalidades, escolha um plano</p>
+            <p>Acesso completo e vitalício por apenas R$ 25,90</p>
 
             <div class="payment-options">
-                <button class="payment-option-btn" onclick="selectPlan('mensal')">
-                    <div class="payment-option-icon">📅</div>
+                <button class="payment-option-btn" onclick="selectPlan('unico')" style="border: 3px solid #10b981;">
+                    <div class="payment-option-icon" style="background: #10b981; color: white;">🔥</div>
                     <div class="payment-option-info">
-                        <h4>Plano Mensal</h4>
-                        <p>Renovação mensal via PIX</p>
+                        <h4>Oferta Especial</h4>
+                        <p>Acesso vitalício • Sem mensalidades</p>
                     </div>
-                    <div class="payment-option-price">R$<br>34,90</div>
-                </button>
-
-                <button class="payment-option-btn" onclick="selectPlan('anual')">
-                    <div class="payment-option-icon">⭐</div>
-                    <div class="payment-option-info">
-                        <h4>Plano Anual</h4>
-                        <p>50% OFF • Melhor custo</p>
+                    <div class="payment-option-price" style="color: #10b981;">
+                        <span style="text-decoration: line-through; font-size: 0.6em; opacity: 0.5; display: block;">R$ 45,90</span>
+                        R$<br>25,90
                     </div>
-                    <div class="payment-option-price">R$<br>209,40</div>
                 </button>
             </div>
 
@@ -2797,7 +2810,7 @@
                 </div>
                 <div class="form-group">
                     <label>Data</label>
-                    <input type="date" id="vaccineDate" required>
+                    <input type="date" id="vaccineDate" required max="2099-12-31">
                 </div>
                 <div class="form-group">
                     <label>Observações</label>
@@ -2863,7 +2876,7 @@
                 </div>
                 <div class="form-group">
                     <label>Data</label>
-                    <input type="date" id="weightDate" required>
+                    <input type="date" id="weightDate" required max="2099-12-31">
                 </div>
                 <div class="form-group">
                     <label>Alimentação Diária</label>
@@ -2906,7 +2919,12 @@
                         <div class="pet-photo-option" data-photo="cat3">
                             <img src="https://images.unsplash.com/photo-1606214174585-fe31582dc6ee?w=300&q=80" alt="Gato laranja" loading="lazy">
                         </div>
+                        <div class="pet-photo-option" id="customPetPhoto" style="background: linear-gradient(135deg, var(--accent) 0%, var(--pink) 100%); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: white;">
+                            📸
+                        </div>
                     </div>
+                    <small style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem; display: block;">Clique em 📸 para enviar sua própria foto</small>
+                    <input type="file" id="customPetPhotoInput" accept="image/*" style="display: none;">
                     <input type="hidden" id="petPhoto" name="petPhoto">
                 </div>
                 <div class="form-group">
@@ -2929,7 +2947,7 @@
                 </div>
                 <div class="form-group">
                     <label>Data de Nascimento</label>
-                    <input type="date" id="petBirthdate" required>
+                    <input type="date" id="petBirthdate" required max="2099-12-31">
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('petModal')">Cancelar</button>
@@ -2962,7 +2980,10 @@
                 </div>
                 <div class="form-group">
                     <label>Senha</label>
-                    <input type="password" id="loginPassword" required placeholder="••••••••">
+                    <div style="position: relative;">
+                        <input type="password" id="loginPassword" required placeholder="••••••••">
+                        <button type="button" onclick="togglePassword('loginPassword', this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.2rem;">👁️</button>
+                    </div>
                 </div>
                 <button type="submit" class="auth-submit">Entrar</button>
             </form>
@@ -2979,15 +3000,34 @@
                 </div>
                 <div class="form-group">
                     <label>Telefone</label>
-                    <input type="tel" id="registerPhone" required placeholder="(00) 00000-0000">
+                    <input type="tel" id="registerPhone" required placeholder="(00) 00000-0000" maxlength="15">
+                    <small style="color: var(--text-secondary); font-size: 0.85rem;">Formato: (12) 34567-8900</small>
                 </div>
                 <div class="form-group">
                     <label>CPF</label>
-                    <input type="text" id="registerCpf" required placeholder="000.000.000-00">
+                    <input type="text" id="registerCpf" required placeholder="000.000.000-00" maxlength="14">
+                    <small style="color: var(--text-secondary); font-size: 0.85rem;">Apenas números</small>
+                    <div id="cpfError" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.5rem; display: none;">
+                        ❌ CPF inválido
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Senha</label>
-                    <input type="password" id="registerPassword" required placeholder="••••••••" minlength="6">
+                    <div style="position: relative;">
+                        <input type="password" id="registerPassword" required placeholder="••••••••" minlength="8">
+                        <button type="button" onclick="togglePassword('registerPassword', this)" style="position: absolute; right: 10px; top: 15px; background: none; border: none; cursor: pointer; font-size: 1.2rem; z-index: 10;">👁️</button>
+                    </div>
+                    <div id="passwordStrength" style="margin-top: 0.75rem;">
+                        <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                            <div class="strength-bar" id="strength1"></div>
+                            <div class="strength-bar" id="strength2"></div>
+                            <div class="strength-bar" id="strength3"></div>
+                            <div class="strength-bar" id="strength4"></div>
+                        </div>
+                        <small id="strengthText" style="color: var(--text-secondary); font-size: 0.85rem;">
+                            Mínimo 8 caracteres, letra maiúscula, minúscula e número
+                        </small>
+                    </div>
                 </div>
                 <button type="submit" class="auth-submit">Criar Conta</button>
             </form>
@@ -3010,12 +3050,48 @@
         // Photo selection
         document.querySelectorAll('.pet-photo-option').forEach(option => {
             option.addEventListener('click', function() {
+                // Check if it's the custom photo button
+                if (this.id === 'customPetPhoto') {
+                    document.getElementById('customPetPhotoInput').click();
+                    return;
+                }
+                
                 document.querySelectorAll('.pet-photo-option').forEach(opt => {
                     opt.classList.remove('selected');
                 });
                 this.classList.add('selected');
                 document.getElementById('petPhoto').value = this.dataset.photo;
             });
+        });
+
+        // Custom pet photo upload
+        document.getElementById('customPetPhotoInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (file.size > 5 * 1024 * 1024) {
+                alert('❌ A foto é muito grande! Máximo 5MB.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const customPhoto = document.getElementById('customPetPhoto');
+                customPhoto.style.backgroundImage = `url(${event.target.result})`;
+                customPhoto.style.backgroundSize = 'cover';
+                customPhoto.style.backgroundPosition = 'center';
+                customPhoto.textContent = '';
+                
+                // Select it
+                document.querySelectorAll('.pet-photo-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                customPhoto.classList.add('selected');
+                
+                // Save as base64
+                document.getElementById('petPhoto').value = 'custom:' + event.target.result;
+            };
+            reader.readAsDataURL(file);
         });
 
         // Load data from localStorage
@@ -3030,12 +3106,9 @@
             }
         }
 
-        // Save data to localStorage + nuvem
+        // Save data to localStorage
         function saveData() {
             localStorage.setItem('petData', JSON.stringify(petData));
-            if (typeof window.saveDataCloud === 'function') {
-                window.saveDataCloud(petData);
-            }
         }
 
         // Modal functions
@@ -3069,7 +3142,15 @@
                 document.getElementById('petName').textContent = petData.name;
                 
                 const avatarEl = document.querySelector('.pet-avatar');
-                if (petData.photo && photoUrls[petData.photo]) {
+                
+                // Check if it's a custom photo (starts with "custom:")
+                if (petData.photo && petData.photo.startsWith('custom:')) {
+                    const photoData = petData.photo.replace('custom:', '');
+                    avatarEl.style.backgroundImage = `url(${photoData})`;
+                    avatarEl.style.backgroundSize = 'cover';
+                    avatarEl.style.backgroundPosition = 'center';
+                    avatarEl.textContent = '';
+                } else if (petData.photo && photoUrls[petData.photo]) {
                     avatarEl.style.backgroundImage = `url(${photoUrls[petData.photo]})`;
                     avatarEl.style.backgroundSize = 'cover';
                     avatarEl.style.backgroundPosition = 'center';
@@ -3250,19 +3331,222 @@
             });
         });
 
+        // Profile photo upload
+        function uploadProfilePhoto() {
+            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+            if (!user) {
+                alert('⚠️ Você precisa estar logado para alterar sua foto!');
+                return;
+            }
+            document.getElementById('profilePhotoInput').click();
+        }
+
+        document.getElementById('profilePhotoInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (file.size > 5 * 1024 * 1024) {
+                alert('❌ A foto é muito grande! Máximo 5MB.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                // Update user photo
+                const user = JSON.parse(localStorage.getItem('petcare_user'));
+                user.profilePhoto = event.target.result;
+                
+                // Update in users list
+                const users = JSON.parse(localStorage.getItem('petcare_users') || '[]');
+                const userIndex = users.findIndex(u => u.id === user.id);
+                if (userIndex !== -1) {
+                    users[userIndex].profilePhoto = event.target.result;
+                    localStorage.setItem('petcare_users', JSON.stringify(users));
+                }
+                
+                // Update current user
+                localStorage.setItem('petcare_user', JSON.stringify(user));
+                
+                // Update avatar display
+                const avatar = document.getElementById('profileAvatar');
+                avatar.style.backgroundImage = `url(${event.target.result})`;
+                avatar.style.backgroundSize = 'cover';
+                avatar.style.backgroundPosition = 'center';
+                avatar.innerHTML = '<div style="position: absolute; bottom: 0; right: 0; background: var(--accent); border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 3px solid white;">📸</div>';
+                
+                showToast('✅ Foto atualizada com sucesso!');
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Toggle password visibility
+        function togglePassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                button.textContent = '👁️';
+            }
+        }
+
+        // CPF Mask and Validation
+        function maskCPF(value) {
+            value = value.replace(/\D/g, ''); // Remove tudo que não é número
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            return value;
+        }
+
+        function validateCPF(cpf) {
+            cpf = cpf.replace(/\D/g, '');
+            
+            if (cpf.length !== 11) return false;
+            
+            // Elimina CPFs invalidos conhecidos
+            if (/^(\d)\1{10}$/.test(cpf)) return false;
+            
+            // Valida 1o digito
+            let add = 0;
+            for (let i = 0; i < 9; i++) {
+                add += parseInt(cpf.charAt(i)) * (10 - i);
+            }
+            let rev = 11 - (add % 11);
+            if (rev === 10 || rev === 11) rev = 0;
+            if (rev !== parseInt(cpf.charAt(9))) return false;
+            
+            // Valida 2o digito
+            add = 0;
+            for (let i = 0; i < 10; i++) {
+                add += parseInt(cpf.charAt(i)) * (11 - i);
+            }
+            rev = 11 - (add % 11);
+            if (rev === 10 || rev === 11) rev = 0;
+            if (rev !== parseInt(cpf.charAt(10))) return false;
+            
+            return true;
+        }
+
+        // Phone Mask
+        function maskPhone(value) {
+            value = value.replace(/\D/g, ''); // Remove tudo que não é número
+            value = value.replace(/^(\d{2})(\d)/g, '($1) $2');
+            value = value.replace(/(\d)(\d{4})$/, '$1-$2');
+            return value;
+        }
+
+        // Password Strength Checker
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            const bars = ['strength1', 'strength2', 'strength3', 'strength4'];
+            const text = document.getElementById('strengthText');
+            
+            // Reset bars
+            bars.forEach(id => {
+                document.getElementById(id).className = 'strength-bar';
+            });
+            
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^a-zA-Z0-9]/.test(password)) strength++;
+            
+            // Update bars
+            if (strength >= 1) {
+                document.getElementById('strength1').classList.add('weak');
+                text.textContent = 'Senha fraca';
+                text.style.color = '#ef4444';
+            }
+            if (strength >= 2) {
+                document.getElementById('strength2').classList.add('medium');
+                text.textContent = 'Senha média';
+                text.style.color = '#f59e0b';
+            }
+            if (strength >= 3) {
+                document.getElementById('strength3').classList.add('good');
+                text.textContent = 'Senha boa';
+                text.style.color = '#10b981';
+            }
+            if (strength >= 4) {
+                document.getElementById('strength4').classList.add('strong');
+                text.textContent = 'Senha forte! ✓';
+                text.style.color = '#10b981';
+            }
+            
+            return strength >= 3; // Requer pelo menos "boa"
+        }
+
+        // Initialize masks and validation
+        document.addEventListener('DOMContentLoaded', function() {
+            // CPF mask
+            const cpfInput = document.getElementById('registerCpf');
+            if (cpfInput) {
+                cpfInput.addEventListener('input', function(e) {
+                    e.target.value = maskCPF(e.target.value);
+                    
+                    // Validate when complete
+                    const cpf = e.target.value.replace(/\D/g, '');
+                    const errorDiv = document.getElementById('cpfError');
+                    if (cpf.length === 11) {
+                        if (!validateCPF(cpf)) {
+                            errorDiv.style.display = 'block';
+                            e.target.style.borderColor = '#ef4444';
+                        } else {
+                            errorDiv.style.display = 'none';
+                            e.target.style.borderColor = '#10b981';
+                        }
+                    } else {
+                        errorDiv.style.display = 'none';
+                        e.target.style.borderColor = '';
+                    }
+                });
+            }
+            
+            // Phone mask
+            const phoneInput = document.getElementById('registerPhone');
+            if (phoneInput) {
+                phoneInput.addEventListener('input', function(e) {
+                    e.target.value = maskPhone(e.target.value);
+                });
+            }
+            
+            // Password strength
+            const passwordInput = document.getElementById('registerPassword');
+            if (passwordInput) {
+                passwordInput.addEventListener('input', function(e) {
+                    checkPasswordStrength(e.target.value);
+                });
+            }
+        });
+
         // Initialize
         loadData();
         checkUserSession();
+        updatePricingVisibility();
 
         // Check if user is logged in (but don't force login)
         function checkUserSession() {
             const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
             
             if (user) {
-                // User is logged in - load their profile
+                // User is logged in - check their premium status
+                if (user.hasPremium) {
+                    localStorage.setItem('petcare_paid', 'true');
+                    localStorage.setItem('petcare_code', user.accessCode || '');
+                } else {
+                    // User doesn't have premium - clear flags
+                    localStorage.removeItem('petcare_paid');
+                    localStorage.removeItem('petcare_code');
+                }
+                
                 loadUserProfile();
             } else {
-                // User not logged in - show guest mode in profile
+                // User not logged in - clear premium flags and show guest mode
+                localStorage.removeItem('petcare_paid');
+                localStorage.removeItem('petcare_code');
                 showGuestMode();
             }
         }
@@ -3279,29 +3563,105 @@
 
         function handleLogin(e) {
             e.preventDefault();
+            
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            // FIX: usar Firebase Auth em vez de localStorage
-            if (typeof window.firebaseLogin === 'function') {
-                window.firebaseLogin(email, password);
+            
+            // Get stored users
+            const users = JSON.parse(localStorage.getItem('petcare_users') || '[]');
+            
+            // Find user
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                // Login successful
+                localStorage.setItem('petcare_user', JSON.stringify(user));
+                closeAuthModal();
+                loadUserProfile();
+                alert('✅ Login realizado com sucesso!');
             } else {
-                alert('❌ Erro: Firebase não carregou. Tente recarregar a página.');
+                alert('❌ Email ou senha incorretos!');
             }
         }
 
         function handleRegister(e) {
             e.preventDefault();
+            
             const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
             const phone = document.getElementById('registerPhone').value;
             const cpf = document.getElementById('registerCpf').value;
             const password = document.getElementById('registerPassword').value;
-            // FIX: usar Firebase Auth em vez de localStorage
-            if (typeof window.firebaseRegister === 'function') {
-                window.firebaseRegister(email, password, { name, phone, cpf });
-            } else {
-                alert('❌ Erro: Firebase não carregou. Tente recarregar a página.');
+            
+            // Validate CPF
+            const cpfNumbers = cpf.replace(/\D/g, '');
+            if (!validateCPF(cpfNumbers)) {
+                alert('❌ CPF inválido! Verifique e tente novamente.');
+                return;
             }
+            
+            // Validate phone (must have 11 digits)
+            const phoneNumbers = phone.replace(/\D/g, '');
+            if (phoneNumbers.length < 10 || phoneNumbers.length > 11) {
+                alert('❌ Telefone inválido! Use o formato (00) 00000-0000');
+                return;
+            }
+            
+            // Validate password strength
+            if (password.length < 8) {
+                alert('❌ Senha deve ter no mínimo 8 caracteres!');
+                return;
+            }
+            if (!/[a-z]/.test(password)) {
+                alert('❌ Senha deve conter letra minúscula!');
+                return;
+            }
+            if (!/[A-Z]/.test(password)) {
+                alert('❌ Senha deve conter letra maiúscula!');
+                return;
+            }
+            if (!/[0-9]/.test(password)) {
+                alert('❌ Senha deve conter número!');
+                return;
+            }
+            
+            // Get existing users
+            const users = JSON.parse(localStorage.getItem('petcare_users') || '[]');
+            
+            // Check if email already exists
+            if (users.find(u => u.email === email)) {
+                alert('❌ Este email já está cadastrado!');
+                return;
+            }
+            
+            // Check if CPF already exists
+            if (users.find(u => u.cpf === cpf)) {
+                alert('❌ Este CPF já está cadastrado!');
+                return;
+            }
+            
+            // Create new user
+            const newUser = {
+                id: Date.now().toString(),
+                name,
+                email,
+                phone,
+                cpf,
+                password,
+                createdAt: new Date().toISOString(),
+                plan: 'Gratuito',
+                code: null
+            };
+            
+            // Save user
+            users.push(newUser);
+            localStorage.setItem('petcare_users', JSON.stringify(users));
+            localStorage.setItem('petcare_user', JSON.stringify(newUser));
+            
+            // Close modal and load profile
+            closeAuthModal();
+            loadUserProfile();
+            alert('✅ Conta criada com sucesso! Bem-vindo ao PetCare! 🐾');
         }
 
         function loadUserProfile() {
@@ -3323,7 +3683,18 @@
             // Update profile section
             document.getElementById('profileName').textContent = user.name;
             document.getElementById('profileEmail').textContent = user.email;
-            document.getElementById('profileAvatar').textContent = user.name.charAt(0).toUpperCase();
+            
+            // Update avatar with photo or initial
+            const avatar = document.getElementById('profileAvatar');
+            if (user.profilePhoto) {
+                avatar.style.backgroundImage = `url(${user.profilePhoto})`;
+                avatar.style.backgroundSize = 'cover';
+                avatar.style.backgroundPosition = 'center';
+                avatar.innerHTML = '<div style="position: absolute; bottom: 0; right: 0; background: var(--accent); border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 3px solid white;">📸</div>';
+            } else {
+                avatar.style.backgroundImage = 'none';
+                avatar.innerHTML = user.name.charAt(0).toUpperCase() + '<div style="position: absolute; bottom: 0; right: 0; background: var(--accent); border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 3px solid white;">📸</div>';
+            }
             
             document.getElementById('infoName').textContent = user.name;
             document.getElementById('infoEmail').textContent = user.email;
@@ -3355,21 +3726,31 @@
 
         function logout() {
             if (confirm('Tem certeza que deseja sair da sua conta?')) {
-                // FIX: limpar tudo para não vazar dados entre contas
+                // Remove user account
                 localStorage.removeItem('petcare_user');
+                
+                // Remove pet data
                 localStorage.removeItem('petData');
-                localStorage.removeItem('petcare_paid');
-                localStorage.removeItem('petcare_code');
+                localStorage.removeItem('vaccines');
+                localStorage.removeItem('medicines');
+                localStorage.removeItem('weights');
                 localStorage.removeItem('petcare_photos');
-                if (typeof window.firebaseLogout === 'function') {
-                    window.firebaseLogout();
-                } else {
-                    location.reload();
-                }
+                
+                // Remove premium access (keep if needed for next user)
+                // localStorage.removeItem('petcare_paid');
+                // localStorage.removeItem('petcare_code');
+                
+                location.reload();
             }
         }
 
         // Navigation
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Also ensure home section is visible
+            showSection('home');
+        }
+
         function showSection(section) {
             // Update nav links
             document.querySelectorAll('.nav-link').forEach(link => {
@@ -3428,6 +3809,16 @@
             return localStorage.getItem('petcare_paid') === 'true';
         }
 
+        // Hide pricing section if user has premium
+        function updatePricingVisibility() {
+            const pricingSection = document.getElementById('pricingSection');
+            if (pricingSection && hasPremiumAccess()) {
+                pricingSection.style.display = 'none';
+            } else if (pricingSection) {
+                pricingSection.style.display = 'block';
+            }
+        }
+
         // Show payment wall
         function showPaymentWall() {
             // Check if user is logged in
@@ -3449,11 +3840,20 @@
             document.getElementById('paymentWall').classList.add('hidden');
         }
 
-        // Override addPetBtn to check payment first
+        // Override addPetBtn to check login and payment first
         document.getElementById('addPetBtn').addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             
+            // Check if user is logged in first
+            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+            if (!user) {
+                alert('⚠️ Você precisa criar uma conta para adicionar seu pet!\n\nCrie sua conta gratuitamente agora! 🐾');
+                openAuthModal('register');
+                return;
+            }
+            
+            // Then check premium access
             if (hasPremiumAccess()) {
                 openModal('petModal');
             } else {
@@ -3466,6 +3866,14 @@
             e.preventDefault();
             e.stopPropagation();
             
+            // Check if user is logged in first
+            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+            if (!user) {
+                alert('⚠️ Você precisa criar uma conta para usar este recurso!\n\nCrie sua conta gratuitamente agora! 🐾');
+                openAuthModal('register');
+                return;
+            }
+            
             if (hasPremiumAccess()) {
                 openModal('vaccineModal');
             } else {
@@ -3477,6 +3885,14 @@
             e.preventDefault();
             e.stopPropagation();
             
+            // Check if user is logged in first
+            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+            if (!user) {
+                alert('⚠️ Você precisa criar uma conta para usar este recurso!\n\nCrie sua conta gratuitamente agora! 🐾');
+                openAuthModal('register');
+                return;
+            }
+            
             if (hasPremiumAccess()) {
                 openModal('medicineModal');
             } else {
@@ -3487,6 +3903,14 @@
         document.getElementById('addWeightBtn').addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
+            
+            // Check if user is logged in first
+            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+            if (!user) {
+                alert('⚠️ Você precisa criar uma conta para usar este recurso!\n\nCrie sua conta gratuitamente agora! 🐾');
+                openAuthModal('register');
+                return;
+            }
             
             if (hasPremiumAccess()) {
                 openModal('weightModal');
@@ -3653,9 +4077,9 @@
             // Close payment wall
             closePaymentWall();
             
-            // Open PIX payment modal
-            const amount = planType === 'mensal' ? '34,90' : '209,40';
-            openPixPayment(planType, amount);
+            // Open PIX payment modal with special price
+            const amount = '25,90';
+            openPixPayment('unico', amount);
         }
 
         function unlockApp() {
@@ -3663,21 +4087,41 @@
             const errorMessage = document.getElementById('errorMessage');
             const code = codeInput.value.toUpperCase().trim();
 
-            // Lista de códigos válidos (você gerencia estes códigos)
+            // Check if user is logged in
+            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+            if (!user) {
+                alert('⚠️ Você precisa estar logado para usar um código de acesso!');
+                return;
+            }
+
+            // Valid codes list (you manage these codes)
             const validCodes = [
-                'TESTE-2024',      // Código de teste
-                'PETCARE-DEMO',    // Código demo
-                'MENSAL-ABC123',   // Exemplo de código mensal
-                'UNICO-XYZ789',    // Exemplo de código único
+                'TESTE-2024',      // Test code
+                'PETCARE-DEMO',    // Demo code
+                'MENSAL-ABC123',   // Monthly code example
+                'UNICO-XYZ789',    // Unique code example
             ];
 
             if (validCodes.includes(code)) {
-                // Código válido - desbloqueia app
+                // Valid code - unlock app FOR THIS USER
+                user.hasPremium = true;
+                user.accessCode = code;
+                user.unlockDate = new Date().toISOString();
+                
+                // Update user in users list
+                const users = JSON.parse(localStorage.getItem('petcare_users') || '[]');
+                const userIndex = users.findIndex(u => u.id === user.id);
+                if (userIndex !== -1) {
+                    users[userIndex] = user;
+                    localStorage.setItem('petcare_users', JSON.stringify(users));
+                }
+                
+                // Update current user
+                localStorage.setItem('petcare_user', JSON.stringify(user));
+                
+                // Also set paid flag for backward compatibility
                 localStorage.setItem('petcare_paid', 'true');
                 localStorage.setItem('petcare_code', code);
-                if (typeof window.savePaymentCloud === 'function') {
-                    window.savePaymentCloud(true, code);
-                }
                 
                 // Close payment wall
                 closePaymentWall();
@@ -3685,11 +4129,17 @@
                 // Success message
                 alert('✅ Acesso Premium liberado com sucesso!\n\nBem-vindo ao PetCare! 🐾\n\nAgora você pode adicionar seu pet e usar todas as funcionalidades.');
                 
+                // Update pricing visibility
+                updatePricingVisibility();
+                
+                // Update profile
+                loadUserProfile();
+                
                 // Clear input
                 codeInput.value = '';
                 errorMessage.classList.remove('show');
             } else {
-                // Código inválido
+                // Invalid code
                 errorMessage.classList.add('show');
                 codeInput.value = '';
                 codeInput.focus();
@@ -3717,19 +4167,15 @@
         // PIX Payment Functions
         function openPixPayment(planType, amount) {
             const modal = document.getElementById('pixPaymentModal');
-            const planName = planType === 'mensal' ? 'Plano Mensal' : 'Plano Anual';
+            const planName = 'Acesso Vitalício - Oferta Especial';
             const warning = document.getElementById('pixWarning');
             
             document.getElementById('selectedPlanName').textContent = planName;
             document.getElementById('pixAmount').textContent = 'R$ ' + amount;
             document.getElementById('instructionAmount').textContent = 'R$ ' + amount;
             
-            // Show warning only for monthly plan
-            if (planType === 'mensal') {
-                warning.style.display = 'block';
-            } else {
-                warning.style.display = 'none';
-            }
+            // Hide warning (no monthly renewal)
+            warning.style.display = 'none';
             
             modal.classList.add('active');
         }
@@ -3767,31 +4213,42 @@
         }
 
         function confirmPayment() {
-            // Aqui você pode adicionar lógica para verificar o pagamento
-            // Por exemplo, enviar para um servidor ou API
+            // Check if user is logged in
+            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+            if (!user) {
+                alert('⚠️ Você precisa estar logado para confirmar o pagamento!');
+                return;
+            }
             
-            const confirmed = confirm('Você confirmou que realizou o pagamento via PIX?\n\n✅ Após a confirmação, você receberá seu código de acesso.');
+            const confirmed = confirm('Você confirmou que realizou o pagamento via PIX?\n\n✅ Após a confirmação, o código de acesso será enviado para seu email cadastrado:\n\n' + user.email);
             
             if (confirmed) {
-                // Simula geração de código (em produção, isso viria do servidor)
+                // Generate access code (in production, this comes from server)
                 const accessCode = generateAccessCode();
                 
-                // Mostra o código para o usuário
-                alert(`✅ Pagamento Confirmado!\n\n🔑 Seu código de acesso:\n${accessCode}\n\n📧 Este código também foi enviado para seu email.\n\nUse-o para desbloquear o app!`);
+                // Add to valid codes list (in production, server does this)
+                // Note: In production, this would be done server-side after payment confirmation
                 
-                // Salva no localStorage e na nuvem
+                // Show success message WITHOUT showing the code
+                alert(`✅ Pagamento Confirmado!\n\n📧 Seu código de acesso foi enviado para:\n${user.email}\n\nVerifique sua caixa de entrada (e spam) e use o código para desbloquear o app!`);
+                
+                // In production: Here you would call an API to:
+                // 1. Verify payment
+                // 2. Generate code
+                // 3. Send email with code
+                // 4. Store code in database linked to user
+                
+                // For now, we'll store it locally as a demo
+                // REMOVE these lines in production:
                 localStorage.setItem('petcare_paid', 'true');
                 localStorage.setItem('petcare_code', accessCode);
-                if (typeof window.savePaymentCloud === 'function') {
-                    window.savePaymentCloud(true, accessCode);
-                }
+                // Instead, the code should only be validated when entered by user
                 
                 closePixPayment();
+                updatePricingVisibility();
                 
-                // Recarrega para aplicar desbloqueio
-                window.location.reload();
+                showToast('📧 Código enviado para seu email!');
             }
-            // Se não confirmou, permanece no modal para revisar
         }
 
         // Gera código de acesso aleatório
@@ -3818,251 +4275,5 @@
             }
         });
     </script>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut,
-           createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile }
-    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { getFirestore, doc, setDoc, getDoc, updateDoc }
-    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyAWEcycTgntSuRKabqWNULjwtLjKnoHApM",
-    authDomain: "petcarepro-9233b.firebaseapp.com",
-    projectId: "petcarepro-9233b",
-    storageBucket: "petcarepro-9233b.firebasestorage.app",
-    messagingSenderId: "277665228536",
-    appId: "1:277665228536:web:d837f12786040186e43d0d"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  const provider = new GoogleAuthProvider();
-
-  console.log('[PetCare Firebase] Módulo carregado');
-
-  // ── Salvar dados do pet na nuvem ─────────────────────────────────────────
-  window.saveDataCloud = async function(data) {
-    const user = auth.currentUser;
-    if (!user) return;
-    try {
-      await setDoc(doc(db, 'users', user.uid, 'data', 'petData'),
-        JSON.parse(JSON.stringify(data)));
-      console.log('[Firebase] petData salvo');
-    } catch(e) { console.error('[Firebase] Erro ao salvar petData:', e); }
-  };
-
-  // ── Salvar fotos na nuvem ────────────────────────────────────────────────
-  window.savePhotosCloud = async function(photos) {
-    const user = auth.currentUser;
-    if (!user) return;
-    try {
-      await setDoc(doc(db, 'users', user.uid, 'data', 'photos'),
-        { gallery: photos.slice(-20) });
-    } catch(e) { console.error('[Firebase] Erro ao salvar fotos:', e); }
-  };
-
-  // ── Salvar pagamento na nuvem (e no perfil para persistir após login) ────
-  window.savePaymentCloud = async function(paid, code) {
-    const user = auth.currentUser;
-    if (!user) return;
-    try {
-      await setDoc(doc(db, 'users', user.uid, 'data', 'payment'), { paid, code });
-      if (paid) {
-        await updateDoc(doc(db, 'users', user.uid, 'data', 'profile'),
-          { plan: 'Premium', code });
-      }
-      console.log('[Firebase] Pagamento salvo');
-    } catch(e) { console.error('[Firebase] Erro ao salvar pagamento:', e); }
-  };
-
-  // ── Carregar todos os dados do usuário da nuvem ──────────────────────────
-  window.loadDataCloud = async function(uid) {
-    console.log('[Firebase] Carregando dados para uid:', uid);
-    try {
-      // Perfil
-      const profileSnap = await getDoc(doc(db, 'users', uid, 'data', 'profile'));
-      if (profileSnap.exists()) {
-        const profile = profileSnap.data();
-        const savedUser = JSON.parse(localStorage.getItem('petcare_user') || '{}');
-        const updatedUser = Object.assign({}, savedUser, profile, { id: uid });
-        localStorage.setItem('petcare_user', JSON.stringify(updatedUser));
-        if (profile.plan === 'Premium') {
-          localStorage.setItem('petcare_paid', 'true');
-          if (profile.code) localStorage.setItem('petcare_code', profile.code);
-        }
-      }
-
-      // Pet
-      const petSnap = await getDoc(doc(db, 'users', uid, 'data', 'petData'));
-      if (petSnap.exists()) {
-        const cloudPet = petSnap.data();
-        if (!cloudPet.vaccines) cloudPet.vaccines = [];
-        if (!cloudPet.medicines) cloudPet.medicines = [];
-        if (!cloudPet.weights) cloudPet.weights = [];
-        Object.assign(petData, cloudPet);
-        localStorage.setItem('petData', JSON.stringify(petData));
-        try { updatePetProfile(); } catch(e) {}
-        try { renderVaccines(); } catch(e) {}
-        try { renderMedicines(); } catch(e) {}
-        try { renderWeights(); } catch(e) {}
-      }
-
-      // Fotos
-      const photoSnap = await getDoc(doc(db, 'users', uid, 'data', 'photos'));
-      if (photoSnap.exists()) {
-        const cloudPhotos = photoSnap.data().gallery || [];
-        photoGallery.length = 0;
-        cloudPhotos.forEach(p => photoGallery.push(p));
-        localStorage.setItem('petcare_photos', JSON.stringify(photoGallery));
-        try { displayPhotos(); } catch(e) {}
-      }
-
-      // Pagamento
-      const paySnap = await getDoc(doc(db, 'users', uid, 'data', 'payment'));
-      if (paySnap.exists() && paySnap.data().paid) {
-        localStorage.setItem('petcare_paid', 'true');
-        if (paySnap.data().code) localStorage.setItem('petcare_code', paySnap.data().code);
-      }
-
-      try { loadUserProfile(); } catch(e) {}
-      console.log('[Firebase] Dados carregados com sucesso!');
-    } catch(e) {
-      console.error('[Firebase] Erro ao carregar dados:', e);
-      try { loadUserProfile(); } catch(e2) {}
-    }
-  };
-
-  // ── Login com Email ──────────────────────────────────────────────────────
-  window.firebaseLogin = async function(email, password) {
-    try {
-      const result = await signInWithEmailAndPassword(auth, email, password);
-      const user = result.user;
-      var extra = { name: user.displayName || email.split('@')[0], phone: '', cpf: '', plan: 'Gratuito', code: null };
-      try {
-        const snap = await getDoc(doc(db, 'users', user.uid, 'data', 'profile'));
-        if (snap.exists()) extra = Object.assign({}, extra, snap.data());
-      } catch(e) {}
-      localStorage.setItem('petcare_user', JSON.stringify({
-        id: user.uid, name: extra.name, email: user.email,
-        phone: extra.phone || '', cpf: extra.cpf || '',
-        photo: user.photoURL || '', plan: extra.plan || 'Gratuito',
-        code: extra.code || null, loginMethod: 'email'
-      }));
-      closeAuthModal();
-      showToast('✅ Login realizado com sucesso!');
-      await window.loadDataCloud(user.uid);
-    } catch(error) {
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-        alert('❌ Email ou senha incorretos!');
-      } else if (error.code === 'auth/too-many-requests') {
-        alert('⚠️ Muitas tentativas. Tente mais tarde.');
-      } else {
-        alert('Erro ao fazer login: ' + error.message);
-      }
-    }
-  };
-
-  // ── Cadastro com Email ───────────────────────────────────────────────────
-  window.firebaseRegister = async function(email, password, extra) {
-    try {
-      const result = await createUserWithEmailAndPassword(auth, email, password);
-      const user = result.user;
-      await updateProfile(user, { displayName: extra.name });
-      await setDoc(doc(db, 'users', user.uid, 'data', 'profile'), {
-        name: extra.name, phone: extra.phone, cpf: extra.cpf,
-        plan: 'Gratuito', code: null, createdAt: new Date().toISOString()
-      });
-      localStorage.setItem('petcare_user', JSON.stringify({
-        id: user.uid, name: extra.name, email: user.email,
-        phone: extra.phone, cpf: extra.cpf, photo: '',
-        plan: 'Gratuito', code: null, loginMethod: 'email'
-      }));
-      closeAuthModal();
-      showToast('✅ Conta criada com sucesso! Bem-vindo ao PetCare! 🐾');
-      await window.loadDataCloud(user.uid);
-    } catch(error) {
-      if (error.code === 'auth/email-already-in-use') {
-        alert('❌ Este email já está cadastrado!');
-      } else if (error.code === 'auth/weak-password') {
-        alert('❌ Senha muito fraca! Mínimo 6 caracteres.');
-      } else {
-        alert('Erro ao criar conta: ' + error.message);
-      }
-    }
-  };
-
-  // ── Login com Google ─────────────────────────────────────────────────────
-  window.entrarComGoogle = async function() {
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      var extra = { name: user.displayName || 'Usuário Google', phone: '', cpf: '', plan: 'Gratuito', code: null };
-      try {
-        const snap = await getDoc(doc(db, 'users', user.uid, 'data', 'profile'));
-        if (snap.exists()) {
-          extra = Object.assign({}, extra, snap.data());
-        } else {
-          await setDoc(doc(db, 'users', user.uid, 'data', 'profile'), {
-            name: extra.name, phone: '', cpf: '',
-            plan: 'Gratuito', code: null, createdAt: new Date().toISOString()
-          });
-        }
-      } catch(e) {}
-      localStorage.setItem('petcare_user', JSON.stringify({
-        id: user.uid, name: extra.name, email: user.email,
-        phone: extra.phone || '', cpf: extra.cpf || '',
-        photo: user.photoURL || '', plan: extra.plan || 'Gratuito',
-        code: extra.code || null, loginMethod: 'google'
-      }));
-      closeAuthModal();
-      showToast('✅ Bem-vindo, ' + extra.name.split(' ')[0] + '! 🐾');
-      await window.loadDataCloud(user.uid);
-    } catch(error) {
-      if (error.code === 'auth/unauthorized-domain') {
-        alert('⚠️ Adicione o domínio nos domínios autorizados do Firebase Console.\nDomínio: ' + window.location.hostname);
-      } else if (error.code !== 'auth/popup-closed-by-user') {
-        alert('Erro ao entrar com Google: ' + error.message);
-      }
-    }
-  };
-
-  // ── Logout ───────────────────────────────────────────────────────────────
-  window.firebaseLogout = function() {
-    signOut(auth).catch(() => {});
-    location.reload();
-  };
-
-  // ── Auth state: restaura sessão ao recarregar página ────────────────────
-  onAuthStateChanged(auth, async function(user) {
-    if (user) {
-      console.log('[Firebase] Usuário detectado:', user.email);
-      // Sempre busca dados frescos da nuvem ao iniciar
-      var extra = { name: user.displayName || user.email.split('@')[0], phone: '', cpf: '', plan: 'Gratuito', code: null };
-      try {
-        const snap = await getDoc(doc(db, 'users', user.uid, 'data', 'profile'));
-        if (snap.exists()) extra = Object.assign({}, extra, snap.data());
-      } catch(e) {}
-      localStorage.setItem('petcare_user', JSON.stringify({
-        id: user.uid, name: extra.name, email: user.email,
-        phone: extra.phone || '', cpf: extra.cpf || '',
-        photo: user.photoURL || '', plan: extra.plan || 'Gratuito',
-        code: extra.code || null
-      }));
-      await window.loadDataCloud(user.uid);
-    } else {
-      // Limpar tudo ao deslogar
-      localStorage.removeItem('petcare_user');
-      localStorage.removeItem('petData');
-      localStorage.removeItem('petcare_paid');
-      localStorage.removeItem('petcare_code');
-      localStorage.removeItem('petcare_photos');
-    }
-  });
-
-  console.log('[PetCare Firebase] Módulo inicializado.');
-</script>
 </body>
 </html>
