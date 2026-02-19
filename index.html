@@ -2324,6 +2324,9 @@
                 <li><a href="#home" class="nav-link active" onclick="showSection('home')">🏠 Início</a></li>
                 <li><a href="#profile" class="nav-link" onclick="showSection('profile')">👤 Perfil</a></li>
             </ul>
+            <div id="user-info">
+                <button onclick="loginWithGoogle()" style="background: linear-gradient(135deg, #ff6b35, #8b5cf6); color: white; border: none; padding: 0.6rem 1.4rem; border-radius: 50px; font-size: 0.95rem; font-weight: 600; cursor: pointer; font-family: 'Outfit', sans-serif;">Entrar com Google</button>
+            </div>
         </nav>
     </header>
 
@@ -4274,6 +4277,44 @@
                 }
             }
         });
+    </script>
+
+    <!-- Supabase Auth -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      const supabase = window.supabase.createClient(
+        "https://chblwbctbkqolymbrqvh.supabase.co",
+        "sb_publishable_WT_rpILQTaihVpghi1MQ5A_C62NVvTL"
+      );
+
+      async function loginWithGoogle() {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: "https://petcarenew.vercel.app"
+          }
+        });
+
+        if (error) {
+          alert("Erro: " + error.message);
+        }
+      }
+
+      async function checkUser() {
+        const { data } = await supabase.auth.getUser();
+        if (data.user) {
+          document.getElementById("user-info").innerHTML =
+            "<span style='font-weight:500; font-size:0.9rem; color:#666;'>Olá, " + data.user.email + "</span>" +
+            " <button onclick='logout()' style='background:none; border:1px solid #ff6b35; color:#ff6b35; padding:0.4rem 1rem; border-radius:50px; font-size:0.85rem; font-weight:600; cursor:pointer; font-family:Outfit,sans-serif;'>Sair</button>";
+        }
+      }
+
+      async function logout() {
+        await supabase.auth.signOut();
+        window.location.reload();
+      }
+
+      checkUser();
     </script>
 </body>
 </html>
