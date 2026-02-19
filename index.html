@@ -4457,37 +4457,62 @@
   };
 
   // ── Auth state: detecta sessão ao carregar a página ──────────────────────
-  supabase.auth.onAuthStateChange(async (event, session) => {
-    console.log('[PetCare] Auth event:', event);
 
-    if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-      const user = session.user;
-      console.log('[PetCare] Usuário logado:', user.email);
-
-      // Garantir que perfil existe na tabela
-      const { data: existing } = await supabase
-        .from('profiles').select('id').eq('id', user.id).single();
-
-      if (!existing) {
-        await supabase.from('profiles').insert({
-          id: user.id,
-          email: user.email,
-          name: user.user_metadata?.full_name || user.email.split('@')[0],
-          phone: '',
-          cpf: '',
-          plan: 'Gratuito',
-          code: null,
-          created_at: new Date().toISOString()
-        });
+  // Tratar redirect do Google (token na URL hash)
+  async function handleOAuthRedirect() {
+    // Supabase v2 processa o hash automaticamente via getSession
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error) {
+      console.error('[PetCare] Erro ao obter sessão:', error.message);
+      return;
+    }
+    if (session) {
+      console.log('[PetCare] Sessão detectada via getSession:', session.user.email);
+      await processLogin(session.user);
+      // Limpar o hash feio da URL sem recarregar
+      if (window.location.hash.includes('access_token')) {
+        history.replaceState(null, '', window.location.pathname);
       }
+    }
+  }
 
-      await loadAllUserData(user.id);
+  async function processLogin(user) {
+    console.log('[PetCare] Processando login para:', user.email);
+    // Garantir que perfil existe na tabela
+    const { data: existing } = await supabase
+      .from('profiles').select('id').eq('id', user.id).single();
+
+    if (!existing) {
+      await supabase.from('profiles').insert({
+        id: user.id,
+        email: user.email,
+        name: user.user_metadata?.full_name || user.email.split('@')[0],
+        phone: '',
+        cpf: '',
+        plan: 'Gratuito',
+        code: null,
+        created_at: new Date().toISOString()
+      });
+    }
+    await loadAllUserData(user.id);
+    try { closeAuthModal(); } catch(e) {}
+    showToast('✅ Login realizado com sucesso! 🐾');
+  }
+
+  supabase.auth.onAuthStateChange(async (event, session) => {
+    console.log('[PetCare] Auth event:', event, session ? session.user?.email : 'sem sessão');
+
+    if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session) {
+      await processLogin(session.user);
     }
 
     if (event === 'SIGNED_OUT') {
       clearLocalStorage();
     }
   });
+
+  // Chamar ao inicializar para pegar o redirect do Google
+  handleOAuthRedirect();
 
   // ── Interceptar savePhotos existente ────────────────────────────────────
   const _origSetItem = localStorage.setItem.bind(localStorage);
