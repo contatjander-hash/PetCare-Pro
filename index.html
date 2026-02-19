@@ -4347,6 +4347,28 @@
     }
 
     checkSupabaseUser();
+    async function usuarioEstaLogado() {
+    const { data } = await supabaseClient.auth.getUser();
+    return data.user !== null;
+}
+async function showTab(tabName) {
+
+    // 🔐 Proteção para abas que precisam de login
+    if (tabName === "perfil") {
+        const { data } = await supabaseClient.auth.getUser();
+
+        if (!data.user) {
+            alert("Você precisa estar logado para acessar essa área.");
+            tabName = "login";
+        }
+    }
+
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+
+    document.getElementById(tabName).classList.add('active');
+}
 </script>
 
 </body>
