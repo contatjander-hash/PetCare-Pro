@@ -3753,15 +3753,14 @@
         async function logout() {
     if (!confirm("Tem certeza que deseja sair da sua conta?")) return;
 
-    // 1️⃣ Encerra sessão do Supabase
-    const { error } = await sb.auth.signOut();
+    const { error } = await supabaseClient.auth.signOut();
 
     if (error) {
         alert("Erro ao sair: " + error.message);
         return;
     }
 
-    // 2️⃣ Limpa seus dados locais
+    // Limpa seus dados locais
     localStorage.removeItem('petcare_user');
     localStorage.removeItem('petData');
     localStorage.removeItem('vaccines');
@@ -3769,7 +3768,7 @@
     localStorage.removeItem('weights');
     localStorage.removeItem('petcare_photos');
 
-    // 3️⃣ Redireciona para página inicial
+    // Redireciona
     window.location.href = "https://petcarenew.vercel.app";
 }
 
