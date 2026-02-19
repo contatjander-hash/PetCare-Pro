@@ -4304,13 +4304,13 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-    const supabase = window.supabase.createClient(
+    const supabaseClient = window.supabase.createClient(
         "https://chblwbctbkqolymbrqvh.supabase.co",
         "sb_publishable_WT_rpILQTaihVpghi1MQ5A_C62NVvTL"
     );
 
     async function loginWithGoogle() {
-        const { error } = await supabase.auth.signInWithOAuth({
+        const { error } = await supabaseClient.auth.signInWithOAuth({
             provider: "google",
             options: {
                 redirectTo: "https://petcarenew.vercel.app"
@@ -4323,7 +4323,8 @@
     }
 
     async function checkSupabaseUser() {
-        const { data } = await supabase.auth.getUser();
+        const { data } = await supabaseClient.auth.getUser()
+;
 
         if (data.user) {
             const userData = {
