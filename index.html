@@ -3491,112 +3491,48 @@
 
         function handleLogin(e) {
             e.preventDefault();
-            
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            
-            // Get stored users
-            const users = JSON.parse(localStorage.getItem('petcare_users') || '[]');
-            
-            // Find user
-            const user = users.find(u => u.email === email && u.password === password);
-            
-            if (user) {
-                // Login successful
-                localStorage.setItem('petcare_user', JSON.stringify(user));
-                closeAuthModal();
-                if (typeof loadDataCloud === 'function') {
-                    loadDataCloud(user.id).then(() => showToast('✅ Login realizado com sucesso!'));
-                } else {
-                    loadUserProfile();
-                    alert('✅ Login realizado com sucesso!');
-                }
+            if (typeof firebaseLogin === 'function') {
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                firebaseLogin(email, password);
             } else {
-                alert('❌ Email ou senha incorretos!');
+                alert('⚠️ Serviço de autenticação ainda carregando. Tente novamente.');
             }
         }
 
         function handleRegister(e) {
             e.preventDefault();
-            
+
             const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
             const phone = document.getElementById('registerPhone').value;
             const cpf = document.getElementById('registerCpf').value;
             const password = document.getElementById('registerPassword').value;
-            
+
             // Validate CPF
             const cpfNumbers = cpf.replace(/\D/g, '');
             if (!validateCPF(cpfNumbers)) {
                 alert('❌ CPF inválido! Verifique e tente novamente.');
                 return;
             }
-            
-            // Validate phone (must have 11 digits)
+
+            // Validate phone
             const phoneNumbers = phone.replace(/\D/g, '');
             if (phoneNumbers.length < 10 || phoneNumbers.length > 11) {
                 alert('❌ Telefone inválido! Use o formato (00) 00000-0000');
                 return;
             }
-            
+
             // Validate password strength
-            if (password.length < 8) {
-                alert('❌ Senha deve ter no mínimo 8 caracteres!');
-                return;
-            }
-            if (!/[a-z]/.test(password)) {
-                alert('❌ Senha deve conter letra minúscula!');
-                return;
-            }
-            if (!/[A-Z]/.test(password)) {
-                alert('❌ Senha deve conter letra maiúscula!');
-                return;
-            }
-            if (!/[0-9]/.test(password)) {
-                alert('❌ Senha deve conter número!');
-                return;
-            }
-            
-            // Get existing users
-            const users = JSON.parse(localStorage.getItem('petcare_users') || '[]');
-            
-            // Check if email already exists
-            if (users.find(u => u.email === email)) {
-                alert('❌ Este email já está cadastrado!');
-                return;
-            }
-            
-            // Check if CPF already exists
-            if (users.find(u => u.cpf === cpf)) {
-                alert('❌ Este CPF já está cadastrado!');
-                return;
-            }
-            
-            // Create new user
-            const newUser = {
-                id: Date.now().toString(),
-                name,
-                email,
-                phone,
-                cpf,
-                password,
-                createdAt: new Date().toISOString(),
-                plan: 'Gratuito',
-                code: null
-            };
-            
-            // Save user
-            users.push(newUser);
-            localStorage.setItem('petcare_users', JSON.stringify(users));
-            localStorage.setItem('petcare_user', JSON.stringify(newUser));
-            
-            // Close modal and load profile
-            closeAuthModal();
-            if (typeof loadDataCloud === 'function') {
-                loadDataCloud(newUser.id).then(() => showToast('✅ Conta criada com sucesso! Bem-vindo ao PetCare! 🐾'));
+            if (password.length < 8) { alert('❌ Senha deve ter no mínimo 8 caracteres!'); return; }
+            if (!/[a-z]/.test(password)) { alert('❌ Senha deve conter letra minúscula!'); return; }
+            if (!/[A-Z]/.test(password)) { alert('❌ Senha deve conter letra maiúscula!'); return; }
+            if (!/[0-9]/.test(password)) { alert('❌ Senha deve conter número!'); return; }
+
+            if (typeof firebaseRegister === 'function') {
+                firebaseRegister(email, password, { name, phone, cpf });
             } else {
-                loadUserProfile();
-                alert('✅ Conta criada com sucesso! Bem-vindo ao PetCare! 🐾');
+                alert('⚠️ Serviço de autenticação ainda carregando. Tente novamente.');
             }
         }
 
@@ -4155,7 +4091,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -4247,6 +4183,96 @@
   window.saveData = function() {
     localStorage.setItem('petData', JSON.stringify(petData));
     saveDataCloud(petData);
+  };
+
+  // ─── Login com Email/Senha ───────────────────────────────────────────────────
+  window.firebaseLogin = async (email, password) => {
+    try {
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      const user = result.user;
+
+      // Buscar dados extras salvos no Firestore (nome, phone, cpf)
+      let extraData = { name: user.displayName || email.split('@')[0], phone: '', cpf: '' };
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid, 'data', 'profile'));
+        if (snap.exists()) extraData = { ...extraData, ...snap.data() };
+      } catch(e) {}
+
+      const userData = {
+        id: user.uid,
+        name: extraData.name,
+        email: user.email,
+        phone: extraData.phone,
+        cpf: extraData.cpf,
+        photo: user.photoURL || '',
+        createdAt: user.metadata.creationTime,
+        plan: 'Gratuito',
+        code: null,
+        loginMethod: 'email'
+      };
+
+      localStorage.setItem('petcare_user', JSON.stringify(userData));
+      closeAuthModal();
+      showToast('✅ Login realizado com sucesso!');
+      await loadDataCloud(user.uid);
+
+    } catch (error) {
+      console.error('Erro login:', error.code);
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        alert('❌ Email ou senha incorretos!');
+      } else if (error.code === 'auth/too-many-requests') {
+        alert('⚠️ Muitas tentativas. Tente novamente mais tarde.');
+      } else {
+        alert('Erro ao fazer login: ' + error.message);
+      }
+    }
+  };
+
+  // ─── Cadastro com Email/Senha ─────────────────────────────────────────────
+  window.firebaseRegister = async (email, password, extra) => {
+    try {
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+      const user = result.user;
+
+      // Atualizar displayName no Firebase Auth
+      await updateProfile(user, { displayName: extra.name });
+
+      // Salvar dados extras (phone, cpf, name) no Firestore
+      await setDoc(doc(db, 'users', user.uid, 'data', 'profile'), {
+        name: extra.name,
+        phone: extra.phone,
+        cpf: extra.cpf,
+        createdAt: new Date().toISOString()
+      });
+
+      const userData = {
+        id: user.uid,
+        name: extra.name,
+        email: user.email,
+        phone: extra.phone,
+        cpf: extra.cpf,
+        photo: '',
+        createdAt: new Date().toISOString(),
+        plan: 'Gratuito',
+        code: null,
+        loginMethod: 'email'
+      };
+
+      localStorage.setItem('petcare_user', JSON.stringify(userData));
+      closeAuthModal();
+      showToast('✅ Conta criada com sucesso! Bem-vindo ao PetCare! 🐾');
+      await loadDataCloud(user.uid);
+
+    } catch (error) {
+      console.error('Erro cadastro:', error.code);
+      if (error.code === 'auth/email-already-in-use') {
+        alert('❌ Este email já está cadastrado!');
+      } else if (error.code === 'auth/weak-password') {
+        alert('❌ Senha muito fraca!');
+      } else {
+        alert('Erro ao criar conta: ' + error.message);
+      }
+    }
   };
 
   // ─── Login com Google ──────────────────────────────────────────────────────
