@@ -3505,8 +3505,12 @@
                 // Login successful
                 localStorage.setItem('petcare_user', JSON.stringify(user));
                 closeAuthModal();
-                loadUserProfile();
-                alert('✅ Login realizado com sucesso!');
+                if (typeof loadDataCloud === 'function') {
+                    loadDataCloud(user.id).then(() => showToast('✅ Login realizado com sucesso!'));
+                } else {
+                    loadUserProfile();
+                    alert('✅ Login realizado com sucesso!');
+                }
             } else {
                 alert('❌ Email ou senha incorretos!');
             }
@@ -3588,8 +3592,12 @@
             
             // Close modal and load profile
             closeAuthModal();
-            loadUserProfile();
-            alert('✅ Conta criada com sucesso! Bem-vindo ao PetCare! 🐾');
+            if (typeof loadDataCloud === 'function') {
+                loadDataCloud(newUser.id).then(() => showToast('✅ Conta criada com sucesso! Bem-vindo ao PetCare! 🐾'));
+            } else {
+                loadUserProfile();
+                alert('✅ Conta criada com sucesso! Bem-vindo ao PetCare! 🐾');
+            }
         }
 
         function loadUserProfile() {
@@ -3643,7 +3651,20 @@
 
         function logout() {
             if (confirm('Tem certeza que deseja sair da sua conta?')) {
+                // Limpa todos os dados do usuário
                 localStorage.removeItem('petcare_user');
+                localStorage.removeItem('petData');
+                localStorage.removeItem('petcare_paid');
+                localStorage.removeItem('petcare_code');
+                localStorage.removeItem('petcare_photos');
+                
+                // Reset variáveis em memória
+                petData = {
+                    name: '', species: '', breed: '', birthdate: '', photo: '',
+                    vaccines: [], medicines: [], weights: []
+                };
+                photoGallery = [];
+                
                 location.reload();
             }
         }
@@ -3853,6 +3874,7 @@
                             // Add to gallery
                             photoGallery.push(photo);
                             localStorage.setItem('petcare_photos', JSON.stringify(photoGallery));
+                            if (typeof savePhotosCloud === 'function') savePhotosCloud(photoGallery);
                             
                             // Update display
                             displayPhotos();
@@ -3931,6 +3953,7 @@
             if (confirm('Tem certeza que deseja excluir esta foto?')) {
                 photoGallery = photoGallery.filter(p => p.id != photoId);
                 localStorage.setItem('petcare_photos', JSON.stringify(photoGallery));
+                if (typeof savePhotosCloud === 'function') savePhotosCloud(photoGallery);
                 displayPhotos();
                 
                 // Close modal
@@ -3994,6 +4017,7 @@
                 // Código válido - desbloqueia app
                 localStorage.setItem('petcare_paid', 'true');
                 localStorage.setItem('petcare_code', code);
+                if (typeof savePaymentCloud === 'function') savePaymentCloud(true, code);
                 
                 // Close payment wall
                 closePaymentWall();
@@ -4094,6 +4118,7 @@
                 // Salva no localStorage (em produção, seria validado no servidor)
                 localStorage.setItem('petcare_paid', 'true');
                 localStorage.setItem('petcare_code', accessCode);
+                if (typeof savePaymentCloud === 'function') savePaymentCloud(true, accessCode);
                 
                 closePixPayment();
                 
@@ -4131,6 +4156,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAWEcycTgntSuRKabqWNULjwtLjKnoHApM",
@@ -4144,8 +4170,86 @@
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  const db = getFirestore(app);
   const provider = new GoogleAuthProvider();
 
+  // ─── Firestore: salvar dados do pet ───────────────────────────────────────
+  window.saveDataCloud = async (data) => {
+    const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+    if (!user) return;
+    try {
+      await setDoc(doc(db, 'users', user.id, 'data', 'petData'), data);
+    } catch (e) {
+      console.warn('Erro ao salvar no Firestore:', e);
+    }
+  };
+
+  // ─── Firestore: salvar fotos ──────────────────────────────────────────────
+  window.savePhotosCloud = async (photos) => {
+    const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+    if (!user) return;
+    try {
+      await setDoc(doc(db, 'users', user.id, 'data', 'photos'), { gallery: photos });
+    } catch (e) {
+      console.warn('Erro ao salvar fotos no Firestore:', e);
+    }
+  };
+
+  // ─── Firestore: salvar status de pagamento ────────────────────────────────
+  window.savePaymentCloud = async (paid, code) => {
+    const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+    if (!user) return;
+    try {
+      await setDoc(doc(db, 'users', user.id, 'data', 'payment'), { paid, code });
+    } catch (e) {
+      console.warn('Erro ao salvar pagamento no Firestore:', e);
+    }
+  };
+
+  // ─── Firestore: carregar todos os dados do usuário ────────────────────────
+  window.loadDataCloud = async (uid) => {
+    try {
+      // Pet data
+      const petSnap = await getDoc(doc(db, 'users', uid, 'data', 'petData'));
+      if (petSnap.exists()) {
+        petData = petSnap.data();
+        localStorage.setItem('petData', JSON.stringify(petData));
+        updatePetProfile();
+        renderVaccines();
+        renderMedicines();
+        renderWeights();
+      }
+
+      // Photos
+      const photoSnap = await getDoc(doc(db, 'users', uid, 'data', 'photos'));
+      if (photoSnap.exists()) {
+        photoGallery = photoSnap.data().gallery || [];
+        localStorage.setItem('petcare_photos', JSON.stringify(photoGallery));
+        displayPhotos();
+      }
+
+      // Payment
+      const paySnap = await getDoc(doc(db, 'users', uid, 'data', 'payment'));
+      if (paySnap.exists()) {
+        const { paid, code } = paySnap.data();
+        if (paid) localStorage.setItem('petcare_paid', 'true');
+        if (code) localStorage.setItem('petcare_code', code);
+      }
+
+      loadUserProfile();
+    } catch (e) {
+      console.warn('Erro ao carregar dados do Firestore:', e);
+    }
+  };
+
+  // ─── Intercepta saveData para também salvar na nuvem ─────────────────────
+  const _origSaveData = window.saveData;
+  window.saveData = function() {
+    localStorage.setItem('petData', JSON.stringify(petData));
+    saveDataCloud(petData);
+  };
+
+  // ─── Login com Google ──────────────────────────────────────────────────────
   window.entrarComGoogle = async () => {
     const btns = document.querySelectorAll('.google-signin-btn');
     btns.forEach(b => { b.disabled = true; b.style.opacity = '0.7'; });
@@ -4153,7 +4257,6 @@
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Salva no mesmo formato que o app espera
       const userData = {
         id: user.uid,
         name: user.displayName || 'Usuário Google',
@@ -4168,14 +4271,13 @@
       };
 
       localStorage.setItem('petcare_user', JSON.stringify(userData));
-
-      // Fecha modal e atualiza o perfil
       closeAuthModal();
-      loadUserProfile();
 
-      // Mostra boas-vindas
       const firstName = (user.displayName || 'Usuário').split(' ')[0];
       showToast(`✅ Bem-vindo, ${firstName}! 🐾`);
+
+      // Carrega dados da nuvem
+      await loadDataCloud(user.uid);
 
     } catch (error) {
       console.error("Erro no Login:", error.code);
@@ -4189,19 +4291,22 @@
     }
   };
 
-  // Sobrescreve a função logout para incluir signOut do Firebase
-  const _originalLogout = window.logout;
+  // ─── Logout ────────────────────────────────────────────────────────────────
   window.logout = function() {
     if (confirm('Tem certeza que deseja sair da sua conta?')) {
       localStorage.removeItem('petcare_user');
+      localStorage.removeItem('petData');
+      localStorage.removeItem('petcare_paid');
+      localStorage.removeItem('petcare_code');
+      localStorage.removeItem('petcare_photos');
       signOut(auth).catch(() => {});
       location.reload();
     }
   };
 
-  onAuthStateChanged(auth, (user) => {
+  // ─── Auth state: restaura sessão e carrega dados da nuvem ─────────────────
+  onAuthStateChanged(auth, async (user) => {
     if (user) {
-      // Se o Firebase tem sessão mas o localStorage foi limpo, restaura
       const savedUser = localStorage.getItem('petcare_user');
       if (!savedUser) {
         const userData = {
@@ -4217,8 +4322,9 @@
           loginMethod: 'google'
         };
         localStorage.setItem('petcare_user', JSON.stringify(userData));
-        if (typeof loadUserProfile === 'function') loadUserProfile();
       }
+      // Sempre carrega dados da nuvem ao detectar sessão ativa
+      await loadDataCloud(user.uid);
     }
   });
 </script>
