@@ -3750,25 +3750,28 @@
             }
         }
 
-        function logout() {
-            if (confirm('Tem certeza que deseja sair da sua conta?')) {
-                // Remove user account
-                localStorage.removeItem('petcare_user');
-                
-                // Remove pet data
-                localStorage.removeItem('petData');
-                localStorage.removeItem('vaccines');
-                localStorage.removeItem('medicines');
-                localStorage.removeItem('weights');
-                localStorage.removeItem('petcare_photos');
-                
-                // Remove premium access (keep if needed for next user)
-                // localStorage.removeItem('petcare_paid');
-                // localStorage.removeItem('petcare_code');
-                
-                location.reload();
-            }
-        }
+        async function logout() {
+    if (!confirm("Tem certeza que deseja sair da sua conta?")) return;
+
+    // 1️⃣ Encerra sessão do Supabase
+    const { error } = await sb.auth.signOut();
+
+    if (error) {
+        alert("Erro ao sair: " + error.message);
+        return;
+    }
+
+    // 2️⃣ Limpa seus dados locais
+    localStorage.removeItem('petcare_user');
+    localStorage.removeItem('petData');
+    localStorage.removeItem('vaccines');
+    localStorage.removeItem('medicines');
+    localStorage.removeItem('weights');
+    localStorage.removeItem('petcare_photos');
+
+    // 3️⃣ Redireciona para página inicial
+    window.location.href = "https://petcarenew.vercel.app";
+}
 
         // Navigation
         function scrollToTop() {
