@@ -3491,13 +3491,25 @@
 
         function handleLogin(e) {
             e.preventDefault();
-            if (typeof firebaseLogin === 'function') {
-                const email = document.getElementById('loginEmail').value;
-                const password = document.getElementById('loginPassword').value;
-                firebaseLogin(email, password);
-            } else {
-                alert('⚠️ Serviço de autenticação ainda carregando. Tente novamente.');
-            }
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const btn = e.target.querySelector('.auth-submit');
+            if (btn) { btn.disabled = true; btn.textContent = 'Entrando...'; }
+            
+            const tryLogin = (attempts) => {
+                if (typeof firebaseLogin === 'function') {
+                    firebaseLogin(email, password).finally(() => {
+                        if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
+                    });
+                } else if (attempts > 0) {
+                    setTimeout(() => tryLogin(attempts - 1), 300);
+                } else {
+                    if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
+                    alert('⚠️ Erro ao conectar. Recarregue a página e tente novamente.');
+                }
+            };
+            tryLogin(10);
         }
 
         function handleRegister(e) {
@@ -3529,11 +3541,22 @@
             if (!/[A-Z]/.test(password)) { alert('❌ Senha deve conter letra maiúscula!'); return; }
             if (!/[0-9]/.test(password)) { alert('❌ Senha deve conter número!'); return; }
 
-            if (typeof firebaseRegister === 'function') {
-                firebaseRegister(email, password, { name, phone, cpf });
-            } else {
-                alert('⚠️ Serviço de autenticação ainda carregando. Tente novamente.');
-            }
+            const btn = e.target.querySelector('.auth-submit');
+            if (btn) { btn.disabled = true; btn.textContent = 'Criando conta...'; }
+
+            const tryRegister = (attempts) => {
+                if (typeof firebaseRegister === 'function') {
+                    firebaseRegister(email, password, { name, phone, cpf }).finally(() => {
+                        if (btn) { btn.disabled = false; btn.textContent = 'Criar Conta'; }
+                    });
+                } else if (attempts > 0) {
+                    setTimeout(() => tryRegister(attempts - 1), 300);
+                } else {
+                    if (btn) { btn.disabled = false; btn.textContent = 'Criar Conta'; }
+                    alert('⚠️ Erro ao conectar. Recarregue a página e tente novamente.');
+                }
+            };
+            tryRegister(10);
         }
 
         function loadUserProfile() {
@@ -4212,6 +4235,7 @@
       };
 
       localStorage.setItem('petcare_user', JSON.stringify(userData));
+      if (typeof window._setAuthHandled === 'function') window._setAuthHandled();
       closeAuthModal();
       showToast('✅ Login realizado com sucesso!');
       await loadDataCloud(user.uid);
@@ -4259,6 +4283,7 @@
       };
 
       localStorage.setItem('petcare_user', JSON.stringify(userData));
+      if (typeof window._setAuthHandled === 'function') window._setAuthHandled();
       closeAuthModal();
       showToast('✅ Conta criada com sucesso! Bem-vindo ao PetCare! 🐾');
       await loadDataCloud(user.uid);
@@ -4331,25 +4356,37 @@
   };
 
   // ─── Auth state: restaura sessão e carrega dados da nuvem ─────────────────
+  let _authHandledByLogin = false;
+
+  // Sinaliza que o login já foi tratado manualmente (evita duplo carregamento)
+  window._setAuthHandled = () => { _authHandledByLogin = true; setTimeout(() => { _authHandledByLogin = false; }, 5000); };
+
   onAuthStateChanged(auth, async (user) => {
-    if (user) {
+    if (user && !_authHandledByLogin) {
+      // Restaura sessão automática (ex: ao recarregar a página)
       const savedUser = localStorage.getItem('petcare_user');
       if (!savedUser) {
+        // Buscar dados extras do Firestore (nome, phone, cpf)
+        let extraData = { name: user.displayName || user.email.split('@')[0], phone: '', cpf: '' };
+        try {
+          const snap = await getDoc(doc(db, 'users', user.uid, 'data', 'profile'));
+          if (snap.exists()) extraData = { ...extraData, ...snap.data() };
+        } catch(e) {}
+
         const userData = {
           id: user.uid,
-          name: user.displayName || 'Usuário Google',
+          name: extraData.name,
           email: user.email,
-          phone: user.phoneNumber || '',
-          cpf: '',
+          phone: extraData.phone,
+          cpf: extraData.cpf,
           photo: user.photoURL || '',
-          createdAt: new Date().toISOString(),
+          createdAt: user.metadata.creationTime,
           plan: 'Gratuito',
           code: null,
-          loginMethod: 'google'
+          loginMethod: user.providerData[0]?.providerId === 'google.com' ? 'google' : 'email'
         };
         localStorage.setItem('petcare_user', JSON.stringify(userData));
       }
-      // Sempre carrega dados da nuvem ao detectar sessão ativa
       await loadDataCloud(user.uid);
     }
   });
