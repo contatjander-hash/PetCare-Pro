@@ -3131,9 +3131,10 @@
             }
         }
 
-        // Save data to localStorage
+        // Save data to localStorage + nuvem
         function saveData() {
             localStorage.setItem('petData', JSON.stringify(petData));
+            if (typeof saveDataCloud === 'function') saveDataCloud(petData);
         }
 
         // Modal functions
@@ -4134,10 +4135,10 @@
 
   // ─── Firestore: salvar dados do pet ───────────────────────────────────────
   window.saveDataCloud = async (data) => {
-    const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
-    if (!user) return;
+    const fbUser = auth.currentUser;
+    if (!fbUser) return;
     try {
-      await setDoc(doc(db, 'users', user.id, 'data', 'petData'), data);
+      await setDoc(doc(db, 'users', fbUser.uid, 'data', 'petData'), data);
     } catch (e) {
       console.warn('Erro ao salvar no Firestore:', e);
     }
@@ -4145,10 +4146,10 @@
 
   // ─── Firestore: salvar fotos ──────────────────────────────────────────────
   window.savePhotosCloud = async (photos) => {
-    const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
-    if (!user) return;
+    const fbUser = auth.currentUser;
+    if (!fbUser) return;
     try {
-      await setDoc(doc(db, 'users', user.id, 'data', 'photos'), { gallery: photos });
+      await setDoc(doc(db, 'users', fbUser.uid, 'data', 'photos'), { gallery: photos });
     } catch (e) {
       console.warn('Erro ao salvar fotos no Firestore:', e);
     }
@@ -4156,10 +4157,10 @@
 
   // ─── Firestore: salvar status de pagamento ────────────────────────────────
   window.savePaymentCloud = async (paid, code) => {
-    const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
-    if (!user) return;
+    const fbUser = auth.currentUser;
+    if (!fbUser) return;
     try {
-      await setDoc(doc(db, 'users', user.id, 'data', 'payment'), { paid, code });
+      await setDoc(doc(db, 'users', fbUser.uid, 'data', 'payment'), { paid, code });
     } catch (e) {
       console.warn('Erro ao salvar pagamento no Firestore:', e);
     }
@@ -4168,10 +4169,23 @@
   // ─── Firestore: carregar todos os dados do usuário ────────────────────────
   window.loadDataCloud = async (uid) => {
     try {
+      // Perfil (nome, phone, cpf) - atualiza localStorage do user
+      const profileSnap = await getDoc(doc(db, 'users', uid, 'data', 'profile'));
+      if (profileSnap.exists()) {
+        const savedUser = JSON.parse(localStorage.getItem('petcare_user') || '{}');
+        const profile = profileSnap.data();
+        const updatedUser = { ...savedUser, ...profile, id: uid };
+        localStorage.setItem('petcare_user', JSON.stringify(updatedUser));
+      }
+
       // Pet data
       const petSnap = await getDoc(doc(db, 'users', uid, 'data', 'petData'));
       if (petSnap.exists()) {
         petData = petSnap.data();
+        // Garantir que os arrays existem
+        if (!petData.vaccines) petData.vaccines = [];
+        if (!petData.medicines) petData.medicines = [];
+        if (!petData.weights) petData.weights = [];
         localStorage.setItem('petData', JSON.stringify(petData));
         updatePetProfile();
         renderVaccines();
@@ -4198,6 +4212,7 @@
       loadUserProfile();
     } catch (e) {
       console.warn('Erro ao carregar dados do Firestore:', e);
+      loadUserProfile();
     }
   };
 
