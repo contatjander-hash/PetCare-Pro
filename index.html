@@ -1200,7 +1200,22 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+// Exemplo de como deve ficar sua função de adicionar peso
+window.addWeight = async function(newWeight) {
+  const user = auth.currentUser;
+  if (!user) return;
 
+  let localData = JSON.parse(localStorage.getItem('petcare_user'));
+  localData.pet.weight.push({ value: newWeight, date: new Date().toISOString() });
+
+  // SALVA NA NUVEM (Firestore)
+  await updateDoc(doc(db, 'users', user.uid, 'data', 'profile'), {
+    pet: localData.pet
+  });
+
+  localStorage.setItem('petcare_user', JSON.stringify(localData));
+  updateDashboard();
+};
   const firebaseConfig = {
     apiKey: "AIzaSyAWEcycTgntSuRKabqWNULjwtLjKnoHApM",
     authDomain: "petcarepro-9233b.firebaseapp.com",
@@ -1521,35 +1536,42 @@
     }
   };
 
-  // ─── Auth state: restaura sessão e carrega dados da nuvem ─────────────────
+ // ─── Auth state: restaura sessão e carrega dados da nuvem corrigido ──────
   var _authHandledByLogin = false;
 
   onAuthStateChanged(auth, async function(user) {
-    console.log('[PetCare Firebase] onAuthStateChanged:', user ? user.email : 'null', 'handled:', _authHandledByLogin);
     if (user && !_authHandledByLogin) {
-      var savedUser = localStorage.getItem('petcare_user');
-      if (!savedUser) {
-        var extraData = { name: user.displayName || user.email.split('@')[0], phone: '', cpf: '' };
-        try {
-          const snap = await getDoc(doc(db, 'users', user.uid, 'data', 'profile'));
-          if (snap.exists()) extraData = Object.assign({}, extraData, snap.data());
-        } catch(e) {}
-
-        var userData = {
-          id: user.uid,
-          name: extraData.name,
-          email: user.email,
-          phone: extraData.phone,
-          cpf: extraData.cpf,
-          photo: user.photoURL || '',
-          createdAt: user.metadata.creationTime,
-          plan: 'Gratuito',
-          code: null,
-          loginMethod: user.providerData[0]?.providerId === 'google.com' ? 'google' : 'email'
-        };
-        localStorage.setItem('petcare_user', JSON.stringify(userData));
+      // SEMPRE busca do Firestore para garantir que o Pet e o Plano apareçam
+      let userData = null;
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid, 'data', 'profile'));
+        if (snap.exists()) {
+          userData = snap.data();
+          console.log('[PetCare] Dados recuperados da nuvem');
+        }
+      } catch(e) {
+        console.error("Erro ao carregar dados:", e);
       }
-      await window.loadDataCloud(user.uid);
+
+      // Se não houver dados na nuvem, cria o padrão
+      if (!userData) {
+        userData = {
+          id: user.uid,
+          name: user.displayName || user.email.split('@')[0],
+          email: user.email,
+          plan: 'Gratuito',
+          pet: { name: 'Seu Pet', weight: [], species: 'Cão' }
+        };
+        // Salva imediatamente para não perder
+        await setDoc(doc(db, 'users', user.uid, 'data', 'profile'), userData);
+      }
+
+      // Atualiza o localstorage e a tela
+      localStorage.setItem('petcare_user', JSON.stringify(userData));
+      updateDashboard(); 
+    } else if (!user) {
+      localStorage.removeItem('petcare_user');
+      // Lógica para deslogar...
     }
   });
 
