@@ -1485,46 +1485,6 @@
             margin-top: 1rem;
         }
 
-        .google-signin-btn {
-            width: 100%;
-            padding: 0.85rem;
-            background: white;
-            color: #444;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-            margin-top: 0.75rem;
-            transition: all 0.2s;
-            font-family: 'Outfit', sans-serif;
-        }
-        .google-signin-btn:hover {
-            background: #f5f5f5;
-            border-color: #bbb;
-            transform: translateY(-1px);
-        }
-        .auth-divider {
-            text-align: center;
-            color: var(--text-tertiary);
-            font-size: 0.85rem;
-            margin: 0.75rem 0;
-            position: relative;
-        }
-        .auth-divider::before, .auth-divider::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            width: 42%;
-            height: 1px;
-            background: var(--border);
-        }
-        .auth-divider::before { left: 0; }
-        .auth-divider::after { right: 0; }
         .auth-submit:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
@@ -3026,11 +2986,6 @@
                     </div>
                 </div>
                 <button type="submit" class="auth-submit">Entrar</button>
-                <div class="auth-divider">ou</div>
-                <button type="button" class="google-signin-btn" onclick="loginComGoogle()">
-                    <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-                    Continuar com Google
-                </button>
             </form>
 
             <!-- Register Form -->
@@ -3075,11 +3030,6 @@
                     </div>
                 </div>
                 <button type="submit" class="auth-submit">Criar Conta</button>
-                <div class="auth-divider">ou</div>
-                <button type="button" class="google-signin-btn" onclick="loginComGoogle()">
-                    <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-                    Cadastrar com Google
-                </button>
             </form>
         </div>
     </div>
@@ -3156,10 +3106,9 @@
             }
         }
 
-        // Save data to localStorage + Supabase
+        // Save data to localStorage
         function saveData() {
             localStorage.setItem('petData', JSON.stringify(petData));
-            if (typeof window.supabaseSavePet === 'function') window.supabaseSavePet(petData);
         }
 
         // Modal functions
@@ -3614,38 +3563,105 @@
 
         function handleLogin(e) {
             e.preventDefault();
+            
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            if (typeof window.supabaseLogin === 'function') {
-                window.supabaseLogin(email, password);
+            
+            // Get stored users
+            const users = JSON.parse(localStorage.getItem('petcare_users') || '[]');
+            
+            // Find user
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                // Login successful
+                localStorage.setItem('petcare_user', JSON.stringify(user));
+                closeAuthModal();
+                loadUserProfile();
+                alert('✅ Login realizado com sucesso!');
             } else {
-                showToast('⚠️ Aguardando conexão... Tente novamente em segundos.');
+                alert('❌ Email ou senha incorretos!');
             }
         }
 
         function handleRegister(e) {
             e.preventDefault();
+            
             const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
             const phone = document.getElementById('registerPhone').value;
             const cpf = document.getElementById('registerCpf').value;
             const password = document.getElementById('registerPassword').value;
-
-            // Validações locais mantidas
+            
+            // Validate CPF
             const cpfNumbers = cpf.replace(/\D/g, '');
-            if (!validateCPF(cpfNumbers)) { alert('❌ CPF inválido!'); return; }
-            const phoneNumbers = phone.replace(/\D/g, '');
-            if (phoneNumbers.length < 10 || phoneNumbers.length > 11) { alert('❌ Telefone inválido!'); return; }
-            if (password.length < 8) { alert('❌ Senha mínimo 8 caracteres!'); return; }
-            if (!/[a-z]/.test(password)) { alert('❌ Senha precisa de letra minúscula!'); return; }
-            if (!/[A-Z]/.test(password)) { alert('❌ Senha precisa de letra maiúscula!'); return; }
-            if (!/[0-9]/.test(password)) { alert('❌ Senha precisa de número!'); return; }
-
-            if (typeof window.supabaseRegister === 'function') {
-                window.supabaseRegister(email, password, { name, phone, cpf });
-            } else {
-                showToast('⚠️ Aguardando conexão... Tente novamente em segundos.');
+            if (!validateCPF(cpfNumbers)) {
+                alert('❌ CPF inválido! Verifique e tente novamente.');
+                return;
             }
+            
+            // Validate phone (must have 11 digits)
+            const phoneNumbers = phone.replace(/\D/g, '');
+            if (phoneNumbers.length < 10 || phoneNumbers.length > 11) {
+                alert('❌ Telefone inválido! Use o formato (00) 00000-0000');
+                return;
+            }
+            
+            // Validate password strength
+            if (password.length < 8) {
+                alert('❌ Senha deve ter no mínimo 8 caracteres!');
+                return;
+            }
+            if (!/[a-z]/.test(password)) {
+                alert('❌ Senha deve conter letra minúscula!');
+                return;
+            }
+            if (!/[A-Z]/.test(password)) {
+                alert('❌ Senha deve conter letra maiúscula!');
+                return;
+            }
+            if (!/[0-9]/.test(password)) {
+                alert('❌ Senha deve conter número!');
+                return;
+            }
+            
+            // Get existing users
+            const users = JSON.parse(localStorage.getItem('petcare_users') || '[]');
+            
+            // Check if email already exists
+            if (users.find(u => u.email === email)) {
+                alert('❌ Este email já está cadastrado!');
+                return;
+            }
+            
+            // Check if CPF already exists
+            if (users.find(u => u.cpf === cpf)) {
+                alert('❌ Este CPF já está cadastrado!');
+                return;
+            }
+            
+            // Create new user
+            const newUser = {
+                id: Date.now().toString(),
+                name,
+                email,
+                phone,
+                cpf,
+                password,
+                createdAt: new Date().toISOString(),
+                plan: 'Gratuito',
+                code: null
+            };
+            
+            // Save user
+            users.push(newUser);
+            localStorage.setItem('petcare_users', JSON.stringify(users));
+            localStorage.setItem('petcare_user', JSON.stringify(newUser));
+            
+            // Close modal and load profile
+            closeAuthModal();
+            loadUserProfile();
+            alert('✅ Conta criada com sucesso! Bem-vindo ao PetCare! 🐾');
         }
 
         function loadUserProfile() {
@@ -3710,20 +3726,21 @@
 
         function logout() {
             if (confirm('Tem certeza que deseja sair da sua conta?')) {
-                // Limpar TODO o localStorage ao deslogar
+                // Remove user account
                 localStorage.removeItem('petcare_user');
+                
+                // Remove pet data
                 localStorage.removeItem('petData');
                 localStorage.removeItem('vaccines');
                 localStorage.removeItem('medicines');
                 localStorage.removeItem('weights');
                 localStorage.removeItem('petcare_photos');
-                localStorage.removeItem('petcare_paid');
-                localStorage.removeItem('petcare_code');
-                if (typeof window.supabaseLogout === 'function') {
-                    window.supabaseLogout();
-                } else {
-                    location.reload();
-                }
+                
+                // Remove premium access (keep if needed for next user)
+                // localStorage.removeItem('petcare_paid');
+                // localStorage.removeItem('petcare_code');
+                
+                location.reload();
             }
         }
 
@@ -3941,7 +3958,6 @@
                             // Add to gallery
                             photoGallery.push(photo);
                             localStorage.setItem('petcare_photos', JSON.stringify(photoGallery));
-                            if (typeof window._syncPhotosToCloud === 'function') window._syncPhotosToCloud(photoGallery);
                             
                             // Update display
                             displayPhotos();
@@ -4106,7 +4122,6 @@
                 // Also set paid flag for backward compatibility
                 localStorage.setItem('petcare_paid', 'true');
                 localStorage.setItem('petcare_code', code);
-                if (typeof window.supabaseSavePayment === 'function') window.supabaseSavePayment(true, code);
                 
                 // Close payment wall
                 closePaymentWall();
@@ -4223,9 +4238,11 @@
                 // 3. Send email with code
                 // 4. Store code in database linked to user
                 
+                // For now, we'll store it locally as a demo
+                // REMOVE these lines in production:
                 localStorage.setItem('petcare_paid', 'true');
                 localStorage.setItem('petcare_code', accessCode);
-                if (typeof window.supabaseSavePayment === 'function') window.supabaseSavePayment(true, accessCode);
+                // Instead, the code should only be validated when entered by user
                 
                 closePixPayment();
                 updatePricingVisibility();
@@ -4258,272 +4275,5 @@
             }
         });
     </script>
-
-<script type="module">
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
-  // ── Configuração Supabase ────────────────────────────────────────────────
-  const SUPABASE_URL = 'https://ojkvaxnjzdjqfgioeqei.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9qa3ZheG5qemRqcWZnaW9lcWVpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1MjYwODYsImV4cCI6MjA4NzEwMjA4Nn0.Vsaeqc5VNA-Ap_eUZwc52RxtT4AiJmAwmWa5blYFiTk';
-  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-  console.log('[PetCare] Supabase conectado');
-
-  // ── Helpers internos ─────────────────────────────────────────────────────
-  function clearLocalStorage() {
-    ['petcare_user','petData','vaccines','medicines','weights',
-     'petcare_photos','petcare_paid','petcare_code'].forEach(k => localStorage.removeItem(k));
-  }
-
-  function applyUserToUI(userData) {
-    localStorage.setItem('petcare_user', JSON.stringify(userData));
-    if (userData.plan === 'Premium') {
-      localStorage.setItem('petcare_paid', 'true');
-      if (userData.code) localStorage.setItem('petcare_code', userData.code);
-    }
-    try { loadUserProfile(); } catch(e) {}
-    try { updatePricingVisibility(); } catch(e) {}
-  }
-
-  // ── Carregar todos os dados do usuário da nuvem ──────────────────────────
-  async function loadAllUserData(userId) {
-    try {
-      // Perfil
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (profile) {
-        applyUserToUI({
-          id: userId,
-          name: profile.name || '',
-          email: profile.email || '',
-          phone: profile.phone || '',
-          cpf: profile.cpf || '',
-          profilePhoto: profile.photo || '',
-          plan: profile.plan || 'Gratuito',
-          code: profile.code || null,
-        });
-      }
-
-      // Pet
-      const { data: pet } = await supabase
-        .from('pets')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
-
-      if (pet && pet.data) {
-        const cloudPet = pet.data;
-        if (!cloudPet.vaccines) cloudPet.vaccines = [];
-        if (!cloudPet.medicines) cloudPet.medicines = [];
-        if (!cloudPet.weights) cloudPet.weights = [];
-        Object.assign(petData, cloudPet);
-        localStorage.setItem('petData', JSON.stringify(petData));
-        try { updatePetProfile(); } catch(e) {}
-        try { renderVaccines(); } catch(e) {}
-        try { renderMedicines(); } catch(e) {}
-        try { renderWeights(); } catch(e) {}
-      }
-
-      // Fotos
-      const { data: photosRow } = await supabase
-        .from('photos')
-        .select('gallery')
-        .eq('user_id', userId)
-        .single();
-
-      if (photosRow && photosRow.gallery) {
-        photoGallery.length = 0;
-        photosRow.gallery.forEach(p => photoGallery.push(p));
-        localStorage.setItem('petcare_photos', JSON.stringify(photoGallery));
-        try { displayPhotos(); } catch(e) {}
-      }
-
-      console.log('[PetCare] Dados carregados do Supabase!');
-    } catch(e) {
-      console.error('[PetCare] Erro ao carregar dados:', e.message);
-    }
-  }
-
-  // ── Salvar pet na nuvem ──────────────────────────────────────────────────
-  window.supabaseSavePet = async function(data) {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    try {
-      await supabase.from('pets').upsert({
-        user_id: user.id,
-        data: JSON.parse(JSON.stringify(data)),
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'user_id' });
-      console.log('[PetCare] Pet salvo no Supabase');
-    } catch(e) { console.error('[PetCare] Erro ao salvar pet:', e.message); }
-  };
-
-  // ── Salvar fotos na nuvem ────────────────────────────────────────────────
-  window.supabaseSavePhotos = async function(photos) {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    try {
-      await supabase.from('photos').upsert({
-        user_id: user.id,
-        gallery: photos.slice(-20),
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'user_id' });
-    } catch(e) { console.error('[PetCare] Erro ao salvar fotos:', e.message); }
-  };
-
-  // ── Salvar pagamento na nuvem ────────────────────────────────────────────
-  window.supabaseSavePayment = async function(paid, code) {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    try {
-      if (paid) {
-        await supabase.from('profiles').update({
-          plan: 'Premium',
-          code: code,
-          updated_at: new Date().toISOString()
-        }).eq('id', user.id);
-        console.log('[PetCare] Plano Premium salvo no Supabase');
-      }
-    } catch(e) { console.error('[PetCare] Erro ao salvar pagamento:', e.message); }
-  };
-
-  // ── Login com Email ──────────────────────────────────────────────────────
-  window.supabaseLogin = async function(email, password) {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      if (error.message.includes('Invalid login')) {
-        alert('❌ Email ou senha incorretos!');
-      } else {
-        alert('Erro ao fazer login: ' + error.message);
-      }
-      return;
-    }
-    closeAuthModal();
-    showToast('✅ Login realizado com sucesso! 🐾');
-    await loadAllUserData(data.user.id);
-  };
-
-  // ── Cadastro com Email ───────────────────────────────────────────────────
-  window.supabaseRegister = async function(email, password, extra) {
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error) {
-      if (error.message.includes('already registered')) {
-        alert('❌ Este email já está cadastrado!');
-      } else {
-        alert('Erro ao criar conta: ' + error.message);
-      }
-      return;
-    }
-    const userId = data.user.id;
-    // Salvar perfil na tabela profiles
-    await supabase.from('profiles').upsert({
-      id: userId,
-      email,
-      name: extra.name,
-      phone: extra.phone,
-      cpf: extra.cpf,
-      plan: 'Gratuito',
-      code: null,
-      created_at: new Date().toISOString()
-    }, { onConflict: 'id' });
-
-    applyUserToUI({
-      id: userId, name: extra.name, email,
-      phone: extra.phone, cpf: extra.cpf,
-      plan: 'Gratuito', code: null
-    });
-    closeAuthModal();
-    showToast('✅ Conta criada! Verifique seu email para confirmar. 🐾');
-  };
-
-  // ── Login com Google ─────────────────────────────────────────────────────
-  window.loginComGoogle = async function() {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.href }
-    });
-    if (error) alert('Erro ao entrar com Google: ' + error.message);
-  };
-
-  // ── Logout ───────────────────────────────────────────────────────────────
-  window.supabaseLogout = async function() {
-    await supabase.auth.signOut();
-    clearLocalStorage();
-    location.reload();
-  };
-
-  // ── Auth state: detecta sessão ao carregar a página ──────────────────────
-
-  // Tratar redirect do Google (token na URL hash)
-  async function handleOAuthRedirect() {
-    // Supabase v2 processa o hash automaticamente via getSession
-    const { data: { session }, error } = await supabase.auth.getSession();
-    if (error) {
-      console.error('[PetCare] Erro ao obter sessão:', error.message);
-      return;
-    }
-    if (session) {
-      console.log('[PetCare] Sessão detectada via getSession:', session.user.email);
-      await processLogin(session.user);
-      // Limpar o hash feio da URL sem recarregar
-      if (window.location.hash.includes('access_token')) {
-        history.replaceState(null, '', window.location.pathname);
-      }
-    }
-  }
-
-  async function processLogin(user) {
-    console.log('[PetCare] Processando login para:', user.email);
-    // Garantir que perfil existe na tabela
-    const { data: existing } = await supabase
-      .from('profiles').select('id').eq('id', user.id).single();
-
-    if (!existing) {
-      await supabase.from('profiles').insert({
-        id: user.id,
-        email: user.email,
-        name: user.user_metadata?.full_name || user.email.split('@')[0],
-        phone: '',
-        cpf: '',
-        plan: 'Gratuito',
-        code: null,
-        created_at: new Date().toISOString()
-      });
-    }
-    await loadAllUserData(user.id);
-    try { closeAuthModal(); } catch(e) {}
-    showToast('✅ Login realizado com sucesso! 🐾');
-  }
-
-  supabase.auth.onAuthStateChange(async (event, session) => {
-    console.log('[PetCare] Auth event:', event, session ? session.user?.email : 'sem sessão');
-
-    if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session) {
-      await processLogin(session.user);
-    }
-
-    if (event === 'SIGNED_OUT') {
-      clearLocalStorage();
-    }
-  });
-
-  // Chamar ao inicializar para pegar o redirect do Google
-  handleOAuthRedirect();
-
-  // ── Interceptar savePhotos existente ────────────────────────────────────
-  const _origSetItem = localStorage.setItem.bind(localStorage);
-  // Observar quando fotos são salvas localmente e espelhar na nuvem
-  window._syncPhotosToCloud = function(photos) {
-    if (typeof window.supabaseSavePhotos === 'function') {
-      window.supabaseSavePhotos(photos);
-    }
-  };
-
-  console.log('[PetCare] Supabase módulo inicializado.');
-</script>
 </body>
 </html>
