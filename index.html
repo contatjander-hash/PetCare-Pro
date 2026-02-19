@@ -280,37 +280,6 @@
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
         }
 
-        .scroll-indicator {
-            position: absolute;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 2;
-            animation: bounce 2s ease-in-out infinite;
-        }
-
-        .scroll-indicator span {
-            display: block;
-            width: 30px;
-            height: 50px;
-            border: 2px solid white;
-            border-radius: 25px;
-            position: relative;
-        }
-
-        .scroll-indicator span::before {
-            content: '';
-            position: absolute;
-            top: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 6px;
-            height: 6px;
-            background: white;
-            border-radius: 50%;
-            animation: scrollDot 2s ease-in-out infinite;
-        }
-
         /* Hero Section */
         .hero {
             padding: 4rem 0 3rem;
@@ -1438,62 +1407,6 @@
             font-size: 0.95rem;
         }
 
-        .google-signin-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-            width: 100%;
-            padding: 0.85rem 1.5rem;
-            background: #ffffff;
-            color: #3c4043;
-            border: 1.5px solid #dadce0;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            font-family: 'Outfit', sans-serif;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            margin-top: 1.25rem;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-            user-select: none;
-        }
-
-        .google-signin-btn:hover {
-            background: #f8f9fa;
-            border-color: #bdc1c6;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-            transform: translateY(-2px);
-        }
-
-        .google-signin-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .google-signin-btn svg {
-            flex-shrink: 0;
-        }
-
-        .auth-divider {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin: 1.25rem 0 0;
-            color: var(--text-tertiary);
-            font-size: 0.85rem;
-        }
-
-        .auth-divider::before,
-        .auth-divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border);
-        }
-
         .auth-tabs {
             display: flex;
             gap: 1rem;
@@ -1575,6 +1488,87 @@
         .auth-submit:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.25rem 0 0;
+            color: var(--text-tertiary);
+            font-size: 0.85rem;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .google-signin-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            width: 100%;
+            padding: 0.85rem 1.5rem;
+            background: #ffffff;
+            color: #3c4043;
+            border: 1.5px solid #dadce0;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-top: 1rem;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        .google-signin-btn:hover {
+            background: #f8f9fa;
+            border-color: #bdc1c6;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .google-signin-btn:active {
+            transform: translateY(0);
+        }
+
+        .google-signin-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Password Strength Indicator */
+        .strength-bar {
+            flex: 1;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .strength-bar.weak {
+            background: #ef4444;
+        }
+
+        .strength-bar.medium {
+            background: #f59e0b;
+        }
+
+        .strength-bar.good {
+            background: #10b981;
+        }
+
+        .strength-bar.strong {
+            background: #10b981;
         }
 
         /* Profile Section */
@@ -2411,9 +2405,6 @@
                     Começar Agora ✨
                 </button>
             </div>
-            <div class="scroll-indicator">
-                <span></span>
-            </div>
         </section>
 
         <section class="hero">
@@ -2554,7 +2545,7 @@
                                 Galeria
                             </h3>
                         </div>
-                        <div class="photo-grid">
+                        <div class="photo-grid" id="dashPhotoGrid">
                             <div class="photo-placeholder">🖼️</div>
                             <div class="photo-placeholder">🖼️</div>
                             <div class="photo-placeholder photo-upload" id="uploadPhotoBtn">+</div>
@@ -3063,15 +3054,31 @@
                 </div>
                 <div class="form-group">
                     <label>Telefone</label>
-                    <input type="tel" id="registerPhone" required placeholder="(00) 00000-0000">
+                    <input type="tel" id="registerPhone" required placeholder="(00) 00000-0000" maxlength="15">
+                    <small style="color: var(--text-secondary); font-size: 0.85rem;">Formato: (12) 34567-8900</small>
                 </div>
                 <div class="form-group">
                     <label>CPF</label>
-                    <input type="text" id="registerCpf" required placeholder="000.000.000-00">
+                    <input type="text" id="registerCpf" required placeholder="000.000.000-00" maxlength="14">
+                    <small style="color: var(--text-secondary); font-size: 0.85rem;">Apenas números</small>
+                    <div id="cpfError" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.5rem; display: none;">
+                        ❌ CPF inválido
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Senha</label>
-                    <input type="password" id="registerPassword" required placeholder="••••••••" minlength="6">
+                    <input type="password" id="registerPassword" required placeholder="••••••••" minlength="8">
+                    <div id="passwordStrength" style="margin-top: 0.75rem;">
+                        <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                            <div class="strength-bar" id="strength1"></div>
+                            <div class="strength-bar" id="strength2"></div>
+                            <div class="strength-bar" id="strength3"></div>
+                            <div class="strength-bar" id="strength4"></div>
+                        </div>
+                        <small id="strengthText" style="color: var(--text-secondary); font-size: 0.85rem;">
+                            Mínimo 8 caracteres, letra maiúscula, minúscula e número
+                        </small>
+                    </div>
                 </div>
                 <button type="submit" class="auth-submit">Criar Conta</button>
                 <div class="auth-divider">ou</div>
@@ -3248,23 +3255,6 @@
             // For now, keeping the demo chart
         }
 
-        // Event Listeners
-        document.getElementById('addPetBtn').addEventListener('click', () => {
-            openModal('petModal');
-        });
-
-        document.getElementById('addVaccineBtn').addEventListener('click', () => {
-            openModal('vaccineModal');
-        });
-
-        document.getElementById('addMedicineBtn').addEventListener('click', () => {
-            openModal('medicineModal');
-        });
-
-        document.getElementById('addWeightBtn').addEventListener('click', () => {
-            openModal('weightModal');
-        });
-
         // Form submissions
         document.getElementById('petForm').addEventListener('submit', (e) => {
             e.preventDefault();
@@ -3341,6 +3331,137 @@
             });
         });
 
+        // CPF Mask and Validation
+        function maskCPF(value) {
+            value = value.replace(/\D/g, ''); // Remove tudo que não é número
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            return value;
+        }
+
+        function validateCPF(cpf) {
+            cpf = cpf.replace(/\D/g, '');
+            
+            if (cpf.length !== 11) return false;
+            
+            // Elimina CPFs invalidos conhecidos
+            if (/^(\d)\1{10}$/.test(cpf)) return false;
+            
+            // Valida 1o digito
+            let add = 0;
+            for (let i = 0; i < 9; i++) {
+                add += parseInt(cpf.charAt(i)) * (10 - i);
+            }
+            let rev = 11 - (add % 11);
+            if (rev === 10 || rev === 11) rev = 0;
+            if (rev !== parseInt(cpf.charAt(9))) return false;
+            
+            // Valida 2o digito
+            add = 0;
+            for (let i = 0; i < 10; i++) {
+                add += parseInt(cpf.charAt(i)) * (11 - i);
+            }
+            rev = 11 - (add % 11);
+            if (rev === 10 || rev === 11) rev = 0;
+            if (rev !== parseInt(cpf.charAt(10))) return false;
+            
+            return true;
+        }
+
+        // Phone Mask
+        function maskPhone(value) {
+            value = value.replace(/\D/g, ''); // Remove tudo que não é número
+            value = value.replace(/^(\d{2})(\d)/g, '($1) $2');
+            value = value.replace(/(\d)(\d{4})$/, '$1-$2');
+            return value;
+        }
+
+        // Password Strength Checker
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            const bars = ['strength1', 'strength2', 'strength3', 'strength4'];
+            const text = document.getElementById('strengthText');
+            
+            // Reset bars
+            bars.forEach(id => {
+                document.getElementById(id).className = 'strength-bar';
+            });
+            
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^a-zA-Z0-9]/.test(password)) strength++;
+            
+            // Update bars
+            if (strength >= 1) {
+                document.getElementById('strength1').classList.add('weak');
+                text.textContent = 'Senha fraca';
+                text.style.color = '#ef4444';
+            }
+            if (strength >= 2) {
+                document.getElementById('strength2').classList.add('medium');
+                text.textContent = 'Senha média';
+                text.style.color = '#f59e0b';
+            }
+            if (strength >= 3) {
+                document.getElementById('strength3').classList.add('good');
+                text.textContent = 'Senha boa';
+                text.style.color = '#10b981';
+            }
+            if (strength >= 4) {
+                document.getElementById('strength4').classList.add('strong');
+                text.textContent = 'Senha forte! ✓';
+                text.style.color = '#10b981';
+            }
+            
+            return strength >= 3; // Requer pelo menos "boa"
+        }
+
+        // Initialize masks and validation
+        document.addEventListener('DOMContentLoaded', function() {
+            // CPF mask
+            const cpfInput = document.getElementById('registerCpf');
+            if (cpfInput) {
+                cpfInput.addEventListener('input', function(e) {
+                    e.target.value = maskCPF(e.target.value);
+                    
+                    // Validate when complete
+                    const cpf = e.target.value.replace(/\D/g, '');
+                    const errorDiv = document.getElementById('cpfError');
+                    if (cpf.length === 11) {
+                        if (!validateCPF(cpf)) {
+                            errorDiv.style.display = 'block';
+                            e.target.style.borderColor = '#ef4444';
+                        } else {
+                            errorDiv.style.display = 'none';
+                            e.target.style.borderColor = '#10b981';
+                        }
+                    } else {
+                        errorDiv.style.display = 'none';
+                        e.target.style.borderColor = '';
+                    }
+                });
+            }
+            
+            // Phone mask
+            const phoneInput = document.getElementById('registerPhone');
+            if (phoneInput) {
+                phoneInput.addEventListener('input', function(e) {
+                    e.target.value = maskPhone(e.target.value);
+                });
+            }
+            
+            // Password strength
+            const passwordInput = document.getElementById('registerPassword');
+            if (passwordInput) {
+                passwordInput.addEventListener('input', function(e) {
+                    checkPasswordStrength(e.target.value);
+                });
+            }
+        });
+
         // Initialize
         loadData();
         checkUserSession();
@@ -3400,12 +3521,50 @@
             const cpf = document.getElementById('registerCpf').value;
             const password = document.getElementById('registerPassword').value;
             
+            // Validate CPF
+            const cpfNumbers = cpf.replace(/\D/g, '');
+            if (!validateCPF(cpfNumbers)) {
+                alert('❌ CPF inválido! Verifique e tente novamente.');
+                return;
+            }
+            
+            // Validate phone (must have 11 digits)
+            const phoneNumbers = phone.replace(/\D/g, '');
+            if (phoneNumbers.length < 10 || phoneNumbers.length > 11) {
+                alert('❌ Telefone inválido! Use o formato (00) 00000-0000');
+                return;
+            }
+            
+            // Validate password strength
+            if (password.length < 8) {
+                alert('❌ Senha deve ter no mínimo 8 caracteres!');
+                return;
+            }
+            if (!/[a-z]/.test(password)) {
+                alert('❌ Senha deve conter letra minúscula!');
+                return;
+            }
+            if (!/[A-Z]/.test(password)) {
+                alert('❌ Senha deve conter letra maiúscula!');
+                return;
+            }
+            if (!/[0-9]/.test(password)) {
+                alert('❌ Senha deve conter número!');
+                return;
+            }
+            
             // Get existing users
             const users = JSON.parse(localStorage.getItem('petcare_users') || '[]');
             
             // Check if email already exists
             if (users.find(u => u.email === email)) {
                 alert('❌ Este email já está cadastrado!');
+                return;
+            }
+            
+            // Check if CPF already exists
+            if (users.find(u => u.cpf === cpf)) {
+                alert('❌ Este CPF já está cadastrado!');
                 return;
             }
             
@@ -3485,10 +3644,6 @@
         function logout() {
             if (confirm('Tem certeza que deseja sair da sua conta?')) {
                 localStorage.removeItem('petcare_user');
-                // Desloga do Firebase também (se estiver logado com Google)
-                import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js")
-                  .then(({ getAuth, signOut }) => signOut(getAuth()))
-                  .catch(() => {});
                 location.reload();
             }
         }
@@ -3573,11 +3728,20 @@
             document.getElementById('paymentWall').classList.add('hidden');
         }
 
-        // Override addPetBtn to check payment first
+        // Override addPetBtn to check login and payment first
         document.getElementById('addPetBtn').addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             
+            // Check if user is logged in first
+            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+            if (!user) {
+                alert('⚠️ Você precisa criar uma conta para adicionar seu pet!\n\nCrie sua conta gratuitamente agora! 🐾');
+                openAuthModal('register');
+                return;
+            }
+            
+            // Then check premium access
             if (hasPremiumAccess()) {
                 openModal('petModal');
             } else {
@@ -3590,6 +3754,14 @@
             e.preventDefault();
             e.stopPropagation();
             
+            // Check if user is logged in first
+            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+            if (!user) {
+                alert('⚠️ Você precisa criar uma conta para usar este recurso!\n\nCrie sua conta gratuitamente agora! 🐾');
+                openAuthModal('register');
+                return;
+            }
+            
             if (hasPremiumAccess()) {
                 openModal('vaccineModal');
             } else {
@@ -3601,6 +3773,14 @@
             e.preventDefault();
             e.stopPropagation();
             
+            // Check if user is logged in first
+            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+            if (!user) {
+                alert('⚠️ Você precisa criar uma conta para usar este recurso!\n\nCrie sua conta gratuitamente agora! 🐾');
+                openAuthModal('register');
+                return;
+            }
+            
             if (hasPremiumAccess()) {
                 openModal('medicineModal');
             } else {
@@ -3611,6 +3791,14 @@
         document.getElementById('addWeightBtn').addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
+            
+            // Check if user is logged in first
+            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+            if (!user) {
+                alert('⚠️ Você precisa criar uma conta para usar este recurso!\n\nCrie sua conta gratuitamente agora! 🐾');
+                openAuthModal('register');
+                return;
+            }
             
             if (hasPremiumAccess()) {
                 openModal('weightModal');
@@ -3625,6 +3813,13 @@
         document.getElementById('uploadPhotoBtn').addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
+
+            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+            if (!user) {
+                alert('⚠️ Você precisa criar uma conta para usar este recurso!\n\nCrie sua conta gratuitamente agora! 🐾');
+                openAuthModal('register');
+                return;
+            }
             
             if (hasPremiumAccess()) {
                 // Create hidden file input
@@ -3676,7 +3871,7 @@
         });
 
         function displayPhotos() {
-            const container = document.querySelector('.photo-gallery-grid');
+            const container = document.getElementById('dashPhotoGrid');
             
             // Clear existing photos (except upload button)
             const existingPhotos = container.querySelectorAll('.photo-item');
@@ -3922,11 +4117,20 @@
             }
         });
 
+        // Close PIX modal on ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const pixModal = document.getElementById('pixPaymentModal');
+                if (pixModal.classList.contains('active')) {
+                    closePixPayment();
+                }
+            }
+        });
     </script>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAWEcycTgntSuRKabqWNULjwtLjKnoHApM",
@@ -3985,6 +4189,16 @@
     }
   };
 
+  // Sobrescreve a função logout para incluir signOut do Firebase
+  const _originalLogout = window.logout;
+  window.logout = function() {
+    if (confirm('Tem certeza que deseja sair da sua conta?')) {
+      localStorage.removeItem('petcare_user');
+      signOut(auth).catch(() => {});
+      location.reload();
+    }
+  };
+
   onAuthStateChanged(auth, (user) => {
     if (user) {
       // Se o Firebase tem sessão mas o localStorage foi limpo, restaura
@@ -4003,12 +4217,10 @@
           loginMethod: 'google'
         };
         localStorage.setItem('petcare_user', JSON.stringify(userData));
-        // Atualiza UI se perfil estiver visível
         if (typeof loadUserProfile === 'function') loadUserProfile();
       }
     }
   });
 </script>
-
 </body>
 </html>
