@@ -3215,11 +3215,32 @@ async function loadData() {
 }
 
 async function saveData() {
-  if (typeof supabaseClient === 'undefined') return { ok: false };
+  // Garante que o Supabase está carregado
+  if (typeof supabaseClient === 'undefined') {
+    console.error('saveData: supabaseClient não disponível');
+    return { ok: false };
+  }
 
-  const { data: { user } = {} } = (typeof supabaseClient !== 'undefined') ? await supabaseClient.auth.getUser() : {};
+  // Busca sessão com timeout de 5s para não travar
+  let user = null;
+  try {
+    const sessionData = await Promise.race([
+      supabaseClient.auth.getUser(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+    ]);
+    user = sessionData?.data?.user || null;
+  } catch (err) {
+    console.error('saveData: erro ao buscar sessão:', err);
+    // Tenta via localStorage como fallback
+    const localUser = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+    if (localUser?.id) {
+      user = localUser;
+    }
+  }
+
   if (!user) {
-    alert("Você precisa estar logado para salvar.");
+    showToast('⚠️ Sessão expirada. Faça login novamente.');
+    openAuthModal('login');
     return { ok: false };
   }
 
@@ -3232,35 +3253,48 @@ async function saveData() {
     photo_url: petData.photo || null
   };
 
-  if (currentPetId) {
-    const { error } = await supabaseClient
+  try {
+    if (currentPetId) {
+      const { error } = await supabaseClient
+        .from('pets')
+        .update(payload)
+        .eq('id', currentPetId)
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Erro update pet:', error);
+        showToast('❌ Erro ao atualizar pet: ' + (error.message || error.code));
+        return { ok: false };
+      }
+      return { ok: true, petId: currentPetId };
+    }
+
+    const { data, error } = await supabaseClient
       .from('pets')
-      .update(payload)
-      .eq('id', currentPetId)
-      .eq('user_id', user.id);
+      .insert(payload)
+      .select('id')
+      .single();
 
     if (error) {
-      console.error("Erro update pet:", error);
-      alert("Erro ao salvar pet.");
+      console.error('Erro insert pet:', error);
+      showToast('❌ Erro ao criar pet: ' + (error.message || error.code));
       return { ok: false };
     }
+
+    if (!data?.id) {
+      console.error('saveData: insert retornou sem id', data);
+      showToast('❌ Erro inesperado ao criar pet.');
+      return { ok: false };
+    }
+
+    currentPetId = data.id;
     return { ok: true, petId: currentPetId };
-  }
 
-  const { data, error } = await supabaseClient
-    .from('pets')
-    .insert(payload)
-    .select('id')
-    .single();
-
-  if (error) {
-    console.error("Erro insert pet:", error);
-    alert("Erro ao criar pet.");
+  } catch (err) {
+    console.error('saveData: erro inesperado:', err);
+    showToast('❌ Erro de conexão ao salvar. Tente novamente.');
     return { ok: false };
   }
-
-  currentPetId = data.id;
-  return { ok: true, petId: currentPetId };
 }
 
 
@@ -3997,27 +4031,22 @@ function setupEventHandlers() {
   try {
     const result = await saveData();
 
-    if (!result?.ok) {
-      // não fecha modal se falhou
-      showToast('❌ Não foi possível salvar. Veja o console para detalhes.');
-      return;
+    if (result?.ok) {
+      // Recarrega do banco e atualiza UI
+      if (typeof loadData === 'function') await loadData();
+      updatePetProfile();
+      showToast('✅ Pet salvo com sucesso!');
+      closeModal('petModal');
+      form.reset();
+      document.querySelectorAll('.pet-photo-option').forEach(opt => opt.classList.remove('selected'));
     }
-
-    // Recarrega do banco e atualiza UI
-    if (typeof loadData === 'function') await loadData();
-    updatePetProfile();
-
-    showToast('✅ Pet salvo com sucesso!');
-    closeModal('petModal');
-
-    form.reset();
-    document.querySelectorAll('.pet-photo-option').forEach(opt => opt.classList.remove('selected'));
+    // Se !result.ok, o saveData já exibiu o toast de erro
 
   } catch (err) {
     console.error('Erro inesperado ao salvar pet:', err);
-    alert('Erro inesperado ao salvar pet. Veja o console.');
+    showToast('❌ Erro inesperado. Tente novamente.');
   } finally {
-    setBtnLoading(saveBtn, false);
+    setBtnLoading(saveBtn, false); // SEMPRE desbloqueia o botão
   }
 });
 
