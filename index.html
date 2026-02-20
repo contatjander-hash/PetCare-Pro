@@ -3124,7 +3124,7 @@ let currentPetId = null;  // pet atualmente aberto
 async function loadData() {
   if (typeof supabaseClient === 'undefined') return;
 
-  const user = (typeof getUsuarioLogado === 'function') ? await getUsuarioLogado() : null;
+  const { data: { user } = {} } = (typeof supabaseClient !== 'undefined') ? await supabaseClient.auth.getUser() : {};
   if (!user) {
     petsList = [];
     currentPetId = null;
@@ -3217,7 +3217,7 @@ async function loadData() {
 async function saveData() {
   if (typeof supabaseClient === 'undefined') return { ok: false };
 
-  const user = (typeof getUsuarioLogado === 'function') ? await getUsuarioLogado() : null;
+  const { data: { user } = {} } = (typeof supabaseClient !== 'undefined') ? await supabaseClient.auth.getUser() : {};
   if (!user) {
     alert("Você precisa estar logado para salvar.");
     return { ok: false };
@@ -3952,6 +3952,8 @@ function setupEventHandlers() {
   document.getElementById('petPhoto') && (document.getElementById('petPhoto').value = '');
   document.querySelectorAll('.pet-photo-option').forEach(opt => opt.classList.remove('selected'));
 
+  currentPetId = null; // reset para forçar insert (novo pet)
+  currentPetId = null; // reset para forçar insert ao invés de update
   openModal('petModal');
 });
   document.getElementById('petForm')?.addEventListener('submit', async (e) => {
