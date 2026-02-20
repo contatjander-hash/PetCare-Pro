@@ -2956,7 +2956,7 @@
 
   <div class="form-actions">
     <button type="button" class="btn btn-secondary" onclick="closeModal('petModal')">Cancelar</button>
-    <button type="submit" class="btn" id="petSaveBtn">Salvar</button>
+    <button type="button" class="btn" id="petSaveBtn" onclick="salvarPet()">Salvar</button>
   </div>
 </form>
         </div>
@@ -3987,14 +3987,14 @@ function setupEventHandlers() {
   document.querySelectorAll('.pet-photo-option').forEach(opt => opt.classList.remove('selected'));
 
   currentPetId = null; // reset para forçar insert (novo pet)
-  currentPetId = null; // reset para forçar insert ao invés de update
   openModal('petModal');
 });
-  document.getElementById('petForm')?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const form = e.target;
-  const saveBtn = document.getElementById('petSaveBtn') || form.querySelector('button[type="submit"]');
+// -------------------------
+// Salvar Pet (função global — chamada pelo onclick do botão)
+// -------------------------
+async function salvarPet() {
+  const saveBtn = document.getElementById('petSaveBtn');
+  const form = document.getElementById('petForm');
 
   const nameEl = document.getElementById('petNameInput');
   const speciesEl = document.getElementById('petSpecies');
@@ -4006,20 +4006,17 @@ function setupEventHandlers() {
   const species = speciesEl?.value || '';
   const birth_date = birthEl?.value || '';
 
-  // Validação manual (agora o submit SEMPRE cai aqui por causa do novalidate)
   if (!requireField(name, '⚠️ Informe o nome do pet.', nameEl)) return;
   if (!requireField(species, '⚠️ Selecione a espécie do pet.', speciesEl)) return;
   if (!requireField(birth_date, '⚠️ Informe a data de nascimento.', birthEl)) return;
 
-  // Garantir sessão Supabase (não só localStorage)
-    const supaUser = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+  const supaUser = JSON.parse(localStorage.getItem('petcare_user') || 'null');
   if (!supaUser) {
     showToast('⚠️ Sua sessão expirou. Faça login novamente.');
     openAuthModal('login');
     return;
   }
 
-  // Atualiza petData com os valores do form
   petData.name = name;
   petData.species = species;
   petData.breed = breedEl?.value?.trim() || '';
@@ -4032,23 +4029,21 @@ function setupEventHandlers() {
     const result = await saveData();
 
     if (result?.ok) {
-      // Recarrega do banco e atualiza UI
-      if (typeof loadData === 'function') await loadData();
+      await loadData();
       updatePetProfile();
       showToast('✅ Pet salvo com sucesso!');
       closeModal('petModal');
-      form.reset();
+      form?.reset();
       document.querySelectorAll('.pet-photo-option').forEach(opt => opt.classList.remove('selected'));
     }
-    // Se !result.ok, o saveData já exibiu o toast de erro
 
   } catch (err) {
     console.error('Erro inesperado ao salvar pet:', err);
     showToast('❌ Erro inesperado. Tente novamente.');
   } finally {
-    setBtnLoading(saveBtn, false); // SEMPRE desbloqueia o botão
+    setBtnLoading(saveBtn, false);
   }
-});
+}
 
   document.getElementById('addVaccineBtn')?.addEventListener('click', async (e) => {
     e.preventDefault(); e.stopPropagation();
