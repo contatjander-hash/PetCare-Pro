@@ -3499,13 +3499,10 @@ function updatePricingVisibility() {
 // -------------------------
 // Payment Wall
 // -------------------------
-async function showPaymentWall() {
-  // Checa sessão real do Supabase primeiro
-  const supaUser = (typeof getUsuarioLogado === 'function') ? await getUsuarioLogado() : null;
-  // Fallback para localStorage
-  const localUser = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+function showPaymentWall() {
+  const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
 
-  if (!supaUser && !localUser) {
+  if (!user) {
     showToast('⚠️ Você precisa criar uma conta para usar este recurso!');
     openAuthModal('register');
     return;
@@ -3514,7 +3511,6 @@ async function showPaymentWall() {
   const wall = document.getElementById('paymentWall');
   if (wall) wall.classList.remove('hidden');
 }
-
 function closePaymentWall() {
   const wall = document.getElementById('paymentWall');
   if (wall) wall.classList.add('hidden');
@@ -3937,7 +3933,7 @@ function setupEventHandlers() {
   e.preventDefault(); e.stopPropagation();
 
   // Checa sessão real do Supabase (evita depender só do localStorage)
-  const supaUser = (typeof getUsuarioLogado === 'function') ? await getUsuarioLogado() : null;
+    const supaUser = JSON.parse(localStorage.getItem('petcare_user') || 'null');
   if (!supaUser) {
     showToast('⚠️ Faça login para adicionar seu pet.');
     openAuthModal('login');
@@ -3980,7 +3976,7 @@ function setupEventHandlers() {
   if (!requireField(birthdate, '⚠️ Informe a data de nascimento.', birthEl)) return;
 
   // Garantir sessão Supabase (não só localStorage)
-  const supaUser = (typeof getUsuarioLogado === 'function') ? await getUsuarioLogado() : null;
+    const supaUser = JSON.parse(localStorage.getItem('petcare_user') || 'null');
   if (!supaUser) {
     showToast('⚠️ Sua sessão expirou. Faça login novamente.');
     openAuthModal('login');
@@ -4026,7 +4022,7 @@ function setupEventHandlers() {
   document.getElementById('addVaccineBtn')?.addEventListener('click', async (e) => {
     e.preventDefault(); e.stopPropagation();
 
-    const supaUser = (typeof getUsuarioLogado === 'function') ? await getUsuarioLogado() : null;
+    const supaUser = JSON.parse(localStorage.getItem('petcare_user') || 'null');
     if (!supaUser) {
       showToast('⚠️ Faça login para usar este recurso.');
       openAuthModal('login');
@@ -4040,7 +4036,7 @@ function setupEventHandlers() {
   document.getElementById('addMedicineBtn')?.addEventListener('click', async (e) => {
     e.preventDefault(); e.stopPropagation();
 
-    const supaUser = (typeof getUsuarioLogado === 'function') ? await getUsuarioLogado() : null;
+    const supaUser = JSON.parse(localStorage.getItem('petcare_user') || 'null');
     if (!supaUser) {
       showToast('⚠️ Faça login para usar este recurso.');
       openAuthModal('login');
@@ -4054,7 +4050,7 @@ function setupEventHandlers() {
   document.getElementById('addWeightBtn')?.addEventListener('click', async (e) => {
     e.preventDefault(); e.stopPropagation();
 
-    const supaUser = (typeof getUsuarioLogado === 'function') ? await getUsuarioLogado() : null;
+    const supaUser = JSON.parse(localStorage.getItem('petcare_user') || 'null');
     if (!supaUser) {
       showToast('⚠️ Faça login para usar este recurso.');
       openAuthModal('login');
