@@ -4008,7 +4008,8 @@ function setupEventHandlers() {
 
   // Forms
   document.getElementById('petForm')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  e.preventDefault();
+  console.log("✅ Submit do petForm disparou!");
 
     petData.name = document.getElementById('petNameInput')?.value || '';
     petData.species = document.getElementById('petSpecies')?.value || '';
