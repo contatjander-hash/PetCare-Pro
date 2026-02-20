@@ -3066,7 +3066,7 @@
   if (error) console.error(error);
 
   if (!data?.user) {
-    openAuthModal('login'); // abre o modal de login
+    openModal('authModal'); // abre o modal de login
     return false;
   }
   return true;
@@ -3410,7 +3410,21 @@ async function saveData() {
             // For now, keeping the demo chart
         }
 
-        // Event Listeners (removidos: substituídos pelos handlers premium + login mais abaixo)
+        // Event Listeners
+        document.getElementById('addPetBtn').addEventListener('click', () => {
+            openModal('petModal');
+        });
+
+        document.getElementById('addVaccineBtn').addEventListener('click', () => {
+            openModal('vaccineModal');
+        });
+
+        document.getElementById('addMedicineBtn').addEventListener('click', () => {
+            openModal('medicineModal');
+        });
+
+        document.getElementById('addWeightBtn').addEventListener('click', () => {
+            openModal('weightModal');
         });
 
         document.getElementById('petForm').addEventListener('submit', async (e) => {
@@ -3681,33 +3695,23 @@ async function saveData() {
 
         // Initialize
 // loadData(); // <- NÃO chama mais aqui (agora loadData depende do supabaseClient)
-// checkUserSession() e updatePricingVisibility() são chamados após inicializar o Supabase (veja no final do arquivo).
-
+checkUserSession();
+updatePricingVisibility();
 
         // Check if user is logged in (but don't force login)
-        
-        // Check if user is logged in (Supabase) and update UI
-        async function checkUserSession() {
-            // Se o Supabase ainda não foi carregado, sai silenciosamente
-            if (typeof supabaseClient === 'undefined') return;
-
-            const { data, error } = await supabaseClient.auth.getUser();
-            if (error) console.error(error);
-
-            if (data?.user) {
-                // Mantemos um espelho no localStorage só para a UI do Perfil/pagamento
-                syncLocalUserFromSupabase(data.user);
-                loadUserProfile();
-            } else {
-                // User not logged in - clear premium flags and show guest mode
-                localStorage.removeItem('petcare_paid');
-                localStorage.removeItem('petcare_code');
-                localStorage.removeItem('petcare_user');
-                showGuestMode();
-            }
-
-            updatePricingVisibility();
-        }
+        function checkUserSession() {
+            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+            
+            if (user) {
+                // User is logged in - check their premium status
+                if (user.hasPremium) {
+                    localStorage.setItem('petcare_paid', 'true');
+                    localStorage.setItem('petcare_code', user.accessCode || '');
+                } else {
+                    // User doesn't have premium - clear flags
+                    localStorage.removeItem('petcare_paid');
+                    localStorage.removeItem('petcare_code');
+                }
                 
                 loadUserProfile();
             } else {
@@ -3962,19 +3966,16 @@ async function saveData() {
         }
 
         // Show payment wall
-        
-        // Show payment wall
-        async function showPaymentWall() {
-            // Precisa estar logado (Supabase)
-            if (!(await exigirLoginSupabase())) {
+        function showPaymentWall() {
+            // Check if user is logged in
+            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+            
+            if (!user) {
+                // Not logged in - show auth modal first
                 alert('⚠️ Você precisa criar uma conta para usar os recursos premium!\n\nCrie sua conta gratuitamente agora! 🐾');
                 openAuthModal('register');
                 return;
             }
-
-            // User is logged in - show payment wall
-            document.getElementById('paymentWall').classList.remove('hidden');
-        }
             
             // User is logged in - show payment wall
             document.getElementById('paymentWall').classList.remove('hidden');
@@ -3985,83 +3986,89 @@ async function saveData() {
             document.getElementById('paymentWall').classList.add('hidden');
         }
 
-        
-        // Handlers premium + login (Supabase)
-        document.getElementById('addPetBtn').addEventListener('click', async (e) => {
+        // Override addPetBtn to check login and payment first
+        document.getElementById('addPetBtn').addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-
-            // Precisa estar logado
-            if (!(await exigirLoginSupabase())) {
+            
+            // Check if user is logged in first
+            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+            if (!user) {
                 alert('⚠️ Você precisa criar uma conta para adicionar seu pet!\n\nCrie sua conta gratuitamente agora! 🐾');
                 openAuthModal('register');
                 return;
             }
-
-            // Precisa ser premium
+            
+            // Then check premium access
             if (hasPremiumAccess()) {
                 openModal('petModal');
             } else {
-                await showPaymentWall();
+                showPaymentWall();
             }
         });
 
-        document.getElementById('addVaccineBtn').addEventListener('click', async (e) => {
+        // Override other premium buttons
+        document.getElementById('addVaccineBtn').addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-
-            if (!(await exigirLoginSupabase())) {
+            
+            // Check if user is logged in first
+            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+            if (!user) {
                 alert('⚠️ Você precisa criar uma conta para usar este recurso!\n\nCrie sua conta gratuitamente agora! 🐾');
                 openAuthModal('register');
                 return;
             }
-
+            
             if (hasPremiumAccess()) {
                 openModal('vaccineModal');
             } else {
-                await showPaymentWall();
+                showPaymentWall();
             }
         });
 
-        document.getElementById('addMedicineBtn').addEventListener('click', async (e) => {
+        document.getElementById('addMedicineBtn').addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-
-            if (!(await exigirLoginSupabase())) {
+            
+            // Check if user is logged in first
+            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+            if (!user) {
                 alert('⚠️ Você precisa criar uma conta para usar este recurso!\n\nCrie sua conta gratuitamente agora! 🐾');
                 openAuthModal('register');
                 return;
             }
-
+            
             if (hasPremiumAccess()) {
                 openModal('medicineModal');
             } else {
-                await showPaymentWall();
+                showPaymentWall();
             }
         });
 
-        document.getElementById('addWeightBtn').addEventListener('click', async (e) => {
+        document.getElementById('addWeightBtn').addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-
-            if (!(await exigirLoginSupabase())) {
+            
+            // Check if user is logged in first
+            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+            if (!user) {
                 alert('⚠️ Você precisa criar uma conta para usar este recurso!\n\nCrie sua conta gratuitamente agora! 🐾');
                 openAuthModal('register');
                 return;
             }
-
+            
             if (hasPremiumAccess()) {
                 openModal('weightModal');
             } else {
-                await showPaymentWall();
+                showPaymentWall();
             }
         });
 
         // Photo Gallery System
-
         let photoGallery = JSON.parse(localStorage.getItem('petcare_photos') || '[]');
 
-        document.getElementById('uploadPhotoBtn').addEventListener('click', async (e) => {
+        document.getElementById('uploadPhotoBtn').addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             
@@ -4434,25 +4441,13 @@ async function saveData() {
 
 supabaseClient.auth.onAuthStateChange(async (_event, session) => {
   if (session?.user) {
-    // Logou (Google ou email/senha)
-    syncLocalUserFromSupabase(session.user);
-    await checkUserSession();  // atualiza UI do perfil + pricing
-    await loadData();          // carrega dados do usuário
+    await loadData(); // ✅ agora carrega do Supabase após login
   } else {
-    // Deslogou
-    localStorage.removeItem('petcare_user');
-
+    // deslogou
     petsList = [];
     currentPetId = null;
     petData = { name:'', species:'', breed:'', birthdate:'', photo:'', vaccines:[], medicines:[], weights:[] };
     updatePetProfile();
-    renderVaccines();
-    renderMedicines();
-    renderWeights();
-
-    await checkUserSession(); // coloca modo visitante + pricing
-  }
-});
     renderVaccines();
     renderMedicines();
     renderWeights();
@@ -4472,47 +4467,30 @@ supabaseClient.auth.onAuthStateChange(async (_event, session) => {
         }
     }
 
-    
-    function syncLocalUserFromSupabase(sbUser) {
-        if (!sbUser) return;
-
-        const existing = JSON.parse(localStorage.getItem('petcare_user') || 'null') || {};
-
-        const userData = {
-            // Mantemos "id" para compatibilidade com partes antigas do código
-            id: sbUser.id,
-            email: sbUser.email,
-            name: sbUser.user_metadata?.full_name || existing.name || sbUser.email,
-            phone: sbUser.user_metadata?.phone || existing.phone || '',
-            cpf: sbUser.user_metadata?.cpf || existing.cpf || '',
-            createdAt: existing.createdAt || new Date().toISOString(),
-            plan: existing.plan || 'Gratuito',
-            code: existing.code || null,
-            profilePhoto: sbUser.user_metadata?.avatar_url || existing.profilePhoto || null,
-            hasPremium: existing.hasPremium || false,
-            accessCode: existing.accessCode || existing.code || null,
-        };
-
-        localStorage.setItem('petcare_user', JSON.stringify(userData));
-    }
-
     async function checkSupabaseUser() {
-        const { data, error } = await supabaseClient.auth.getUser();
-        if (error) console.error(error);
+        const { data } = await supabaseClient.auth.getUser()
+;
 
-        if (data?.user) {
-            syncLocalUserFromSupabase(data.user);
-        } else {
-            localStorage.removeItem('petcare_user');
+        if (data.user) {
+            const userData = {
+                id: data.user.id,
+                name: data.user.user_metadata.full_name || data.user.email,
+                email: data.user.email,
+                phone: '',
+                cpf: '',
+                createdAt: new Date().toISOString(),
+                plan: 'Gratuito',
+                code: null,
+                profilePhoto: data.user.user_metadata.avatar_url || null
+            };
+
+            localStorage.setItem('petcare_user', JSON.stringify(userData));
+loadUserProfile();
+await loadData();
         }
     }
 
-    // Bootstrap: ao carregar a página, sincroniza usuário e atualiza UI/dados
-    (async () => {
-        await checkSupabaseUser();
-        await checkUserSession();   // atualiza UI do perfil + pricing
-        await loadData();           // se estiver logado, carrega pets; se não, limpa UI
-    })();
+    checkSupabaseUser();
     async function usuarioEstaLogado() {
     const { data } = await supabaseClient.auth.getUser();
     return data.user !== null;
