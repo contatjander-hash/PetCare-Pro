@@ -3178,21 +3178,21 @@ async function loadData() {
 
   const [vaccRes, medRes, weiRes] = await Promise.all([
     supabaseClient
-      .from('vaccines')
+      .from('vacinas')
       .select('id, name, applied_date, next_due_date, created_at')
       .eq('user_id', user.id)
       .eq('pet_id', currentPetId)
       .order('applied_date', { ascending: false }),
 
     supabaseClient
-      .from('medicines')
+      .from('medicamentos')
       .select('*')
       .eq('user_id', user.id)
       .eq('pet_id', currentPetId)
       .order('created_at', { ascending: false }),
 
     supabaseClient
-      .from('weights')
+      .from('pesos')
       .select('*')
       .eq('user_id', user.id)
       .eq('pet_id', currentPetId)
@@ -3440,7 +3440,7 @@ function renderMedicines() {
   }
 
   list.innerHTML = petData.medicines.map(m => {
-    const nextDose = new Date(m.nextDose || m.next_dose || m.next_dose_at || '');
+    const nextDose = new Date(m.next_dose_at || '');
     const today = new Date();
     const isOverdue = !isNaN(nextDose.getTime()) && nextDose < today;
     const status = isOverdue ? 'status-overdue' : 'status-upcoming';
@@ -4100,47 +4100,106 @@ function setupEventHandlers() {
 
   document.getElementById('vaccineForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    setBtnLoading(btn, true);
 
-    // aqui ainda é local; depois você vai migrar para INSERT em vaccines
-    petData.vaccines.push({
-      type: document.getElementById('vaccineType')?.value || 'vaccine',
+    const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+    if (!user || !currentPetId) {
+      showToast('⚠️ Selecione um pet antes de adicionar vacina.');
+      setBtnLoading(btn, false);
+      return;
+    }
+
+    const payload = {
+      user_id: user.id,
+      pet_id: currentPetId,
       name: document.getElementById('vaccineName')?.value || '',
-      date: document.getElementById('vaccineDate')?.value || '',
-      notes: document.getElementById('vaccineNotes')?.value || ''
-    });
+      applied_date: document.getElementById('vaccineDate')?.value || null,
+      next_due_date: null
+    };
 
-    renderVaccines();
-    closeModal('vaccineModal');
-    e.target.reset();
+    try {
+      const { error } = await supabaseClient.from('vacinas').insert(payload);
+      if (error) { showToast('❌ Erro ao salvar vacina: ' + error.message); return; }
+      showToast('✅ Vacina salva!');
+      await loadData();
+      closeModal('vaccineModal');
+      e.target.reset();
+    } catch(err) {
+      showToast('❌ Erro inesperado.');
+    } finally {
+      setBtnLoading(btn, false);
+    }
   });
 
-  document.getElementById('medicineForm')?.addEventListener('submit', (e) => {
+  document.getElementById('medicineForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    setBtnLoading(btn, true);
 
-    petData.medicines.push({
+    const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+    if (!user || !currentPetId) {
+      showToast('⚠️ Selecione um pet antes de adicionar medicamento.');
+      setBtnLoading(btn, false);
+      return;
+    }
+
+    const payload = {
+      user_id: user.id,
+      pet_id: currentPetId,
       name: document.getElementById('medicineName')?.value || '',
       dosage: document.getElementById('medicineDosage')?.value || '',
       frequency: document.getElementById('medicineFrequency')?.value || '',
-      nextDose: document.getElementById('medicineNextDose')?.value || ''
-    });
+      next_dose_at: document.getElementById('medicineNextDose')?.value || null,
+      notes: ''
+    };
 
-    renderMedicines();
-    closeModal('medicineModal');
-    e.target.reset();
+    try {
+      const { error } = await supabaseClient.from('medicamentos').insert(payload);
+      if (error) { showToast('❌ Erro ao salvar medicamento: ' + error.message); return; }
+      showToast('✅ Medicamento salvo!');
+      await loadData();
+      closeModal('medicineModal');
+      e.target.reset();
+    } catch(err) {
+      showToast('❌ Erro inesperado.');
+    } finally {
+      setBtnLoading(btn, false);
+    }
   });
 
-  document.getElementById('weightForm')?.addEventListener('submit', (e) => {
+  document.getElementById('weightForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    setBtnLoading(btn, true);
 
-    petData.weights.push({
+    const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+    if (!user || !currentPetId) {
+      showToast('⚠️ Selecione um pet antes de registrar peso.');
+      setBtnLoading(btn, false);
+      return;
+    }
+
+    const payload = {
+      user_id: user.id,
+      pet_id: currentPetId,
+      date: document.getElementById('weightDate')?.value || null,
       value: parseFloat(document.getElementById('weightValue')?.value || '0'),
-      date: document.getElementById('weightDate')?.value || '',
-      food: document.getElementById('foodAmount')?.value || ''
-    });
+      notes: document.getElementById('foodAmount')?.value || ''
+    };
 
-    renderWeights();
-    closeModal('weightModal');
-    e.target.reset();
+    try {
+      const { error } = await supabaseClient.from('pesos').insert(payload);
+      if (error) { showToast('❌ Erro ao salvar peso: ' + error.message); return; }
+      showToast('✅ Peso registrado!');
+      await loadData();
+      closeModal('weightModal');
+      e.target.reset();
+    } catch(err) {
+      showToast('❌ Erro inesperado.');
+    } finally {
+      setBtnLoading(btn, false);
+    }
   });
 
   // Payment wall: fechar clicando fora + enter
