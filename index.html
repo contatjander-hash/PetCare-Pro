@@ -3193,7 +3193,8 @@ async function saveData() {
     return { ok: false };
   }
 
-  const payload = {
+  // payload para INSERT (tem user_id)
+  const insertPayload = {
     user_id: user.id,
     name: petData.name,
     species: petData.species || null,
@@ -3202,28 +3203,54 @@ async function saveData() {
     photo_url: petData.photo || null
   };
 
-  if (currentPetId) {
-    const updatePayload = {
-  name: petData.name,
-  species: petData.species || null,
-  breed: petData.breed || null,
-  birthdate: petData.birthdate || null,
-  photo_url: petData.photo || null
-};
+  // payload para UPDATE (NÃO tem user_id)
+  const updatePayload = {
+    name: petData.name,
+    species: petData.species || null,
+    breed: petData.breed || null,
+    birthdate: petData.birthdate || null,
+    photo_url: petData.photo || null
+  };
 
-const { error } = await supabaseClient
-  .from('pets')
-  .update(updatePayload)
-  .eq('id', currentPetId)
-  .eq('user_id', user.id);
+  // UPDATE
+  if (currentPetId) {
+    const { error } = await supabaseClient
+      .from('pets')
+      .update(updatePayload)
+      .eq('id', currentPetId)
+      .eq('user_id', user.id);
 
     if (error) {
       console.error("Erro update pet:", error);
       alert("Erro ao salvar pet.");
       return { ok: false };
     }
+
     return { ok: true, petId: currentPetId };
   }
+
+  // INSERT
+  const { data, error } = await supabaseClient
+    .from('pets')
+    .insert(insertPayload)
+    .select('id')
+    .maybeSingle();
+
+  if (error) {
+    console.error("Erro insert pet:", error);
+    alert("Erro ao criar pet.");
+    return { ok: false };
+  }
+
+  if (!data?.id) {
+    console.error("Insert não retornou id:", data);
+    alert("Pet criado, mas não consegui obter o ID. Recarregue a página.");
+    return { ok: false };
+  }
+
+  currentPetId = data.id;
+  return { ok: true, petId: currentPetId };
+}
 
     const { data, error } = await supabaseClient
     .from('pets')
