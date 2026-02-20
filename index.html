@@ -2357,7 +2357,7 @@
                     <div class="hero-text">
                         <h1>Cuide do seu melhor amigo</h1>
                         <p>Acompanhe vacinas, consultas, alimentação e todos os momentos especiais do seu pet em um só lugar.</p>
-                        <button class="btn" id="addPetBtn">Adicionar Meu Pet 🐾</button>
+                        <button class="btn" id="addPetBtn" type="button">Adicionar Meu Pet 🐾</button>
                     </div>
                     <div class="pet-profile-card">
                         <div class="pet-avatar">🐕</div>
@@ -2897,63 +2897,68 @@
                 <h3>Adicionar Pet</h3>
                 <button class="close-btn" onclick="closeModal('petModal')">&times;</button>
             </div>
-            <form id="petForm">
-                <div class="form-group">
-                    <label class="photo-label">Escolha uma foto que represente seu pet</label>
-                    <div class="pet-photo-selector">
-                        <div class="pet-photo-option" data-photo="dog1">
-                            <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=300&q=80" alt="Cachorro feliz" loading="lazy">
-                        </div>
-                        <div class="pet-photo-option" data-photo="dog2">
-                            <img src="https://images.unsplash.com/photo-1560807707-8cc77767d783?w=300&q=80" alt="Golden Retriever" loading="lazy">
-                        </div>
-                        <div class="pet-photo-option" data-photo="dog3">
-                            <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?w=300&q=80" alt="Cachorro sorrindo" loading="lazy">
-                        </div>
-                        <div class="pet-photo-option" data-photo="cat1">
-                            <img src="https://images.unsplash.com/photo-1574158622682-e40e69881006?w=300&q=80" alt="Gato fofo" loading="lazy">
-                        </div>
-                        <div class="pet-photo-option" data-photo="cat2">
-                            <img src="https://images.unsplash.com/photo-1615789591457-74a63395c990?w=300&q=80" alt="Gato branco" loading="lazy">
-                        </div>
-                        <div class="pet-photo-option" data-photo="cat3">
-                            <img src="https://images.unsplash.com/photo-1606214174585-fe31582dc6ee?w=300&q=80" alt="Gato laranja" loading="lazy">
-                        </div>
-                        <div class="pet-photo-option" id="customPetPhoto" style="background: linear-gradient(135deg, var(--accent) 0%, var(--pink) 100%); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: white;">
-                            📸
-                        </div>
-                    </div>
-                    <small style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem; display: block;">Clique em 📸 para enviar sua própria foto</small>
-                    <input type="file" id="customPetPhotoInput" accept="image/*" style="display: none;">
-                    <input type="hidden" id="petPhoto" name="petPhoto">
-                </div>
-                <div class="form-group">
-                    <label>Nome</label>
-                    <input type="text" id="petNameInput" placeholder="Ex: Rex" required>
-                </div>
-                <div class="form-group">
-                    <label>Espécie</label>
-                    <select id="petSpecies" required>
-                        <option value="">Selecione...</option>
-                        <option value="dog">Cachorro 🐕</option>
-                        <option value="cat">Gato 🐱</option>
-                        <option value="bird">Pássaro 🐦</option>
-                        <option value="other">Outro 🐾</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Raça</label>
-                    <input type="text" id="petBreed" placeholder="Ex: Labrador">
-                </div>
-                <div class="form-group">
-                    <label>Data de Nascimento</label>
-                    <input type="date" id="petBirthdate" required max="2099-12-31">
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('petModal')">Cancelar</button>
-                    <button type="submit" class="btn">Salvar</button>
-                </div>
-            </form>
+            <form id="petForm" novalidate>
+  <div class="form-group">
+    <label class="photo-label">Escolha uma foto que represente seu pet</label>
+    <div class="pet-photo-selector">
+      <div class="pet-photo-option" data-photo="dog1">
+        <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=300&q=80" alt="Cachorro feliz" loading="lazy">
+      </div>
+      <div class="pet-photo-option" data-photo="dog2">
+        <img src="https://images.unsplash.com/photo-1560807707-8cc77767d783?w=300&q=80" alt="Golden Retriever" loading="lazy">
+      </div>
+      <div class="pet-photo-option" data-photo="dog3">
+        <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?w=300&q=80" alt="Cachorro sorrindo" loading="lazy">
+      </div>
+      <div class="pet-photo-option" data-photo="cat1">
+        <img src="https://images.unsplash.com/photo-1574158622682-e40e69881006?w=300&q=80" alt="Gato fofo" loading="lazy">
+      </div>
+      <div class="pet-photo-option" data-photo="cat2">
+        <img src="https://images.unsplash.com/photo-1615789591457-74a63395c990?w=300&q=80" alt="Gato branco" loading="lazy">
+      </div>
+      <div class="pet-photo-option" data-photo="cat3">
+        <img src="https://images.unsplash.com/photo-1606214174585-fe31582dc6ee?w=300&q=80" alt="Gato laranja" loading="lazy">
+      </div>
+      <div class="pet-photo-option" id="customPetPhoto" style="background: linear-gradient(135deg, var(--accent) 0%, var(--pink) 100%); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: white;">
+        📸
+      </div>
+    </div>
+    <small style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem; display: block;">Clique em 📸 para enviar sua própria foto</small>
+    <input type="file" id="customPetPhotoInput" accept="image/*" style="display: none;">
+    <input type="hidden" id="petPhoto" name="petPhoto">
+  </div>
+
+  <div class="form-group">
+    <label>Nome</label>
+    <input type="text" id="petNameInput" placeholder="Ex: Rex">
+  </div>
+
+  <div class="form-group">
+    <label>Espécie</label>
+    <select id="petSpecies">
+      <option value="">Selecione...</option>
+      <option value="dog">Cachorro 🐕</option>
+      <option value="cat">Gato 🐱</option>
+      <option value="bird">Pássaro 🐦</option>
+      <option value="other">Outro 🐾</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>Raça</label>
+    <input type="text" id="petBreed" placeholder="Ex: Labrador">
+  </div>
+
+  <div class="form-group">
+    <label>Data de Nascimento</label>
+    <input type="date" id="petBirthdate" max="2099-12-31">
+  </div>
+
+  <div class="form-actions">
+    <button type="button" class="btn btn-secondary" onclick="closeModal('petModal')">Cancelar</button>
+    <button type="submit" class="btn" id="petSaveBtn">Salvar</button>
+  </div>
+</form>
         </div>
     </div>
 
@@ -3068,6 +3073,31 @@
  *  ========================= */
 
 function safeEvent(evt){ return evt || window.event || null; }
+function setBtnLoading(btn, loading, loadingText = 'Salvando...') {
+  if (!btn) return;
+  if (loading) {
+    btn.dataset.originalText = btn.dataset.originalText || btn.textContent;
+    btn.textContent = loadingText;
+    btn.disabled = true;
+    btn.style.opacity = '0.75';
+    btn.style.cursor = 'not-allowed';
+  } else {
+    btn.textContent = btn.dataset.originalText || 'Salvar';
+    btn.disabled = false;
+    btn.style.opacity = '';
+    btn.style.cursor = '';
+  }
+}
+
+function requireField(value, message, elToFocus) {
+  const v = (value ?? '').toString().trim();
+  if (!v) {
+    showToast(message);
+    elToFocus?.focus?.();
+    return false;
+  }
+  return true;
+}
 
 // -------------------------
 // Estado (UI) do Pet
@@ -3901,19 +3931,95 @@ async function checkUserSession() {
  // -------------------------
 function setupEventHandlers() {
   // Botões principais
-  document.getElementById('addPetBtn')?.addEventListener('click', (e) => {
-    e.preventDefault(); e.stopPropagation();
+  document.getElementById('addPetBtn')?.addEventListener('click', async (e) => {
+  e.preventDefault(); e.stopPropagation();
 
-    const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
-    if (!user) {
-      alert('⚠️ Você precisa criar uma conta para adicionar seu pet!\n\nCrie sua conta gratuitamente agora! 🐾');
-      openAuthModal('register');
+  // Checa sessão real do Supabase (evita depender só do localStorage)
+  const supaUser = (typeof getUsuarioLogado === 'function') ? await getUsuarioLogado() : null;
+  if (!supaUser) {
+    showToast('⚠️ Faça login para adicionar seu pet.');
+    openAuthModal('login');
+    return;
+  }
+
+  // Mantém o paywall premium (como está no seu app)
+  if (!hasPremiumAccess()) {
+    showPaymentWall();
+    return;
+  }
+
+  // Limpa o formulário antes de abrir
+  const form = document.getElementById('petForm');
+  form?.reset?.();
+  document.getElementById('petPhoto') && (document.getElementById('petPhoto').value = '');
+  document.querySelectorAll('.pet-photo-option').forEach(opt => opt.classList.remove('selected'));
+
+  openModal('petModal');
+});
+  document.getElementById('petForm')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const form = e.target;
+  const saveBtn = document.getElementById('petSaveBtn') || form.querySelector('button[type="submit"]');
+
+  const nameEl = document.getElementById('petNameInput');
+  const speciesEl = document.getElementById('petSpecies');
+  const breedEl = document.getElementById('petBreed');
+  const birthEl = document.getElementById('petBirthdate');
+  const photoEl = document.getElementById('petPhoto');
+
+  const name = nameEl?.value?.trim() || '';
+  const species = speciesEl?.value || '';
+  const birthdate = birthEl?.value || '';
+
+  // Validação manual (agora o submit SEMPRE cai aqui por causa do novalidate)
+  if (!requireField(name, '⚠️ Informe o nome do pet.', nameEl)) return;
+  if (!requireField(species, '⚠️ Selecione a espécie do pet.', speciesEl)) return;
+  if (!requireField(birthdate, '⚠️ Informe a data de nascimento.', birthEl)) return;
+
+  // Garantir sessão Supabase (não só localStorage)
+  const supaUser = (typeof getUsuarioLogado === 'function') ? await getUsuarioLogado() : null;
+  if (!supaUser) {
+    showToast('⚠️ Sua sessão expirou. Faça login novamente.');
+    openAuthModal('login');
+    return;
+  }
+
+  // Atualiza petData com os valores do form
+  petData.name = name;
+  petData.species = species;
+  petData.breed = breedEl?.value?.trim() || '';
+  petData.birthdate = birthdate;
+  petData.photo = photoEl?.value || '';
+
+  setBtnLoading(saveBtn, true);
+
+  try {
+    const result = await saveData();
+
+    if (!result?.ok) {
+      // não fecha modal se falhou
+      showToast('❌ Não foi possível salvar. Veja o console para detalhes.');
       return;
     }
 
-    if (hasPremiumAccess()) openModal('petModal');
-    else showPaymentWall();
-  });
+    // Recarrega do banco e atualiza UI
+    if (typeof loadData === 'function') await loadData();
+    updatePetProfile();
+
+    showToast('✅ Pet salvo com sucesso!');
+    closeModal('petModal');
+
+    form.reset();
+    document.querySelectorAll('.pet-photo-option').forEach(opt => opt.classList.remove('selected'));
+
+  } catch (err) {
+    console.error('Erro inesperado ao salvar pet:', err);
+    alert('Erro inesperado ao salvar pet. Veja o console.');
+  } finally {
+    setBtnLoading(saveBtn, false);
+  }
+});
 
   document.getElementById('addVaccineBtn')?.addEventListener('click', (e) => {
     e.preventDefault(); e.stopPropagation();
@@ -4007,27 +4113,6 @@ function setupEventHandlers() {
   });
 
   // Forms
-  document.getElementById('petForm')?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  console.log("✅ Submit do petForm disparou!");
-
-    petData.name = document.getElementById('petNameInput')?.value || '';
-    petData.species = document.getElementById('petSpecies')?.value || '';
-    petData.breed = document.getElementById('petBreed')?.value || '';
-    petData.birthdate = document.getElementById('petBirthdate')?.value || '';
-    petData.photo = document.getElementById('petPhoto')?.value || '';
-
-    // saveData/loadData vêm do seu bloco Supabase (definido mais acima no HTML)
-    if (typeof saveData === 'function') {
-      const result = await saveData();
-      if (result && result.ok && typeof loadData === 'function') await loadData();
-    }
-
-    updatePetProfile();
-    closeModal('petModal');
-    e.target.reset();
-    document.querySelectorAll('.pet-photo-option').forEach(opt => opt.classList.remove('selected'));
-  });
 
   document.getElementById('vaccineForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -4099,20 +4184,30 @@ function setupEventHandlers() {
 // -------------------------
 // Init
 // -------------------------
-document.addEventListener('DOMContentLoaded', async () => {
-  setupPetPhotoSelectors();
-  setupProfilePhotoInput();
-  setupEventHandlers();
+function bootstrapApp() {
+  try { setupPetPhotoSelectors(); } catch (e) { console.error('setupPetPhotoSelectors erro:', e); }
+  try { setupProfilePhotoInput(); } catch (e) { console.error('setupProfilePhotoInput erro:', e); }
+  try { setupEventHandlers(); } catch (e) { console.error('setupEventHandlers erro:', e); }
 
-  await checkUserSession();
-  updatePricingVisibility();
+  // Não bloqueia o app se sessão falhar
+  Promise.resolve()
+    .then(() => checkUserSession?.())
+    .catch((e) => console.error('checkUserSession erro:', e))
+    .finally(() => {
+      try { updatePricingVisibility?.(); } catch (e) { console.error('updatePricingVisibility erro:', e); }
+      try { displayPhotos?.(); } catch (e) { console.error('displayPhotos erro:', e); }
+      try { updatePetProfile?.(); } catch (e) { console.error('updatePetProfile erro:', e); }
+      try { renderVaccines?.(); } catch (e) { console.error('renderVaccines erro:', e); }
+      try { renderMedicines?.(); } catch (e) { console.error('renderMedicines erro:', e); }
+      try { renderWeights?.(); } catch (e) { console.error('renderWeights erro:', e); }
+    });
+}
 
-  displayPhotos();
-  updatePetProfile();
-  renderVaccines();
-  renderMedicines();
-  renderWeights();
-});
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootstrapApp);
+} else {
+  bootstrapApp();
+}
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
