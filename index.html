@@ -4342,38 +4342,27 @@ function syncLocalUserFromSupabase(user) {
   localStorage.setItem('petcare_user', JSON.stringify(userData));
 }
 
-supabaseClient.auth.onAuthStateChange(async (_event, session) => {
+supabaseClient.auth.onAuthStateChange(async (event, session) => {
+  // INITIAL_SESSION é disparado no reload — usa ele para carregar dados
+  // Ignora outros eventos duplicados se já carregou
   if (session?.user) {
     syncLocalUserFromSupabase(session.user);
-    checkUserSession();   // atualiza UI do perfil/premium flags
-    loadUserProfile();    // atualiza a tela perfil
-    await loadData();     // carrega pets/vacinas etc do Supabase
-  } else {
-    // deslogou
+    checkUserSession();
+    loadUserProfile();
+    await loadData();
+  } else if (event === 'SIGNED_OUT') {
     localStorage.removeItem('petcare_user');
-
     petsList = [];
     currentPetId = null;
     petData = { name:'', species:'', breed:'', birth_date:'', photo:'', vaccines:[], medicines:[], weights:[] };
-
     updatePetProfile();
     renderVaccines();
     renderMedicines();
     renderWeights();
-
     checkUserSession();
     loadUserProfile();
   }
 });
-(async function bootstrapAuth() {
-  const { data } = await supabaseClient.auth.getSession();
-  if (data?.session?.user) {
-    syncLocalUserFromSupabase(data.session.user);
-    checkUserSession();
-    loadUserProfile();
-    await loadData();
-  }
-})();
 
     async function loginWithGoogle() {
         const { error } = await supabaseClient.auth.signInWithOAuth({
@@ -4467,30 +4456,7 @@ supabaseClient.auth.onAuthStateChange(async (_event, session) => {
         await loadData();
     }
 
-    async function checkSupabaseUser() {
-        const { data } = await supabaseClient.auth.getUser()
-;
 
-        if (data.user) {
-            const userData = {
-                id: data.user.id,
-                name: data.user.user_metadata.full_name || data.user.email,
-                email: data.user.email,
-                phone: '',
-                cpf: '',
-                createdAt: new Date().toISOString(),
-                plan: 'Gratuito',
-                code: null,
-                profilePhoto: data.user.user_metadata.avatar_url || null
-            };
-
-            localStorage.setItem('petcare_user', JSON.stringify(userData));
-loadUserProfile();
-await loadData();
-        }
-    }
-
-    checkSupabaseUser();
     async function usuarioEstaLogado() {
     const { data } = await supabaseClient.auth.getUser();
     return data.user !== null;
