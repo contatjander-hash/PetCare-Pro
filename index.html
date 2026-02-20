@@ -3123,6 +3123,9 @@ let currentPetId = null;  // pet atualmente aberto
 // -------------------------
 async function loadData() {
   if (typeof supabaseClient === 'undefined') return;
+  if (window._loadingData) return; // evita chamadas simultâneas
+  window._loadingData = true;
+  try {
 
   // getSession é síncrono com o storage local — mais confiável no reload
   // do que getUser() que faz round-trip ao servidor
@@ -3226,8 +3229,13 @@ async function loadData() {
   renderVaccines();
   renderMedicines();
   renderWeights();
+  window._loadingData = false;
+  } catch(err) {
+    console.error('loadData erro:', err);
+  } finally {
+    window._loadingData = false;
+  }
 }
-
 async function saveData() {
   // Garante que o Supabase está carregado
   if (typeof supabaseClient === 'undefined') {
@@ -4343,13 +4351,14 @@ function syncLocalUserFromSupabase(user) {
 }
 
 supabaseClient.auth.onAuthStateChange(async (event, session) => {
-  // INITIAL_SESSION é disparado no reload — usa ele para carregar dados
-  // Ignora outros eventos duplicados se já carregou
-  if (session?.user) {
-    syncLocalUserFromSupabase(session.user);
-    checkUserSession();
-    loadUserProfile();
-    await loadData();
+  // Só age em eventos reais — evita loop com TOKEN_REFRESHED
+  if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+    if (session?.user) {
+      syncLocalUserFromSupabase(session.user);
+      checkUserSession();
+      loadUserProfile();
+      await loadData();
+    }
   } else if (event === 'SIGNED_OUT') {
     localStorage.removeItem('petcare_user');
     petsList = [];
