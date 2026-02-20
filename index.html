@@ -3174,6 +3174,21 @@ async function loadData() {
   if (!user) {
     petsList = [];
     currentPetId = null;
+    // Tenta fallback do cache local para não "sumir" visualmente em casos de sessão/política
+    try {
+      const cached = JSON.parse(localStorage.getItem('petcare_pets_cache') || 'null');
+      if (cached?.petData) {
+        petsList = cached.petsList || [];
+        currentPetId = cached.currentPetId || null;
+        petData = cached.petData;
+        updatePetProfile();
+        renderVaccines();
+        renderMedicines();
+        renderWeights();
+        return;
+      }
+    } catch(e) {}
+
     petData = { name:'', species:'', breed:'', birth_date:'', photo:'', vaccines:[], medicines:[], weights:[] };
     updatePetProfile();
     renderVaccines();
@@ -3190,12 +3205,30 @@ async function loadData() {
 
   if (petsError) {
     console.error("Erro ao buscar pets:", petsError);
+    try { showToast("❌ Não consegui carregar seus pets. Verifique sua conexão e tente atualizar."); } catch(e) {}
     return;
   }
 
   petsList = pets || [];
 
   if (petsList.length === 0) {
+    try { showToast("ℹ️ Nenhum pet encontrado após carregar. Se você salvou e sumiu ao atualizar, pode ser política (RLS) no Supabase ou sessão não persistindo."); } catch(e) {}
+
+    // Fallback visual via cache local
+    try {
+      const cached = JSON.parse(localStorage.getItem('petcare_pets_cache') || 'null');
+      if (cached?.petData) {
+        petsList = cached.petsList || [];
+        currentPetId = cached.currentPetId || null;
+        petData = cached.petData;
+        updatePetProfile();
+        renderVaccines();
+        renderMedicines();
+        renderWeights();
+        return;
+      }
+    } catch(e) {}
+
     currentPetId = null;
     petData = { name:'', species:'', breed:'', birth_date:'', photo:'', vaccines:[], medicines:[], weights:[] };
     updatePetProfile();
@@ -3253,6 +3286,11 @@ async function loadData() {
     weights: weiRes.data || []
   };
 
+  // Cache local simples (fallback visual)
+  try {
+    localStorage.setItem('petcare_pets_cache', JSON.stringify({ petsList, currentPetId, petData }));
+  } catch(e) {}
+
   updatePetProfile();
   renderVaccines();
   renderMedicines();
@@ -3290,6 +3328,7 @@ async function saveData() {
   if (!user) {
     // Se o usuário estava "logado" só no localStorage, limpa para não ficar em estado inconsistente
     localStorage.removeItem('petcare_user');
+        clearCachedSupabaseSession();
     showToast('⚠️ Sua sessão expirou. Faça login novamente.');
     openAuthModal('login');
     return { ok: false };
@@ -4365,10 +4404,69 @@ if (document.readyState === 'loading') {
 
 <script>
     const supabaseClient = window.supabase.createClient(
-        
+
         "https://chblwbctbkqolymbrqvh.supabase.co",
-        "sb_publishable_WT_rpILQTaihVpghi1MQ5A_C62NVvTL"
+        "sb_publishable_WT_rpILQTaihVpghi1MQ5A_C62NVvTL",
+        {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true,
+            storage: window.localStorage
+          }
+        }
     );
+
+    // -------------------------
+    // Sessão: cache extra (fallback) para evitar "sumir" após atualizar
+    // -------------------------
+    const PETCARE_SESSION_CACHE_KEY = 'petcare_supabase_session';
+
+    function cacheSupabaseSession(session) {
+      try {
+        if (session?.access_token && session?.refresh_token) {
+          localStorage.setItem(PETCARE_SESSION_CACHE_KEY, JSON.stringify({
+            access_token: session.access_token,
+            refresh_token: session.refresh_token
+          }));
+        }
+      } catch (e) {
+        console.warn('cacheSupabaseSession: não foi possível salvar sessão', e);
+      }
+    }
+
+    function clearCachedSupabaseSession() {
+      try { localStorage.removeItem(PETCARE_SESSION_CACHE_KEY); } catch (e) {}
+    }
+
+    async function restoreSupabaseSessionFromCache() {
+      try {
+        const raw = localStorage.getItem(PETCARE_SESSION_CACHE_KEY);
+        if (!raw) return null;
+        const cached = JSON.parse(raw);
+        if (!cached?.access_token || !cached?.refresh_token) return null;
+
+        const { data, error } = await supabaseClient.auth.setSession({
+          access_token: cached.access_token,
+          refresh_token: cached.refresh_token
+        });
+
+        if (error) {
+          console.warn('restoreSupabaseSessionFromCache: setSession erro:', error);
+          clearCachedSupabaseSession();
+          return null;
+        }
+
+        // Atualiza cache (tokens podem ter sido rotacionados)
+        if (data?.session) cacheSupabaseSession(data.session);
+
+        return data?.session || null;
+      } catch (e) {
+        console.warn('restoreSupabaseSessionFromCache: erro:', e);
+        return null;
+      }
+    }
+
 
     async function getUsuarioLogado() {
   const { data, error } = await supabaseClient.auth.getUser();
@@ -4406,7 +4504,20 @@ function syncLocalUserFromSupabase(user) {
             const { data: sessionData, error: sessionErr } = await supabaseClient.auth.getSession();
             if (sessionErr) console.warn('bootstrapAuthAndData: getSession erro:', sessionErr);
 
-            const user = sessionData?.session?.user || null;
+            let user = sessionData?.session?.user || null;
+
+            // Fallback: se por algum motivo o Supabase não restaurou a sessão do storage,
+            // tentamos restaurar do nosso cache.
+            if (!user) {
+                const restored = await restoreSupabaseSessionFromCache();
+                user = restored?.user || null;
+
+                // Re-lê a sessão após setSession
+                if (!user) {
+                    const { data: sessionData2 } = await supabaseClient.auth.getSession();
+                    user = sessionData2?.session?.user || null;
+                }
+            }
 
             if (user) {
                 syncLocalUserFromSupabase(user);
@@ -4430,6 +4541,9 @@ function syncLocalUserFromSupabase(user) {
       // Inclui TOKEN_REFRESHED para casos em que INITIAL_SESSION venha sem sessão
       if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') {
         if (session?.user) {
+          // mantém um cache extra da sessão para sobreviver a reloads em alguns navegadores
+          if (session) cacheSupabaseSession(session);
+
           syncLocalUserFromSupabase(session.user);
           checkUserSession?.();
           loadUserProfile?.();
@@ -4466,8 +4580,7 @@ function syncLocalUserFromSupabase(user) {
         const { error } = await supabaseClient.auth.signInWithOAuth({
             provider: "google",
             options: {
-                redirectTo: "https://petcarenew.vercel.app"
-            }
+                redirectTo: `${window.location.origin}${window.location.pathname}`}
         });
 
         if (error) {
@@ -4499,6 +4612,7 @@ function syncLocalUserFromSupabase(user) {
         if (data?.user) {
             syncLocalUserFromSupabase(data.user);
         }
+        if (data?.session) cacheSupabaseSession(data.session);
 
         closeAuthModal();
         document.getElementById('loginForm')?.reset();
@@ -4545,6 +4659,7 @@ function syncLocalUserFromSupabase(user) {
 
         // Se veio session, já está logado
         syncLocalUserFromSupabase(data.session.user);
+        if (data?.session) cacheSupabaseSession(data.session);
 
         closeAuthModal();
         document.getElementById('registerForm')?.reset();
