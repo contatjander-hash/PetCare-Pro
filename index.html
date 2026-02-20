@@ -3944,9 +3944,9 @@ function setupEventHandlers() {
     return;
   }
 
-  // Mantém o paywall premium (como está no seu app)
+  // Exige premium para adicionar pet
   if (!hasPremiumAccess()) {
-    showPaymentWall();
+    await showPaymentWall();
     return;
   }
 
