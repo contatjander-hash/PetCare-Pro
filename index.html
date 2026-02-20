@@ -3120,7 +3120,7 @@ let currentPetId = null;  // pet atualmente aberto
 // Auth helper (sessão real do Supabase)
 // -------------------------
 async function getAuthUserOrNull({ syncLocal = true } = {}) {
-  if (typeof supabaseClient === 'undefined') return null;
+  if (typeof supabaseClient === 'undefined' || !supabaseClient) return null;
   try {
     const { data: sData, error: sErr } = await supabaseClient.auth.getSession();
     if (sErr) console.warn('getAuthUserOrNull: getSession erro:', sErr);
@@ -3150,7 +3150,7 @@ async function getAuthUserOrNull({ syncLocal = true } = {}) {
 // Estas funções só rodam quando o usuário já está logado.
 // -------------------------
 async function loadData() {
-  if (typeof supabaseClient === 'undefined') return;
+  if (typeof supabaseClient === 'undefined' || !supabaseClient) return;
   if (window._loadingData) return; // evita chamadas simultâneas
   window._loadingData = true;
   try {
@@ -3304,7 +3304,7 @@ async function loadData() {
 }
 async function saveData() {
   // Garante que o Supabase está carregado
-  if (typeof supabaseClient === 'undefined') {
+  if (typeof supabaseClient === 'undefined' || !supabaseClient) {
     console.error('saveData: supabaseClient não disponível');
     return { ok: false };
   }
@@ -3868,7 +3868,16 @@ function showToast(message) {
 // -------------------------
 // Galeria de fotos (LOCAL)
  // -------------------------
-let photoGallery = JSON.parse(localStorage.getItem('petcare_photos') || '[]');
+let photoGallery = [];
+try {
+  const raw = localStorage.getItem('petcare_photos');
+  const parsed = raw ? JSON.parse(raw) : [];
+  photoGallery = Array.isArray(parsed) ? parsed : [];
+} catch (e) {
+  console.warn('petcare_photos inválido; resetando cache local.', e);
+  try { localStorage.removeItem('petcare_photos'); } catch(_) {}
+  photoGallery = [];
+}
 
 function displayPhotos() {
   const grid = document.querySelector('.photo-grid');
@@ -4403,19 +4412,30 @@ if (document.readyState === 'loading') {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-    const supabaseClient = window.supabase.createClient(
-
-        "https://chblwbctbkqolymbrqvh.supabase.co",
-        "sb_publishable_WT_rpILQTaihVpghi1MQ5A_C62NVvTL",
-        {
-          auth: {
-            persistSession: true,
-            autoRefreshToken: true,
-            detectSessionInUrl: true,
-            storage: window.localStorage
+    // Criação segura do client (não quebra o app se o CDN falhar ou se o storage estiver bloqueado)
+    var supabaseClient = null;
+    try {
+      const _storage = (() => { try { return window.localStorage; } catch(e) { return undefined; } })();
+      if (window.supabase && typeof window.supabase.createClient === 'function') {
+        supabaseClient = window.supabase.createClient(
+          "https://chblwbctbkqolymbrqvh.supabase.co",
+          "sb_publishable_WT_rpILQTaihVpghi1MQ5A_C62NVvTL",
+          {
+            auth: {
+              persistSession: true,
+              autoRefreshToken: true,
+              detectSessionInUrl: true,
+              storage: _storage
+            }
           }
-        }
-    );
+        );
+      } else {
+        console.error('Supabase JS não carregou (CDN). Verifique sua conexão/bloqueadores.');
+      }
+    } catch (e) {
+      console.error('Erro ao criar supabaseClient:', e);
+      supabaseClient = null;
+    }
 
     // -------------------------
     // Sessão: cache extra (fallback) para evitar "sumir" após atualizar
@@ -4440,6 +4460,7 @@ if (document.readyState === 'loading') {
     }
 
     async function restoreSupabaseSessionFromCache() {
+      if (!supabaseClient) return null;
       try {
         const raw = localStorage.getItem(PETCARE_SESSION_CACHE_KEY);
         if (!raw) return null;
@@ -4500,6 +4521,7 @@ function syncLocalUserFromSupabase(user) {
     // Bootstrap: garante que, ao recarregar a página, a sessão é lida do storage
     // e os dados são carregados sem depender apenas do onAuthStateChange.
     async function bootstrapAuthAndData() {
+        if (!supabaseClient) { console.warn('Supabase indisponível; mantendo UI offline.'); return; }
         try {
             const { data: sessionData, error: sessionErr } = await supabaseClient.auth.getSession();
             if (sessionErr) console.warn('bootstrapAuthAndData: getSession erro:', sessionErr);
@@ -4537,50 +4559,59 @@ function syncLocalUserFromSupabase(user) {
 
     let _lastLoadDataAt = 0;
 
-    supabaseClient.auth.onAuthStateChange(async (event, session) => {
-      // Inclui TOKEN_REFRESHED para casos em que INITIAL_SESSION venha sem sessão
-      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') {
-        if (session?.user) {
-          // mantém um cache extra da sessão para sobreviver a reloads em alguns navegadores
-          if (session) cacheSupabaseSession(session);
+    if (supabaseClient) {
+      supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        // Inclui TOKEN_REFRESHED para casos em que INITIAL_SESSION venha sem sessão
+        if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') {
+          if (session?.user) {
+            // mantém um cache extra da sessão para sobreviver a reloads em alguns navegadores
+            try { cacheSupabaseSession(session); } catch(e) {}
 
-          syncLocalUserFromSupabase(session.user);
-          checkUserSession?.();
-          loadUserProfile?.();
+            syncLocalUserFromSupabase(session.user);
+            checkUserSession?.();
+            loadUserProfile?.();
 
-          const now = Date.now();
-          if (event !== 'TOKEN_REFRESHED' || (now - _lastLoadDataAt) > 1500) {
-            _lastLoadDataAt = now;
-            await loadData?.();
+            const now = Date.now();
+            if (event !== 'TOKEN_REFRESHED' || (now - _lastLoadDataAt) > 1500) {
+              _lastLoadDataAt = now;
+              await loadData?.();
+            }
+          } else if (event === 'INITIAL_SESSION') {
+            // Sessão não existe: limpa o "logado" do localStorage para não ficar inconsistente
+            localStorage.removeItem('petcare_user');
+            checkUserSession?.();
+            loadUserProfile?.();
           }
-        } else if (event === 'INITIAL_SESSION') {
+        } else if (event === 'SIGNED_OUT') {
           localStorage.removeItem('petcare_user');
+          try { clearCachedSupabaseSession(); } catch(e) {}
+          petsList = [];
+          currentPetId = null;
+          petData = { name:'', species:'', breed:'', birth_date:'', photo:'', vaccines:[], medicines:[], weights:[] };
+          updatePetProfile();
+          renderVaccines();
+          renderMedicines();
+          renderWeights();
           checkUserSession?.();
           loadUserProfile?.();
         }
-      } else if (event === 'SIGNED_OUT') {
-        localStorage.removeItem('petcare_user');
-        petsList = [];
-        currentPetId = null;
-        petData = { name:'', species:'', breed:'', birth_date:'', photo:'', vaccines:[], medicines:[], weights:[] };
-        updatePetProfile();
-        renderVaccines();
-        renderMedicines();
-        renderWeights();
-        checkUserSession?.();
-        loadUserProfile?.();
-      }
-    });
+      });
+    }
 
-    // roda no load/reload
-    bootstrapAuthAndData();
+    // roda no load/reload (garante DOM pronto)
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootstrapAuthAndData);
+    } else {
+      bootstrapAuthAndData();
+    }
 
 
     async function loginWithGoogle() {
         const { error } = await supabaseClient.auth.signInWithOAuth({
             provider: "google",
             options: {
-                redirectTo: `${window.location.origin}${window.location.pathname}`}
+                redirectTo: `${window.location.origin}${window.location.pathname}`
+            }
         });
 
         if (error) {
