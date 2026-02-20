@@ -3060,86 +3060,42 @@
         </div>
     </div>
 
-    <script>
-        async function exigirLoginSupabase() {
-  const { data, error } = await supabaseClient.auth.getUser();
-  if (error) console.error(error);
+    
+<script>
+/** =========================
+ *  PetCare - JS principal
+ *  (corrigido: sem erros de sintaxe e sem depender de window.event)
+ *  ========================= */
 
-  if (!data?.user) {
-    openModal('authModal'); // abre o modal de login
-    return false;
-  }
-  return true;
-}
-        // Data storage
-        let petData = {
-            name: '',
-            species: '',
-            breed: '',
-            birthdate: '',
-            photo: '',
-            vaccines: [],
-            medicines: [],
-            weights: []
-        };
-        let petsList = [];        // lista de pets do usuário logado
+function safeEvent(evt){ return evt || window.event || null; }
+
+// -------------------------
+// Estado (UI) do Pet
+// -------------------------
+let petData = {
+  name: '',
+  species: '',
+  breed: '',
+  birthdate: '',
+  photo: '',
+  vaccines: [],
+  medicines: [],
+  weights: []
+};
+
+let petsList = [];        // lista de pets do usuário logado
 let currentPetId = null;  // pet atualmente aberto
 
-        // Photo selection
-        document.querySelectorAll('.pet-photo-option').forEach(option => {
-            option.addEventListener('click', function() {
-                // Check if it's the custom photo button
-                if (this.id === 'customPetPhoto') {
-                    document.getElementById('customPetPhotoInput').click();
-                    return;
-                }
-                
-                document.querySelectorAll('.pet-photo-option').forEach(opt => {
-                    opt.classList.remove('selected');
-                });
-                this.classList.add('selected');
-                document.getElementById('petPhoto').value = this.dataset.photo;
-            });
-        });
-
-        // Custom pet photo upload
-        document.getElementById('customPetPhotoInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            if (file.size > 5 * 1024 * 1024) {
-                alert('❌ A foto é muito grande! Máximo 5MB.');
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const customPhoto = document.getElementById('customPetPhoto');
-                customPhoto.style.backgroundImage = `url(${event.target.result})`;
-                customPhoto.style.backgroundSize = 'cover';
-                customPhoto.style.backgroundPosition = 'center';
-                customPhoto.textContent = '';
-                
-                // Select it
-                document.querySelectorAll('.pet-photo-option').forEach(opt => {
-                    opt.classList.remove('selected');
-                });
-                customPhoto.classList.add('selected');
-                
-                // Save as base64
-                document.getElementById('petPhoto').value = 'custom:' + event.target.result;
-            };
-            reader.readAsDataURL(file);
-        });
-
-        // ✅ Load data from Supabase
+// -------------------------
+// Supabase (dados multi-dispositivo)
+// OBS: o supabaseClient é definido mais abaixo no HTML.
+// Estas funções só rodam quando o usuário já está logado.
+// -------------------------
 async function loadData() {
-  // supabaseClient ainda não existe? (segurança)
   if (typeof supabaseClient === 'undefined') return;
 
-  const user = await getUsuarioLogado();
+  const user = (typeof getUsuarioLogado === 'function') ? await getUsuarioLogado() : null;
   if (!user) {
-    // deslogado -> estado vazio
     petsList = [];
     currentPetId = null;
     petData = { name:'', species:'', breed:'', birthdate:'', photo:'', vaccines:[], medicines:[], weights:[] };
@@ -3150,7 +3106,6 @@ async function loadData() {
     return;
   }
 
-  // 1) lista de pets do usuário
   const { data: pets, error: petsError } = await supabaseClient
     .from('pets')
     .select('id, name, species, breed, birthdate, photo_url, created_at')
@@ -3165,7 +3120,6 @@ async function loadData() {
 
   petsList = pets || [];
 
-  // sem pets ainda
   if (petsList.length === 0) {
     currentPetId = null;
     petData = { name:'', species:'', breed:'', birthdate:'', photo:'', vaccines:[], medicines:[], weights:[] };
@@ -3176,10 +3130,8 @@ async function loadData() {
     return;
   }
 
-  // escolhe o pet atual (primeiro por enquanto)
   currentPetId = currentPetId || petsList[0].id;
 
-  // 2) carrega tabelas filhas do pet atual
   const [vaccRes, medRes, weiRes] = await Promise.all([
     supabaseClient
       .from('vaccines')
@@ -3209,7 +3161,6 @@ async function loadData() {
 
   const pet = petsList.find(p => p.id === currentPetId);
 
-  // 3) monta petData no formato que seu JS já usa hoje
   petData = {
     name: pet?.name || '',
     species: pet?.species || '',
@@ -3233,9 +3184,10 @@ async function loadData() {
   renderWeights();
 }
 
-// ✅ Save pet (pets table) to Supabase
 async function saveData() {
-  const user = await getUsuarioLogado();
+  if (typeof supabaseClient === 'undefined') return { ok: false };
+
+  const user = (typeof getUsuarioLogado === 'function') ? await getUsuarioLogado() : null;
   if (!user) {
     alert("Você precisa estar logado para salvar.");
     return { ok: false };
@@ -3250,7 +3202,6 @@ async function saveData() {
     photo_url: petData.photo || null
   };
 
-  // update pet existente
   if (currentPetId) {
     const { error } = await supabaseClient
       .from('pets')
@@ -3266,7 +3217,6 @@ async function saveData() {
     return { ok: true, petId: currentPetId };
   }
 
-  // insert novo pet
   const { data, error } = await supabaseClient
     .from('pets')
     .insert(payload)
@@ -3283,1145 +3233,888 @@ async function saveData() {
   return { ok: true, petId: currentPetId };
 }
 
-        // Modal functions
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
-        }
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-        }
-
-        // Update pet profile
-        function updatePetProfile() {
-            if (petData.name) {
-                const speciesEmoji = {
-                    'dog': '🐕',
-                    'cat': '🐱',
-                    'bird': '🐦',
-                    'other': '🐾'
-                };
-                
-                const photoUrls = {
-                    'dog1': 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=300&q=80',
-                    'dog2': 'https://images.unsplash.com/photo-1560807707-8cc77767d783?w=300&q=80',
-                    'dog3': 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=300&q=80',
-                    'cat1': 'https://images.unsplash.com/photo-1574158622682-e40e69881006?w=300&q=80',
-                    'cat2': 'https://images.unsplash.com/photo-1615789591457-74a63395c990?w=300&q=80',
-                    'cat3': 'https://images.unsplash.com/photo-1606214174585-fe31582dc6ee?w=300&q=80'
-                };
-                
-                document.getElementById('petName').textContent = petData.name;
-                
-                const avatarEl = document.querySelector('.pet-avatar');
-                
-                // Check if it's a custom photo (starts with "custom:")
-                if (petData.photo && petData.photo.startsWith('custom:')) {
-                    const photoData = petData.photo.replace('custom:', '');
-                    avatarEl.style.backgroundImage = `url(${photoData})`;
-                    avatarEl.style.backgroundSize = 'cover';
-                    avatarEl.style.backgroundPosition = 'center';
-                    avatarEl.textContent = '';
-                } else if (petData.photo && photoUrls[petData.photo]) {
-                    avatarEl.style.backgroundImage = `url(${photoUrls[petData.photo]})`;
-                    avatarEl.style.backgroundSize = 'cover';
-                    avatarEl.style.backgroundPosition = 'center';
-                    avatarEl.textContent = '';
-                } else {
-                    avatarEl.style.backgroundImage = 'none';
-                    avatarEl.textContent = speciesEmoji[petData.species] || '🐾';
-                }
-                
-                const birthDate = new Date(petData.birthdate);
-                const age = Math.floor((new Date() - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
-                document.getElementById('petDetails').textContent = `${petData.breed || petData.species} • ${age} ${age === 1 ? 'ano' : 'anos'}`;
-            }
-        }
-
-        // Render vaccines
-        function renderVaccines() {
-            const list = document.getElementById('vaccineList');
-            
-            if (petData.vaccines.length === 0) {
-                list.innerHTML = `
-                    <li class="empty-state">
-                        <div class="empty-state-icon">📋</div>
-                        <p>Nenhum registro ainda</p>
-                    </li>
-                `;
-                return;
-            }
-
-            list.innerHTML = petData.vaccines.map((v, index) => {
-                const date = new Date(v.date);
-                const today = new Date();
-                const isPast = date < today;
-                const status = isPast ? 'status-done' : 'status-upcoming';
-                const statusText = isPast ? 'Realizado' : 'Agendado';
-
-                return `
-                    <li class="item">
-                        <div class="item-info">
-                            <h4>${v.name}</h4>
-                            <p>${date.toLocaleDateString('pt-BR')} • ${v.type === 'vaccine' ? 'Vacina' : 'Consulta'}</p>
-                        </div>
-                        <span class="item-status ${status}">${statusText}</span>
-                    </li>
-                `;
-            }).join('');
-        }
-
-        // Render medicines
-        function renderMedicines() {
-            const list = document.getElementById('medicineList');
-            
-            if (petData.medicines.length === 0) {
-                list.innerHTML = `
-                    <li class="empty-state">
-                        <div class="empty-state-icon">⏰</div>
-                        <p>Nenhum lembrete configurado</p>
-                    </li>
-                `;
-                return;
-            }
-
-            list.innerHTML = petData.medicines.map(m => {
-                const nextDose = new Date(m.nextDose);
-                const today = new Date();
-                const isOverdue = nextDose < today;
-                const status = isOverdue ? 'status-overdue' : 'status-upcoming';
-                const statusText = isOverdue ? 'Atrasado' : 'Próximo';
-
-                return `
-                    <li class="item">
-                        <div class="item-info">
-                            <h4>${m.name}</h4>
-                            <p>${m.dosage} • ${nextDose.toLocaleDateString('pt-BR')}</p>
-                        </div>
-                        <span class="item-status ${status}">${statusText}</span>
-                    </li>
-                `;
-            }).join('');
-        }
-
-        // Render weights
-        function renderWeights() {
-            // This would update the chart with actual data
-            // For now, keeping the demo chart
-        }
-
-        // Event Listeners
-        document.getElementById('addPetBtn').addEventListener('click', () => {
-            openModal('petModal');
-        });
-
-        document.getElementById('addVaccineBtn').addEventListener('click', () => {
-            openModal('vaccineModal');
-        });
-
-        document.getElementById('addMedicineBtn').addEventListener('click', () => {
-            openModal('medicineModal');
-        });
-
-        document.getElementById('addWeightBtn').addEventListener('click', () => {
-            openModal('weightModal');
-        });
-
-        document.getElementById('petForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  petData.name = document.getElementById('petNameInput').value;
-  petData.species = document.getElementById('petSpecies').value;
-  petData.breed = document.getElementById('petBreed').value;
-  petData.birthdate = document.getElementById('petBirthdate').value;
-  petData.photo = document.getElementById('petPhoto').value;
-
-  const result = await saveData(); // ✅ Supabase
-  if (!result.ok) return;
-
-  await loadData(); // ✅ recarrega (multi-device)
-  closeModal('petModal');
-
-  e.target.reset();
-  document.querySelectorAll('.pet-photo-option').forEach(opt => opt.classList.remove('selected'));
-});
-
-        document.getElementById('vaccineForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            petData.vaccines.push({
-                type: document.getElementById('vaccineType').value,
-                name: document.getElementById('vaccineName').value,
-                date: document.getElementById('vaccineDate').value,
-                notes: document.getElementById('vaccineNotes').value
-            });
-            
-            saveData();
-            renderVaccines();
-            closeModal('vaccineModal');
-            e.target.reset();
-        });
-
-        document.getElementById('medicineForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            petData.medicines.push({
-                name: document.getElementById('medicineName').value,
-                dosage: document.getElementById('medicineDosage').value,
-                frequency: document.getElementById('medicineFrequency').value,
-                nextDose: document.getElementById('medicineNextDose').value
-            });
-            
-            saveData();
-            renderMedicines();
-            closeModal('medicineModal');
-            e.target.reset();
-        });
-
-        document.getElementById('weightForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            petData.weights.push({
-                value: parseFloat(document.getElementById('weightValue').value),
-                date: document.getElementById('weightDate').value,
-                food: document.getElementById('foodAmount').value
-            });
-            
-            saveData();
-            renderWeights();
-            closeModal('weightModal');
-            e.target.reset();
-        });
-
-        // Close modal on outside click
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    closeModal(modal.id);
-                }
-            });
-        });
-
-        // Profile photo upload
-        function uploadProfilePhoto() {
-            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
-            if (!user) {
-                alert('⚠️ Você precisa estar logado para alterar sua foto!');
-                return;
-            }
-            document.getElementById('profilePhotoInput').click();
-        }
-
-        document.getElementById('profilePhotoInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            if (file.size > 5 * 1024 * 1024) {
-                alert('❌ A foto é muito grande! Máximo 5MB.');
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                // Update user photo
-                const user = JSON.parse(localStorage.getItem('petcare_user'));
-                user.profilePhoto = event.target.result;
-                
-                // Update in users list
-                const users = JSON.parse(localStorage.getItem('petcare_users') || '[]');
-                const userIndex = users.findIndex(u => u.id === user.id);
-                if (userIndex !== -1) {
-                    users[userIndex].profilePhoto = event.target.result;
-                    localStorage.setItem('petcare_users', JSON.stringify(users));
-                }
-                
-                // Update current user
-                localStorage.setItem('petcare_user', JSON.stringify(user));
-                
-                // Update avatar display
-                const avatar = document.getElementById('profileAvatar');
-                avatar.style.backgroundImage = `url(${event.target.result})`;
-                avatar.style.backgroundSize = 'cover';
-                avatar.style.backgroundPosition = 'center';
-                avatar.innerHTML = '<div style="position: absolute; bottom: 0; right: 0; background: var(--accent); border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 3px solid white;">📸</div>';
-                
-                showToast('✅ Foto atualizada com sucesso!');
-            };
-            reader.readAsDataURL(file);
-        });
-
-        // Toggle password visibility
-        function togglePassword(inputId, button) {
-            const input = document.getElementById(inputId);
-            if (input.type === 'password') {
-                input.type = 'text';
-                button.textContent = '🙈';
-            } else {
-                input.type = 'password';
-                button.textContent = '👁️';
-            }
-        }
-
-        // CPF Mask and Validation
-        function maskCPF(value) {
-            value = value.replace(/\D/g, ''); // Remove tudo que não é número
-            value = value.replace(/(\d{3})(\d)/, '$1.$2');
-            value = value.replace(/(\d{3})(\d)/, '$1.$2');
-            value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-            return value;
-        }
-
-        function validateCPF(cpf) {
-            cpf = cpf.replace(/\D/g, '');
-            
-            if (cpf.length !== 11) return false;
-            
-            // Elimina CPFs invalidos conhecidos
-            if (/^(\d)\1{10}$/.test(cpf)) return false;
-            
-            // Valida 1o digito
-            let add = 0;
-            for (let i = 0; i < 9; i++) {
-                add += parseInt(cpf.charAt(i)) * (10 - i);
-            }
-            let rev = 11 - (add % 11);
-            if (rev === 10 || rev === 11) rev = 0;
-            if (rev !== parseInt(cpf.charAt(9))) return false;
-            
-            // Valida 2o digito
-            add = 0;
-            for (let i = 0; i < 10; i++) {
-                add += parseInt(cpf.charAt(i)) * (11 - i);
-            }
-            rev = 11 - (add % 11);
-            if (rev === 10 || rev === 11) rev = 0;
-            if (rev !== parseInt(cpf.charAt(10))) return false;
-            
-            return true;
-        }
-
-        // Phone Mask
-        function maskPhone(value) {
-            value = value.replace(/\D/g, ''); // Remove tudo que não é número
-            value = value.replace(/^(\d{2})(\d)/g, '($1) $2');
-            value = value.replace(/(\d)(\d{4})$/, '$1-$2');
-            return value;
-        }
-
-        // Password Strength Checker
-        function checkPasswordStrength(password) {
-            let strength = 0;
-            const bars = ['strength1', 'strength2', 'strength3', 'strength4'];
-            const text = document.getElementById('strengthText');
-            
-            // Reset bars
-            bars.forEach(id => {
-                document.getElementById(id).className = 'strength-bar';
-            });
-            
-            if (password.length >= 8) strength++;
-            if (/[a-z]/.test(password)) strength++;
-            if (/[A-Z]/.test(password)) strength++;
-            if (/[0-9]/.test(password)) strength++;
-            if (/[^a-zA-Z0-9]/.test(password)) strength++;
-            
-            // Update bars
-            if (strength >= 1) {
-                document.getElementById('strength1').classList.add('weak');
-                text.textContent = 'Senha fraca';
-                text.style.color = '#ef4444';
-            }
-            if (strength >= 2) {
-                document.getElementById('strength2').classList.add('medium');
-                text.textContent = 'Senha média';
-                text.style.color = '#f59e0b';
-            }
-            if (strength >= 3) {
-                document.getElementById('strength3').classList.add('good');
-                text.textContent = 'Senha boa';
-                text.style.color = '#10b981';
-            }
-            if (strength >= 4) {
-                document.getElementById('strength4').classList.add('strong');
-                text.textContent = 'Senha forte! ✓';
-                text.style.color = '#10b981';
-            }
-            
-            return strength >= 3; // Requer pelo menos "boa"
-        }
-
-        // Initialize masks and validation
-        document.addEventListener('DOMContentLoaded', function() {
-            // CPF mask
-            const cpfInput = document.getElementById('registerCpf');
-            if (cpfInput) {
-                cpfInput.addEventListener('input', function(e) {
-                    e.target.value = maskCPF(e.target.value);
-                    
-                    // Validate when complete
-                    const cpf = e.target.value.replace(/\D/g, '');
-                    const errorDiv = document.getElementById('cpfError');
-                    if (cpf.length === 11) {
-                        if (!validateCPF(cpf)) {
-                            errorDiv.style.display = 'block';
-                            e.target.style.borderColor = '#ef4444';
-                        } else {
-                            errorDiv.style.display = 'none';
-                            e.target.style.borderColor = '#10b981';
-                        }
-                    } else {
-                        errorDiv.style.display = 'none';
-                        e.target.style.borderColor = '';
-                    }
-                });
-            }
-            
-            // Phone mask
-            const phoneInput = document.getElementById('registerPhone');
-            if (phoneInput) {
-                phoneInput.addEventListener('input', function(e) {
-                    e.target.value = maskPhone(e.target.value);
-                });
-            }
-            
-            // Password strength
-            const passwordInput = document.getElementById('registerPassword');
-            if (passwordInput) {
-                passwordInput.addEventListener('input', function(e) {
-                    checkPasswordStrength(e.target.value);
-                });
-            }
-        });
-
-        // Initialize
-// loadData(); // <- NÃO chama mais aqui (agora loadData depende do supabaseClient)
-checkUserSession();
-updatePricingVisibility();
-
-        // Check if user is logged in (but don't force login)
-        function checkUserSession() {
-            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
-            
-            if (user) {
-                // User is logged in - check their premium status
-                if (user.hasPremium) {
-                    localStorage.setItem('petcare_paid', 'true');
-                    localStorage.setItem('petcare_code', user.accessCode || '');
-                } else {
-                    // User doesn't have premium - clear flags
-                    localStorage.removeItem('petcare_paid');
-                    localStorage.removeItem('petcare_code');
-                }
-                
-                loadUserProfile();
-            } else {
-                // User not logged in - clear premium flags and show guest mode
-                localStorage.removeItem('petcare_paid');
-                localStorage.removeItem('petcare_code');
-                showGuestMode();
-            }
-        }
-
-        function showGuestMode() {
-            // Update profile to show login prompt
-            const profileSection = document.getElementById('profileSection');
-            if (profileSection) {
-                document.getElementById('profileName').textContent = 'Visitante';
-                document.getElementById('profileEmail').textContent = 'Faça login para salvar seus dados';
-                document.getElementById('profileAvatar').textContent = '👤';
-            }
-        }
-
-        async function handleLogin(e) {
-  e.preventDefault();
-
-  const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value;
-
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email,
-    password
-  });
-
-  if (error) {
-    alert("Erro ao entrar: " + error.message);
-    return;
-  }
-
-  // Opcional: guardar dados para UI (perfil), mas NÃO é mais autenticação
-  const user = data.user;
-  const userData = {
-    email: user.email,
-    name: user.user_metadata?.full_name || "",
-    phone: user.user_metadata?.phone || "",
-    cpf: user.user_metadata?.cpf || "",
-    createdAt: new Date().toISOString()
-  };
-  localStorage.setItem('petcare_user', JSON.stringify(userData));
-
-  // fecha modal e limpa
-  closeModal('authModal');
-  document.getElementById('loginForm').reset();
-
-  // seu onAuthStateChange já chama loadData(); então aqui pode só atualizar perfil
-  loadUserProfile();
+// -------------------------
+// Helpers de Modal
+// -------------------------
+function openModal(modalId) {
+  const el = document.getElementById(modalId);
+  if (!el) return;
+  el.classList.add('active');
 }
 
-        async function handleRegister(e) {
-  e.preventDefault();
+function closeModal(modalId) {
+  const el = document.getElementById(modalId);
+  if (!el) return;
+  el.classList.remove('active');
+}
 
-  const name = document.getElementById('registerName').value.trim();
-  const email = document.getElementById('registerEmail').value.trim();
-  const phone = document.getElementById('registerPhone').value.trim();
-  const cpf = document.getElementById('registerCpf').value.trim();
-  const password = document.getElementById('registerPassword').value;
+// -------------------------
+// UI: Perfil do Pet (card)
+ // -------------------------
+function updatePetProfile() {
+  const nameEl = document.getElementById('petName');
+  const detailsEl = document.getElementById('petDetails');
+  const avatarEl = document.querySelector('.pet-avatar');
 
-  const { data, error } = await supabaseClient.auth.signUp({
-    email,
-    password,
-    options: {
-      data: { full_name: name, phone, cpf }
-    }
-  });
+  if (!nameEl || !detailsEl || !avatarEl) return;
 
-  if (error) {
-    alert("Erro ao cadastrar: " + error.message);
+  if (!petData.name) {
+    nameEl.textContent = 'Seu Pet';
+    detailsEl.textContent = 'Clique em "Adicionar Pet" para começar';
+    avatarEl.style.backgroundImage = 'none';
+    avatarEl.textContent = '🐾';
     return;
   }
 
-  alert("Conta criada! Se o Supabase exigir confirmação, verifique seu email.");
+  const speciesEmoji = { dog:'🐕', cat:'🐱', bird:'🐦', other:'🐾' };
+  const photoUrls = {
+    dog1:'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=300&q=80',
+    dog2:'https://images.unsplash.com/photo-1560807707-8cc77767d783?w=300&q=80',
+    dog3:'https://images.unsplash.com/photo-1552053831-71594a27632d?w=300&q=80',
+    cat1:'https://images.unsplash.com/photo-1574158622682-e40e69881006?w=300&q=80',
+    cat2:'https://images.unsplash.com/photo-1615789591457-74a63395c990?w=300&q=80',
+    cat3:'https://images.unsplash.com/photo-1606214174585-fe31582dc6ee?w=300&q=80'
+  };
 
-  // Opcional: se veio session (quando confirmação está desligada), já atualiza UI
-  if (data?.session?.user) {
-    const user = data.session.user;
-    localStorage.setItem('petcare_user', JSON.stringify({
-      email: user.email,
-      name,
-      phone,
-      cpf,
-      createdAt: new Date().toISOString()
-    }));
+  nameEl.textContent = petData.name;
+
+  // Foto (custom base64 ou opção)
+  if (petData.photo && typeof petData.photo === 'string' && petData.photo.startsWith('custom:')) {
+    const photoData = petData.photo.replace('custom:', '');
+    avatarEl.style.backgroundImage = `url(${photoData})`;
+    avatarEl.style.backgroundSize = 'cover';
+    avatarEl.style.backgroundPosition = 'center';
+    avatarEl.textContent = '';
+  } else if (petData.photo && photoUrls[petData.photo]) {
+    avatarEl.style.backgroundImage = `url(${photoUrls[petData.photo]})`;
+    avatarEl.style.backgroundSize = 'cover';
+    avatarEl.style.backgroundPosition = 'center';
+    avatarEl.textContent = '';
+  } else {
+    avatarEl.style.backgroundImage = 'none';
+    avatarEl.textContent = speciesEmoji[petData.species] || '🐾';
+  }
+
+  // Idade
+  let ageText = '';
+  if (petData.birthdate) {
+    const birth = new Date(petData.birthdate);
+    if (!isNaN(birth.getTime())) {
+      const age = Math.floor((Date.now() - birth.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+      if (age >= 0) ageText = ` • ${age} ${age === 1 ? 'ano' : 'anos'}`;
+    }
+  }
+
+  detailsEl.textContent = `${petData.breed || petData.species || 'Pet'}${ageText}`.trim();
+}
+
+// -------------------------
+// Render: Vacinas
+// -------------------------
+function renderVaccines() {
+  const list = document.getElementById('vaccineList');
+  if (!list) return;
+
+  if (!petData.vaccines || petData.vaccines.length === 0) {
+    list.innerHTML = `
+      <li class="empty-state">
+        <div class="empty-state-icon">📋</div>
+        <p>Nenhum registro ainda</p>
+      </li>`;
+    return;
+  }
+
+  list.innerHTML = petData.vaccines.map(v => {
+    const d = new Date(v.date || v.applied_date);
+    const today = new Date();
+    const isPast = !isNaN(d.getTime()) && d < today;
+    const status = isPast ? 'status-done' : 'status-upcoming';
+    const statusText = isPast ? 'Realizado' : 'Agendado';
+    const dateText = !isNaN(d.getTime()) ? d.toLocaleDateString('pt-BR') : (v.date || '');
+
+    return `
+      <li class="item">
+        <div class="item-info">
+          <h4>${escapeHtml(v.name || '')}</h4>
+          <p>${dateText} • ${v.type === 'checkup' ? 'Consulta' : 'Vacina'}</p>
+        </div>
+        <span class="item-status ${status}">${statusText}</span>
+      </li>
+    `;
+  }).join('');
+}
+
+// -------------------------
+// Render: Medicamentos
+// -------------------------
+function renderMedicines() {
+  const list = document.getElementById('medicineList');
+  if (!list) return;
+
+  if (!petData.medicines || petData.medicines.length === 0) {
+    list.innerHTML = `
+      <li class="empty-state">
+        <div class="empty-state-icon">⏰</div>
+        <p>Nenhum lembrete configurado</p>
+      </li>`;
+    return;
+  }
+
+  list.innerHTML = petData.medicines.map(m => {
+    const nextDose = new Date(m.nextDose || m.next_dose || m.next_dose_at || '');
+    const today = new Date();
+    const isOverdue = !isNaN(nextDose.getTime()) && nextDose < today;
+    const status = isOverdue ? 'status-overdue' : 'status-upcoming';
+    const statusText = isOverdue ? 'Atrasado' : 'Próximo';
+    const nextDoseText = !isNaN(nextDose.getTime()) ? nextDose.toLocaleDateString('pt-BR') : '';
+
+    return `
+      <li class="item">
+        <div class="item-info">
+          <h4>${escapeHtml(m.name || '')}</h4>
+          <p>${escapeHtml(m.dosage || '')}${nextDoseText ? ' • ' + nextDoseText : ''}</p>
+        </div>
+        <span class="item-status ${status}">${statusText}</span>
+      </li>
+    `;
+  }).join('');
+}
+
+// -------------------------
+// Render: Pesos (placeholder)
+ // -------------------------
+function renderWeights() {
+  // Você pode evoluir depois para desenhar o gráfico com dados reais
+  // Por enquanto não quebra nada.
+}
+
+// -------------------------
+// Escape básico para evitar quebrar HTML em listagens
+// -------------------------
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'","&#039;");
+}
+
+// -------------------------
+// Seleção de foto do pet (opções + custom)
+ // -------------------------
+function setupPetPhotoSelectors() {
+  document.querySelectorAll('.pet-photo-option').forEach(option => {
+    option.addEventListener('click', function() {
+      if (this.id === 'customPetPhoto') {
+        const input = document.getElementById('customPetPhotoInput');
+        if (input) input.click();
+        return;
+      }
+
+      document.querySelectorAll('.pet-photo-option').forEach(opt => opt.classList.remove('selected'));
+      this.classList.add('selected');
+
+      const hidden = document.getElementById('petPhoto');
+      if (hidden) hidden.value = this.dataset.photo || '';
+    });
+  });
+
+  const customInput = document.getElementById('customPetPhotoInput');
+  if (customInput) {
+    customInput.addEventListener('change', function(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      if (file.size > 5 * 1024 * 1024) {
+        alert('❌ A foto é muito grande! Máximo 5MB.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        const customPhoto = document.getElementById('customPetPhoto');
+        if (!customPhoto) return;
+
+        customPhoto.style.backgroundImage = `url(${ev.target.result})`;
+        customPhoto.style.backgroundSize = 'cover';
+        customPhoto.style.backgroundPosition = 'center';
+        customPhoto.textContent = '';
+
+        document.querySelectorAll('.pet-photo-option').forEach(opt => opt.classList.remove('selected'));
+        customPhoto.classList.add('selected');
+
+        const hidden = document.getElementById('petPhoto');
+        if (hidden) hidden.value = 'custom:' + ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+}
+
+// -------------------------
+// Premium (localStorage) - mantido como está no seu app
+// -------------------------
+function hasPremiumAccess() {
+  return localStorage.getItem('petcare_paid') === 'true';
+}
+
+function updatePricingVisibility() {
+  const pricingSection = document.getElementById('pricingSection');
+  if (!pricingSection) return;
+  pricingSection.style.display = hasPremiumAccess() ? 'none' : 'block';
+}
+
+// -------------------------
+// Payment Wall
+// -------------------------
+function showPaymentWall() {
+  // aqui seu app ainda usa localStorage para "user"; manteremos compatível
+  const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+
+  if (!user) {
+    alert('⚠️ Você precisa criar uma conta para usar os recursos premium!\n\nCrie sua conta gratuitamente agora! 🐾');
+    openAuthModal('register');
+    return;
+  }
+
+  const wall = document.getElementById('paymentWall');
+  if (wall) wall.classList.remove('hidden');
+}
+
+function closePaymentWall() {
+  const wall = document.getElementById('paymentWall');
+  if (wall) wall.classList.add('hidden');
+}
+
+// -------------------------
+// Navegação (Home/Perfil) - sem depender de "event" global
+// -------------------------
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showSection('home');
+}
+
+function showSection(section, evt) {
+  const e = safeEvent(evt);
+
+  // atualiza nav highlight
+  document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+  if (e && e.target) {
+    const a = e.target.closest && e.target.closest('.nav-link');
+    if (a) a.classList.add('active');
+  } else {
+    // fallback: marcar pelo href
+    const link = document.querySelector(`.nav-link[href="#${section}"]`);
+    if (link) link.classList.add('active');
+  }
+
+  if (section === 'home') {
+    document.getElementById('homeSection')?.classList.remove('hidden');
+    document.getElementById('profileSection')?.classList.remove('active');
+  } else if (section === 'profile') {
+    document.getElementById('homeSection')?.classList.add('hidden');
+    document.getElementById('profileSection')?.classList.add('active');
     loadUserProfile();
   }
-
-  closeModal('authModal');
-  document.getElementById('registerForm').reset();
 }
 
-        function loadUserProfile() {
-            const user = JSON.parse(localStorage.getItem('petcare_user'));
-            if (!user) {
-                // Show guest prompt
-                document.getElementById('guestPrompt').style.display = 'block';
-                document.getElementById('loggedInContent').style.display = 'none';
-                document.getElementById('profileName').textContent = 'Visitante';
-                document.getElementById('profileEmail').textContent = 'Faça login para salvar seus dados';
-                document.getElementById('profileAvatar').textContent = '👤';
-                return;
-            }
-            
-            // Hide guest prompt, show logged in content
-            document.getElementById('guestPrompt').style.display = 'none';
-            document.getElementById('loggedInContent').style.display = 'block';
-            
-            // Update profile section
-            document.getElementById('profileName').textContent = user.name;
-            document.getElementById('profileEmail').textContent = user.email;
-            
-            // Update avatar with photo or initial
-            const avatar = document.getElementById('profileAvatar');
-            if (user.profilePhoto) {
-                avatar.style.backgroundImage = `url(${user.profilePhoto})`;
-                avatar.style.backgroundSize = 'cover';
-                avatar.style.backgroundPosition = 'center';
-                avatar.innerHTML = '<div style="position: absolute; bottom: 0; right: 0; background: var(--accent); border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 3px solid white;">📸</div>';
-            } else {
-                avatar.style.backgroundImage = 'none';
-                avatar.innerHTML = user.name.charAt(0).toUpperCase() + '<div style="position: absolute; bottom: 0; right: 0; background: var(--accent); border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 3px solid white;">📸</div>';
-            }
-            
-            document.getElementById('infoName').textContent = user.name;
-            document.getElementById('infoEmail').textContent = user.email;
-            document.getElementById('infoPhone').textContent = user.phone;
-            document.getElementById('infoCpf').textContent = user.cpf;
-            
-            // Check if has premium access
-            const isPaid = localStorage.getItem('petcare_paid') === 'true';
-            const code = localStorage.getItem('petcare_code');
-            
-            if (isPaid && code) {
-                document.getElementById('infoPlan').innerHTML = '<span style="color: #10b981;">Premium</span>';
-                document.getElementById('infoCode').textContent = code;
-            } else {
-                document.getElementById('infoPlan').textContent = 'Gratuito';
-                document.getElementById('infoCode').innerHTML = '<a href="#pricing" onclick="showSection(\'home\'); setTimeout(() => document.querySelector(\'.pricing-section\').scrollIntoView({behavior: \'smooth\'}), 100)" style="color: var(--accent); cursor: pointer;">Assinar agora</a>';
-            }
-            
-            // Load user pets
-            if (petData.name) {
-                document.getElementById('userPets').innerHTML = `
-                    <div class="info-item">
-                        <span class="info-label">🐾 ${petData.name}</span>
-                        <span class="info-value">${petData.species} • ${petData.breed || 'Sem raça definida'}</span>
-                    </div>
-                `;
-            }
-        }
+// -------------------------
+// Auth modal (Login/Cadastro) UI
+// -------------------------
+function openAuthModal(tab = 'login') {
+  document.getElementById('authModal')?.classList.add('active');
 
-        async function logout() {
-    if (!confirm("Tem certeza que deseja sair da sua conta?")) return;
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
 
-    const { error } = await supabaseClient.auth.signOut();
+  if (tab === 'login') {
+    document.querySelector('.auth-tab:first-child')?.classList.add('active');
+    document.getElementById('loginForm')?.classList.add('active');
+  } else {
+    document.querySelector('.auth-tab:last-child')?.classList.add('active');
+    document.getElementById('registerForm')?.classList.add('active');
+  }
+}
 
-    if (error) {
-        alert("Erro ao sair: " + error.message);
-        return;
+function showAuthTab(tab, evt) {
+  const e = safeEvent(evt);
+
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+
+  // Se veio evento, marca o botão clicado. Se não veio, marca pelo "tab".
+  if (e && e.target) {
+    e.target.classList.add('active');
+  } else {
+    if (tab === 'login') document.querySelector('.auth-tab:first-child')?.classList.add('active');
+    else document.querySelector('.auth-tab:last-child')?.classList.add('active');
+  }
+
+  document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+  if (tab === 'login') document.getElementById('loginForm')?.classList.add('active');
+  else document.getElementById('registerForm')?.classList.add('active');
+}
+
+function closeAuthModal() {
+  document.getElementById('authModal')?.classList.remove('active');
+}
+
+// -------------------------
+// Perfil do usuário (usa localStorage petcare_user p/ UI)
+ // -------------------------
+function showGuestMode() {
+  document.getElementById('guestPrompt')?.style && (document.getElementById('guestPrompt').style.display = 'block');
+  document.getElementById('loggedInContent')?.style && (document.getElementById('loggedInContent').style.display = 'none');
+
+  document.getElementById('profileName').textContent = 'Visitante';
+  document.getElementById('profileEmail').textContent = 'Faça login para salvar seus dados';
+
+  const avatar = document.getElementById('profileAvatar');
+  if (avatar) {
+    avatar.style.backgroundImage = 'none';
+    avatar.textContent = '👤';
+  }
+}
+
+function loadUserProfile() {
+  const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+
+  if (!user) {
+    showGuestMode();
+    return;
+  }
+
+  document.getElementById('guestPrompt')?.style && (document.getElementById('guestPrompt').style.display = 'none');
+  document.getElementById('loggedInContent')?.style && (document.getElementById('loggedInContent').style.display = 'block');
+
+  document.getElementById('profileName').textContent = user.name || 'Usuário';
+  document.getElementById('profileEmail').textContent = user.email || '';
+
+  const avatar = document.getElementById('profileAvatar');
+  if (avatar) {
+    if (user.profilePhoto) {
+      avatar.style.backgroundImage = `url(${user.profilePhoto})`;
+      avatar.style.backgroundSize = 'cover';
+      avatar.style.backgroundPosition = 'center';
+      avatar.innerHTML = '<div style="position: absolute; bottom: 0; right: 0; background: var(--accent); border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 3px solid white;">📸</div>';
+    } else {
+      avatar.style.backgroundImage = 'none';
+      avatar.innerHTML = (user.name ? user.name.charAt(0).toUpperCase() : '👤') +
+        '<div style="position: absolute; bottom: 0; right: 0; background: var(--accent); border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 3px solid white;">📸</div>';
+    }
+  }
+
+  document.getElementById('infoName').textContent = user.name || '-';
+  document.getElementById('infoEmail').textContent = user.email || '-';
+  document.getElementById('infoPhone').textContent = user.phone || '-';
+  document.getElementById('infoCpf').textContent = user.cpf || '-';
+
+  const isPaid = hasPremiumAccess();
+  const code = localStorage.getItem('petcare_code') || '';
+
+  if (isPaid && code) {
+    document.getElementById('infoPlan').innerHTML = '<span style="color: #10b981;">Premium</span>';
+    document.getElementById('infoCode').textContent = code;
+  } else {
+    document.getElementById('infoPlan').textContent = 'Gratuito';
+    document.getElementById('infoCode').innerHTML =
+      `<a href="#pricing" onclick="showSection('home'); setTimeout(() => document.querySelector('.pricing-section')?.scrollIntoView({behavior:'smooth'}), 100)" style="color: var(--accent); cursor: pointer;">Assinar agora</a>`;
+  }
+
+  // pets (mostra 1 por enquanto)
+  const userPets = document.getElementById('userPets');
+  if (userPets) {
+    if (petData.name) {
+      userPets.innerHTML = `
+        <div class="info-item">
+          <span class="info-label">🐾 ${escapeHtml(petData.name)}</span>
+          <span class="info-value">${escapeHtml(petData.species || '')} • ${escapeHtml(petData.breed || 'Sem raça definida')}</span>
+        </div>`;
+    } else {
+      userPets.innerHTML = `
+        <div class="info-item">
+          <span class="info-value" style="color: var(--text-secondary);">Nenhum pet cadastrado ainda</span>
+        </div>`;
+    }
+  }
+}
+
+// -------------------------
+// Upload de foto de perfil (LOCAL — você pode migrar p/ Supabase depois)
+ // -------------------------
+function uploadProfilePhoto() {
+  const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+  if (!user) {
+    alert('⚠️ Você precisa estar logado para alterar sua foto!');
+    return;
+  }
+  document.getElementById('profilePhotoInput')?.click();
+}
+
+function setupProfilePhotoInput() {
+  const input = document.getElementById('profilePhotoInput');
+  if (!input) return;
+
+  input.addEventListener('change', function(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('❌ A foto é muito grande! Máximo 5MB.');
+      return;
     }
 
-    // Limpa seus dados locais
-    localStorage.removeItem('petcare_user');
-    localStorage.removeItem('petData');
-    localStorage.removeItem('vaccines');
-    localStorage.removeItem('medicines');
-    localStorage.removeItem('weights');
-    localStorage.removeItem('petcare_photos');
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+      if (!user) return;
 
-    // Redireciona
-    window.location.href = "https://petcarenew.vercel.app";
+      user.profilePhoto = ev.target.result;
+      localStorage.setItem('petcare_user', JSON.stringify(user));
+
+      const avatar = document.getElementById('profileAvatar');
+      if (avatar) {
+        avatar.style.backgroundImage = `url(${ev.target.result})`;
+        avatar.style.backgroundSize = 'cover';
+        avatar.style.backgroundPosition = 'center';
+        avatar.innerHTML = '<div style="position: absolute; bottom: 0; right: 0; background: var(--accent); border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 3px solid white;">📸</div>';
+      }
+
+      showToast('✅ Foto atualizada com sucesso!');
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
-        // Navigation
-        function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            // Also ensure home section is visible
-            showSection('home');
+// -------------------------
+// Toast
+// -------------------------
+function showToast(message) {
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--pink) 100%);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    z-index: 6000;
+    animation: slideInRight 0.3s ease-out;
+  `;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.animation = 'slideOutRight 0.3s ease-out';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// -------------------------
+// Galeria de fotos (LOCAL)
+ // -------------------------
+let photoGallery = JSON.parse(localStorage.getItem('petcare_photos') || '[]');
+
+function displayPhotos() {
+  const grid = document.querySelector('.photo-grid');
+  if (!grid) return;
+
+  // remove fotos existentes (mantém botão "+")
+  grid.querySelectorAll('.photo-item').forEach(el => el.remove());
+
+  // insere antes do botão upload
+  const uploadBtn = document.getElementById('uploadPhotoBtn');
+
+  photoGallery.forEach(photo => {
+    const el = document.createElement('div');
+    el.className = 'photo-placeholder photo-item';
+    el.style.backgroundImage = `url(${photo.data})`;
+    el.style.backgroundSize = 'cover';
+    el.style.backgroundPosition = 'center';
+    el.style.cursor = 'pointer';
+    el.onclick = () => viewPhoto(photo);
+
+    if (uploadBtn) grid.insertBefore(el, uploadBtn);
+    else grid.appendChild(el);
+  });
+}
+
+function viewPhoto(photo) {
+  const modal = document.createElement('div');
+  modal.className = 'modal active';
+  modal.style.zIndex = '5000';
+  modal.innerHTML = `
+    <div class="modal-content" style="max-width: 800px; padding: 0; background: transparent;">
+      <div style="position: relative;">
+        <img src="${photo.data}" style="width: 100%; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
+        <button type="button" style="position: absolute; top: 1rem; right: 1rem; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.7); color: white; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+        <button type="button" style="position: absolute; bottom: 1rem; right: 1rem; padding: 0.75rem 1.5rem; background: #ef4444; color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer;">🗑️ Excluir</button>
+      </div>
+    </div>
+  `;
+
+  const [closeBtn, delBtn] = modal.querySelectorAll('button');
+  closeBtn.onclick = () => modal.remove();
+  delBtn.onclick = () => deletePhoto(photo.id, modal);
+
+  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+  document.body.appendChild(modal);
+}
+
+function deletePhoto(photoId, modalEl) {
+  if (!confirm('Tem certeza que deseja excluir esta foto?')) return;
+  photoGallery = photoGallery.filter(p => p.id !== photoId);
+  localStorage.setItem('petcare_photos', JSON.stringify(photoGallery));
+  displayPhotos();
+  if (modalEl) modalEl.remove();
+  showToast('🗑️ Foto excluída!');
+}
+
+// -------------------------
+// PIX / Pagamento (mantido)
+ // -------------------------
+function openPixPayment(planType, amount) {
+  const modal = document.getElementById('pixPaymentModal');
+  const warning = document.getElementById('pixWarning');
+
+  document.getElementById('selectedPlanName').textContent = 'Acesso Vitalício - Oferta Especial';
+  document.getElementById('pixAmount').textContent = 'R$ ' + amount;
+  document.getElementById('instructionAmount').textContent = 'R$ ' + amount;
+
+  if (warning) warning.style.display = 'none';
+  modal?.classList.add('active');
+}
+
+function closePixPayment() {
+  document.getElementById('pixPaymentModal')?.classList.remove('active');
+  const copyBtn = document.getElementById('copyButtonText');
+  if (copyBtn) copyBtn.textContent = 'Copiar';
+  copyBtn?.parentElement?.classList.remove('copied');
+}
+
+function copyPixCode() {
+  const pixCode = document.getElementById('pixCode');
+  const copyBtnText = document.getElementById('copyButtonText');
+  if (!pixCode || !copyBtnText) return;
+
+  pixCode.select();
+  pixCode.setSelectionRange(0, 99999);
+
+  navigator.clipboard.writeText(pixCode.value);
+
+  copyBtnText.textContent = '✓ Copiado!';
+  copyBtnText.parentElement?.classList.add('copied');
+
+  setTimeout(() => {
+    copyBtnText.textContent = 'Copiar';
+    copyBtnText.parentElement?.classList.remove('copied');
+  }, 3000);
+}
+
+function confirmPayment() {
+  const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+  if (!user) {
+    alert('⚠️ Você precisa estar logado para confirmar o pagamento!');
+    return;
+  }
+
+  const ok = confirm(
+    'Você confirmou que realizou o pagamento via PIX?\n\n' +
+    '✅ Após a confirmação, o código de acesso será enviado para seu email cadastrado:\n\n' +
+    user.email
+  );
+
+  if (!ok) return;
+
+  // Demo local (em produção: servidor)
+  const accessCode = generateAccessCode();
+  localStorage.setItem('petcare_paid', 'true');
+  localStorage.setItem('petcare_code', accessCode);
+
+  closePixPayment();
+  updatePricingVisibility();
+  loadUserProfile();
+
+  alert(`✅ Pagamento Confirmado!\n\n📧 Seu código de acesso foi enviado para:\n${user.email}\n\n(DEV: código gerado: ${accessCode})`);
+  showToast('📧 Código enviado para seu email!');
+}
+
+function generateAccessCode() {
+  const prefix = 'PETCARE';
+  const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+  return `${prefix}-${random}`;
+}
+
+// Unlock (demo)
+function unlockApp() {
+  const codeInput = document.getElementById('unlockCode');
+  const errorMessage = document.getElementById('errorMessage');
+  const code = (codeInput?.value || '').toUpperCase().trim();
+
+  const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+  if (!user) {
+    alert('⚠️ Você precisa estar logado para usar um código de acesso!');
+    return;
+  }
+
+  const validCodes = ['TESTE-2024', 'PETCARE-DEMO', 'MENSAL-ABC123', 'UNICO-XYZ789'];
+
+  if (validCodes.includes(code)) {
+    localStorage.setItem('petcare_paid', 'true');
+    localStorage.setItem('petcare_code', code);
+    closePaymentWall();
+    updatePricingVisibility();
+    loadUserProfile();
+    alert('✅ Acesso Premium liberado com sucesso!');
+    if (codeInput) codeInput.value = '';
+    errorMessage?.classList.remove('show');
+  } else {
+    errorMessage?.classList.add('show');
+    if (codeInput) {
+      codeInput.value = '';
+      codeInput.focus();
+    }
+    setTimeout(() => errorMessage?.classList.remove('show'), 3000);
+  }
+}
+
+function selectPlan(planType) {
+  closePaymentWall();
+  openPixPayment('unico', '25,90');
+}
+
+// -------------------------
+// Login local session check (mantido compatível)
+ // -------------------------
+async function checkUserSession() {
+  const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+  if (user) loadUserProfile();
+  else showGuestMode();
+}
+
+// -------------------------
+// Bind de eventos (botões + forms)
+ // -------------------------
+function setupEventHandlers() {
+  // Botões principais
+  document.getElementById('addPetBtn')?.addEventListener('click', (e) => {
+    e.preventDefault(); e.stopPropagation();
+
+    const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+    if (!user) {
+      alert('⚠️ Você precisa criar uma conta para adicionar seu pet!\n\nCrie sua conta gratuitamente agora! 🐾');
+      openAuthModal('register');
+      return;
+    }
+
+    if (hasPremiumAccess()) openModal('petModal');
+    else showPaymentWall();
+  });
+
+  document.getElementById('addVaccineBtn')?.addEventListener('click', (e) => {
+    e.preventDefault(); e.stopPropagation();
+
+    const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+    if (!user) {
+      alert('⚠️ Você precisa criar uma conta para usar este recurso!\n\nCrie sua conta gratuitamente agora! 🐾');
+      openAuthModal('register');
+      return;
+    }
+
+    if (hasPremiumAccess()) openModal('vaccineModal');
+    else showPaymentWall();
+  });
+
+  document.getElementById('addMedicineBtn')?.addEventListener('click', (e) => {
+    e.preventDefault(); e.stopPropagation();
+
+    const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+    if (!user) {
+      alert('⚠️ Você precisa criar uma conta para usar este recurso!\n\nCrie sua conta gratuitamente agora! 🐾');
+      openAuthModal('register');
+      return;
+    }
+
+    if (hasPremiumAccess()) openModal('medicineModal');
+    else showPaymentWall();
+  });
+
+  document.getElementById('addWeightBtn')?.addEventListener('click', (e) => {
+    e.preventDefault(); e.stopPropagation();
+
+    const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+    if (!user) {
+      alert('⚠️ Você precisa criar uma conta para usar este recurso!\n\nCrie sua conta gratuitamente agora! 🐾');
+      openAuthModal('register');
+      return;
+    }
+
+    if (hasPremiumAccess()) openModal('weightModal');
+    else showPaymentWall();
+  });
+
+  // Upload de foto da galeria
+  document.getElementById('uploadPhotoBtn')?.addEventListener('click', (e) => {
+    e.preventDefault(); e.stopPropagation();
+
+    if (!hasPremiumAccess()) {
+      showPaymentWall();
+      return;
+    }
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.multiple = true;
+
+    input.onchange = (ev) => {
+      const files = ev.target.files;
+      if (!files || files.length === 0) return;
+
+      Array.from(files).forEach(file => {
+        if (file.size > 5 * 1024 * 1024) {
+          alert(`❌ A foto ${file.name} é muito grande! Máximo 5MB.`);
+          return;
         }
 
-        function showSection(section) {
-            // Update nav links
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('active');
-            });
-            event.target.closest('.nav-link')?.classList.add('active');
-            
-            // Show/hide sections
-            if (section === 'home') {
-                document.getElementById('homeSection').classList.remove('hidden');
-                document.getElementById('profileSection').classList.remove('active');
-            } else if (section === 'profile') {
-                document.getElementById('homeSection').classList.add('hidden');
-                document.getElementById('profileSection').classList.add('active');
-                loadUserProfile();
-            }
-        }
+        const reader = new FileReader();
+        reader.onload = (re) => {
+          const photo = {
+            id: Date.now() + Math.random(),
+            data: re.target.result,
+            name: file.name,
+            date: new Date().toISOString()
+          };
+          photoGallery.push(photo);
+          localStorage.setItem('petcare_photos', JSON.stringify(photoGallery));
+          displayPhotos();
+          showToast('✅ Foto adicionada com sucesso!');
+        };
+        reader.readAsDataURL(file);
+      });
+    };
 
-        // Auth Modal
-        function openAuthModal(tab = 'login') {
-            document.getElementById('authModal').classList.add('active');
-            
-            // Set active tab
-            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-            
-            if (tab === 'login') {
-                document.querySelector('.auth-tab:first-child').classList.add('active');
-                document.getElementById('loginForm').classList.add('active');
-            } else {
-                document.querySelector('.auth-tab:last-child').classList.add('active');
-                document.getElementById('registerForm').classList.add('active');
-            }
-        }
+    input.click();
+  });
 
-        function showAuthTab(tab) {
-            // Update tabs
-            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // Show forms
-            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-            if (tab === 'login') {
-                document.getElementById('loginForm').classList.add('active');
-            } else {
-                document.getElementById('registerForm').classList.add('active');
-            }
-        }
+  // Fechar modais clicando fora
+  document.querySelectorAll('.modal').forEach(modal => {
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(modal.id); });
+  });
 
-        function closeAuthModal() {
-            document.getElementById('authModal').classList.remove('active');
-        }
+  // Forms
+  document.getElementById('petForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-        // Check if user has premium access
-        function hasPremiumAccess() {
-            return localStorage.getItem('petcare_paid') === 'true';
-        }
+    petData.name = document.getElementById('petNameInput')?.value || '';
+    petData.species = document.getElementById('petSpecies')?.value || '';
+    petData.breed = document.getElementById('petBreed')?.value || '';
+    petData.birthdate = document.getElementById('petBirthdate')?.value || '';
+    petData.photo = document.getElementById('petPhoto')?.value || '';
 
-        // Hide pricing section if user has premium
-        function updatePricingVisibility() {
-            const pricingSection = document.getElementById('pricingSection');
-            if (pricingSection && hasPremiumAccess()) {
-                pricingSection.style.display = 'none';
-            } else if (pricingSection) {
-                pricingSection.style.display = 'block';
-            }
-        }
+    // saveData/loadData vêm do seu bloco Supabase (definido mais acima no HTML)
+    if (typeof saveData === 'function') {
+      const result = await saveData();
+      if (result && result.ok && typeof loadData === 'function') await loadData();
+    }
 
-        // Show payment wall
-        function showPaymentWall() {
-            // Check if user is logged in
-            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
-            
-            if (!user) {
-                // Not logged in - show auth modal first
-                alert('⚠️ Você precisa criar uma conta para usar os recursos premium!\n\nCrie sua conta gratuitamente agora! 🐾');
-                openAuthModal('register');
-                return;
-            }
-            
-            // User is logged in - show payment wall
-            document.getElementById('paymentWall').classList.remove('hidden');
-        }
+    updatePetProfile();
+    closeModal('petModal');
+    e.target.reset();
+    document.querySelectorAll('.pet-photo-option').forEach(opt => opt.classList.remove('selected'));
+  });
 
-        // Close payment wall
-        function closePaymentWall() {
-            document.getElementById('paymentWall').classList.add('hidden');
-        }
+  document.getElementById('vaccineForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-        // Override addPetBtn to check login and payment first
-        document.getElementById('addPetBtn').addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Check if user is logged in first
-            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
-            if (!user) {
-                alert('⚠️ Você precisa criar uma conta para adicionar seu pet!\n\nCrie sua conta gratuitamente agora! 🐾');
-                openAuthModal('register');
-                return;
-            }
-            
-            // Then check premium access
-            if (hasPremiumAccess()) {
-                openModal('petModal');
-            } else {
-                showPaymentWall();
-            }
-        });
+    // aqui ainda é local; depois você vai migrar para INSERT em vaccines
+    petData.vaccines.push({
+      type: document.getElementById('vaccineType')?.value || 'vaccine',
+      name: document.getElementById('vaccineName')?.value || '',
+      date: document.getElementById('vaccineDate')?.value || '',
+      notes: document.getElementById('vaccineNotes')?.value || ''
+    });
 
-        // Override other premium buttons
-        document.getElementById('addVaccineBtn').addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Check if user is logged in first
-            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
-            if (!user) {
-                alert('⚠️ Você precisa criar uma conta para usar este recurso!\n\nCrie sua conta gratuitamente agora! 🐾');
-                openAuthModal('register');
-                return;
-            }
-            
-            if (hasPremiumAccess()) {
-                openModal('vaccineModal');
-            } else {
-                showPaymentWall();
-            }
-        });
+    renderVaccines();
+    closeModal('vaccineModal');
+    e.target.reset();
+  });
 
-        document.getElementById('addMedicineBtn').addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Check if user is logged in first
-            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
-            if (!user) {
-                alert('⚠️ Você precisa criar uma conta para usar este recurso!\n\nCrie sua conta gratuitamente agora! 🐾');
-                openAuthModal('register');
-                return;
-            }
-            
-            if (hasPremiumAccess()) {
-                openModal('medicineModal');
-            } else {
-                showPaymentWall();
-            }
-        });
+  document.getElementById('medicineForm')?.addEventListener('submit', (e) => {
+    e.preventDefault();
 
-        document.getElementById('addWeightBtn').addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Check if user is logged in first
-            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
-            if (!user) {
-                alert('⚠️ Você precisa criar uma conta para usar este recurso!\n\nCrie sua conta gratuitamente agora! 🐾');
-                openAuthModal('register');
-                return;
-            }
-            
-            if (hasPremiumAccess()) {
-                openModal('weightModal');
-            } else {
-                showPaymentWall();
-            }
-        });
+    petData.medicines.push({
+      name: document.getElementById('medicineName')?.value || '',
+      dosage: document.getElementById('medicineDosage')?.value || '',
+      frequency: document.getElementById('medicineFrequency')?.value || '',
+      nextDose: document.getElementById('medicineNextDose')?.value || ''
+    });
 
-        // Photo Gallery System
-        let photoGallery = JSON.parse(localStorage.getItem('petcare_photos') || '[]');
+    renderMedicines();
+    closeModal('medicineModal');
+    e.target.reset();
+  });
 
-        document.getElementById('uploadPhotoBtn').addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            if (hasPremiumAccess()) {
-                // Create hidden file input
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = 'image/*';
-                input.multiple = true;
-                
-                input.onchange = (event) => {
-                    const files = event.target.files;
-                    if (files.length === 0) return;
-                    
-                    // Process each file
-                    Array.from(files).forEach(file => {
-                        // Check file size (max 5MB)
-                        if (file.size > 5 * 1024 * 1024) {
-                            alert(`❌ A foto ${file.name} é muito grande! Máximo 5MB.`);
-                            return;
-                        }
-                        
-                        // Read file as base64
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            const photo = {
-                                id: Date.now() + Math.random(),
-                                data: e.target.result,
-                                name: file.name,
-                                date: new Date().toISOString()
-                            };
-                            
-                            // Add to gallery
-                            photoGallery.push(photo);
-                            localStorage.setItem('petcare_photos', JSON.stringify(photoGallery));
-                            
-                            // Update display
-                            displayPhotos();
-                            
-                            // Show success message
-                            showToast('✅ Foto adicionada com sucesso!');
-                        };
-                        reader.readAsDataURL(file);
-                    });
-                };
-                
-                input.click();
-            } else {
-                showPaymentWall();
-            }
-        });
+  document.getElementById('weightForm')?.addEventListener('submit', (e) => {
+    e.preventDefault();
 
-        function displayPhotos() {
-            const container = document.querySelector('.photo-gallery-grid');
-            
-            // Clear existing photos (except upload button)
-            const existingPhotos = container.querySelectorAll('.photo-item');
-            existingPhotos.forEach(photo => photo.remove());
-            
-            // Add photos from gallery
-            photoGallery.forEach(photo => {
-                const photoEl = document.createElement('div');
-                photoEl.className = 'photo-placeholder photo-item';
-                photoEl.style.backgroundImage = `url(${photo.data})`;
-                photoEl.style.backgroundSize = 'cover';
-                photoEl.style.backgroundPosition = 'center';
-                photoEl.style.cursor = 'pointer';
-                
-                // Click to view full size
-                photoEl.onclick = () => viewPhoto(photo);
-                
-                // Insert before upload button
-                const uploadBtn = document.getElementById('uploadPhotoBtn');
-                container.insertBefore(photoEl, uploadBtn);
-            });
-            
-            // Update counter
-            updatePhotoCounter();
-        }
+    petData.weights.push({
+      value: parseFloat(document.getElementById('weightValue')?.value || '0'),
+      date: document.getElementById('weightDate')?.value || '',
+      food: document.getElementById('foodAmount')?.value || ''
+    });
 
-        function updatePhotoCounter() {
-            const counter = document.querySelector('.card-header .badge');
-            if (counter) {
-                counter.textContent = photoGallery.length;
-            }
-        }
+    renderWeights();
+    closeModal('weightModal');
+    e.target.reset();
+  });
 
-        function viewPhoto(photo) {
-            // Create modal to view photo
-            const modal = document.createElement('div');
-            modal.className = 'modal active';
-            modal.style.zIndex = '5000';
-            modal.innerHTML = `
-                <div class="modal-content" style="max-width: 800px; padding: 0; background: transparent;">
-                    <div style="position: relative;">
-                        <img src="${photo.data}" style="width: 100%; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
-                        <button onclick="this.closest('.modal').remove()" style="position: absolute; top: 1rem; right: 1rem; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.7); color: white; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
-                        <button onclick="deletePhoto('${photo.id}')" style="position: absolute; bottom: 1rem; right: 1rem; padding: 0.75rem 1.5rem; background: #ef4444; color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer;">🗑️ Excluir</button>
-                    </div>
-                </div>
-            `;
-            
-            modal.onclick = (e) => {
-                if (e.target === modal) modal.remove();
-            };
-            
-            document.body.appendChild(modal);
-        }
+  // Payment wall: fechar clicando fora + enter
+  document.getElementById('paymentWall')?.addEventListener('click', (e) => {
+    if (e.target && e.target.id === 'paymentWall') closePaymentWall();
+  });
 
-        function deletePhoto(photoId) {
-            if (confirm('Tem certeza que deseja excluir esta foto?')) {
-                photoGallery = photoGallery.filter(p => p.id != photoId);
-                localStorage.setItem('petcare_photos', JSON.stringify(photoGallery));
-                displayPhotos();
-                
-                // Close modal
-                const modal = document.querySelector('.modal');
-                if (modal) modal.remove();
-                
-                showToast('🗑️ Foto excluída!');
-            }
-        }
+  document.getElementById('unlockCode')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') unlockApp();
+  });
 
-        function showToast(message) {
-            const toast = document.createElement('div');
-            toast.style.cssText = `
-                position: fixed;
-                bottom: 2rem;
-                right: 2rem;
-                background: linear-gradient(135deg, var(--accent) 0%, var(--pink) 100%);
-                color: white;
-                padding: 1rem 1.5rem;
-                border-radius: 12px;
-                font-weight: 600;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-                z-index: 6000;
-                animation: slideInRight 0.3s ease-out;
-            `;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.animation = 'slideOutRight 0.3s ease-out';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
+  // Pix modal: fechar clicando fora + ESC
+  document.getElementById('pixPaymentModal')?.addEventListener('click', (e) => {
+    if (e.target && e.target.id === 'pixPaymentModal') closePixPayment();
+  });
 
-        // Load photos on init
-        displayPhotos();
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const pix = document.getElementById('pixPaymentModal');
+      if (pix && pix.classList.contains('active')) closePixPayment();
+    }
+  });
+}
 
-        function selectPlan(planType) {
-            // Close payment wall
-            closePaymentWall();
-            
-            // Open PIX payment modal with special price
-            const amount = '25,90';
-            openPixPayment('unico', amount);
-        }
+// -------------------------
+// Init
+// -------------------------
+document.addEventListener('DOMContentLoaded', async () => {
+  setupPetPhotoSelectors();
+  setupProfilePhotoInput();
+  setupEventHandlers();
 
-        function unlockApp() {
-            const codeInput = document.getElementById('unlockCode');
-            const errorMessage = document.getElementById('errorMessage');
-            const code = codeInput.value.toUpperCase().trim();
+  await checkUserSession();
+  updatePricingVisibility();
 
-            // Check if user is logged in
-            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
-            if (!user) {
-                alert('⚠️ Você precisa estar logado para usar um código de acesso!');
-                return;
-            }
+  displayPhotos();
+  updatePetProfile();
+  renderVaccines();
+  renderMedicines();
+  renderWeights();
+});
+</script>
 
-            // Valid codes list (you manage these codes)
-            const validCodes = [
-                'TESTE-2024',      // Test code
-                'PETCARE-DEMO',    // Demo code
-                'MENSAL-ABC123',   // Monthly code example
-                'UNICO-XYZ789',    // Unique code example
-            ];
-
-            if (validCodes.includes(code)) {
-                // Valid code - unlock app FOR THIS USER
-                user.hasPremium = true;
-                user.accessCode = code;
-                user.unlockDate = new Date().toISOString();
-                
-                // Update user in users list
-                const users = JSON.parse(localStorage.getItem('petcare_users') || '[]');
-                const userIndex = users.findIndex(u => u.id === user.id);
-                if (userIndex !== -1) {
-                    users[userIndex] = user;
-                    localStorage.setItem('petcare_users', JSON.stringify(users));
-                }
-                
-                // Update current user
-                localStorage.setItem('petcare_user', JSON.stringify(user));
-                
-                // Also set paid flag for backward compatibility
-                localStorage.setItem('petcare_paid', 'true');
-                localStorage.setItem('petcare_code', code);
-                
-                // Close payment wall
-                closePaymentWall();
-
-                // Success message
-                alert('✅ Acesso Premium liberado com sucesso!\n\nBem-vindo ao PetCare! 🐾\n\nAgora você pode adicionar seu pet e usar todas as funcionalidades.');
-                
-                // Update pricing visibility
-                updatePricingVisibility();
-                
-                // Update profile
-                loadUserProfile();
-                
-                // Clear input
-                codeInput.value = '';
-                errorMessage.classList.remove('show');
-            } else {
-                // Invalid code
-                errorMessage.classList.add('show');
-                codeInput.value = '';
-                codeInput.focus();
-                
-                setTimeout(() => {
-                    errorMessage.classList.remove('show');
-                }, 3000);
-            }
-        }
-
-        // Allow unlock on Enter key
-        document.getElementById('unlockCode')?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                unlockApp();
-            }
-        });
-
-        // Close payment wall on outside click
-        document.getElementById('paymentWall')?.addEventListener('click', (e) => {
-            if (e.target.id === 'paymentWall') {
-                closePaymentWall();
-            }
-        });
-
-        // PIX Payment Functions
-        function openPixPayment(planType, amount) {
-            const modal = document.getElementById('pixPaymentModal');
-            const planName = 'Acesso Vitalício - Oferta Especial';
-            const warning = document.getElementById('pixWarning');
-            
-            document.getElementById('selectedPlanName').textContent = planName;
-            document.getElementById('pixAmount').textContent = 'R$ ' + amount;
-            document.getElementById('instructionAmount').textContent = 'R$ ' + amount;
-            
-            // Hide warning (no monthly renewal)
-            warning.style.display = 'none';
-            
-            modal.classList.add('active');
-        }
-
-        function closePixPayment() {
-            document.getElementById('pixPaymentModal').classList.remove('active');
-            // Reset copy button
-            const copyBtn = document.getElementById('copyButtonText');
-            copyBtn.textContent = 'Copiar';
-            copyBtn.parentElement.classList.remove('copied');
-            
-            // Optional: scroll back to pricing section
-            // document.querySelector('.pricing-section').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function copyPixCode() {
-            const pixCode = document.getElementById('pixCode');
-            const copyBtn = document.getElementById('copyButtonText');
-            const copyButton = copyBtn.parentElement;
-            
-            // Copy to clipboard
-            pixCode.select();
-            pixCode.setSelectionRange(0, 99999); // For mobile
-            navigator.clipboard.writeText(pixCode.value);
-            
-            // Visual feedback
-            copyBtn.textContent = '✓ Copiado!';
-            copyButton.classList.add('copied');
-            
-            // Reset after 3 seconds
-            setTimeout(() => {
-                copyBtn.textContent = 'Copiar';
-                copyButton.classList.remove('copied');
-            }, 3000);
-        }
-
-        function confirmPayment() {
-            // Check if user is logged in
-            const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
-            if (!user) {
-                alert('⚠️ Você precisa estar logado para confirmar o pagamento!');
-                return;
-            }
-            
-            const confirmed = confirm('Você confirmou que realizou o pagamento via PIX?\n\n✅ Após a confirmação, o código de acesso será enviado para seu email cadastrado:\n\n' + user.email);
-            
-            if (confirmed) {
-                // Generate access code (in production, this comes from server)
-                const accessCode = generateAccessCode();
-                
-                // Add to valid codes list (in production, server does this)
-                // Note: In production, this would be done server-side after payment confirmation
-                
-                // Show success message WITHOUT showing the code
-                alert(`✅ Pagamento Confirmado!\n\n📧 Seu código de acesso foi enviado para:\n${user.email}\n\nVerifique sua caixa de entrada (e spam) e use o código para desbloquear o app!`);
-                
-                // In production: Here you would call an API to:
-                // 1. Verify payment
-                // 2. Generate code
-                // 3. Send email with code
-                // 4. Store code in database linked to user
-                
-                // For now, we'll store it locally as a demo
-                // REMOVE these lines in production:
-                localStorage.setItem('petcare_paid', 'true');
-                localStorage.setItem('petcare_code', accessCode);
-                // Instead, the code should only be validated when entered by user
-                
-                closePixPayment();
-                updatePricingVisibility();
-                
-                showToast('📧 Código enviado para seu email!');
-            }
-        }
-
-        // Gera código de acesso aleatório
-        function generateAccessCode() {
-            const prefix = 'PETCARE';
-            const random = Math.random().toString(36).substring(2, 8).toUpperCase();
-            return `${prefix}-${random}`;
-        }
-
-        // Close PIX modal on outside click
-        document.getElementById('pixPaymentModal').addEventListener('click', (e) => {
-            if (e.target.id === 'pixPaymentModal') {
-                closePixPayment();
-            }
-        });
-
-        // Close PIX modal on ESC key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                const pixModal = document.getElementById('pixPaymentModal');
-                if (pixModal.classList.contains('active')) {
-                    closePixPayment();
-                }
-            }
-        });
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
     const supabaseClient = window.supabase.createClient(
@@ -4438,21 +4131,56 @@ updatePricingVisibility();
   }
   return data?.user ?? null;
 }
+function syncLocalUserFromSupabase(user) {
+  if (!user) return;
+
+  const userData = {
+    id: user.id,
+    name: user.user_metadata?.full_name || user.email,
+    email: user.email,
+    phone: user.user_metadata?.phone || '',
+    cpf: user.user_metadata?.cpf || '',
+    createdAt: new Date().toISOString(),
+    plan: 'Gratuito',
+    code: null,
+    profilePhoto: user.user_metadata?.avatar_url || null
+  };
+
+  localStorage.setItem('petcare_user', JSON.stringify(userData));
+}
 
 supabaseClient.auth.onAuthStateChange(async (_event, session) => {
   if (session?.user) {
-    await loadData(); // ✅ agora carrega do Supabase após login
+    syncLocalUserFromSupabase(session.user);
+    checkUserSession();   // atualiza UI do perfil/premium flags
+    loadUserProfile();    // atualiza a tela perfil
+    await loadData();     // carrega pets/vacinas etc do Supabase
   } else {
     // deslogou
+    localStorage.removeItem('petcare_user');
+
     petsList = [];
     currentPetId = null;
     petData = { name:'', species:'', breed:'', birthdate:'', photo:'', vaccines:[], medicines:[], weights:[] };
+
     updatePetProfile();
     renderVaccines();
     renderMedicines();
     renderWeights();
+
+    checkUserSession();
+    loadUserProfile();
   }
 });
+(async function bootstrapAuth() {
+  const { data } = await supabaseClient.auth.getSession();
+  if (data?.session?.user) {
+    syncLocalUserFromSupabase(data.session.user);
+    checkUserSession();
+    loadUserProfile();
+    await loadData();
+  }
+})();
 
     async function loginWithGoogle() {
         const { error } = await supabaseClient.auth.signInWithOAuth({
