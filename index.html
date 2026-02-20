@@ -1,237 +1,4583 @@
- (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
-diff --git a/index.html b/index.html
-index 810ec592f0aa4e9311e32aa65e50ba8d52fb2c28..74f44e5f5e76c4dc681dd75ff061490bf84640b1 100644
---- a/index.html
-+++ b/index.html
-@@ -3105,61 +3105,63 @@ function requireField(value, message, elToFocus) {
- let petData = {
-   name: '',
-   species: '',
-   breed: '',
-   birth_date: '',
-   photo: '',
-   vaccines: [],
-   medicines: [],
-   weights: []
- };
- 
- let petsList = [];        // lista de pets do usuário logado
- let currentPetId = null;  // pet atualmente aberto
- 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>PetCare - Acompanhamento do seu Pet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #fef8f3;
+            --bg-secondary: #ffffff;
+            --bg-accent: #fff5ed;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --text-tertiary: #999999;
+            --accent: #ff6b35;
+            --accent-light: #ff8c61;
+            --accent-dark: #e55a2b;
+            --purple: #8b5cf6;
+            --purple-light: #a78bfa;
+            --blue: #3b82f6;
+            --green: #10b981;
+            --yellow: #fbbf24;
+            --pink: #ec4899;
+            --border: #ffe4d6;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --shadow: rgba(255, 107, 53, 0.1);
+            --shadow-md: rgba(255, 107, 53, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 245, 237, 0.98) 100%);
+            border-bottom: 2px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.75rem;
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo::before {
+            content: '🐾';
+            font-size: 1.5rem;
+            animation: bounce 2s ease-in-out infinite;
+            -webkit-text-fill-color: initial;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -0.5rem;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        /* Video Hero Section */
+        .video-hero {
+            position: relative;
+            height: 70vh;
+            min-height: 500px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        }
+
+        .video-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #4facfe);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        .video-background::before,
+        .video-background::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .video-background::before {
+            background: rgba(255, 107, 53, 0.6);
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .video-background::after {
+            background: rgba(236, 72, 153, 0.6);
+            bottom: 20%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        .floating-paws {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .paw {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.2;
+            animation: floatPaw 20s linear infinite;
+        }
+
+        .paw:nth-child(1) { left: 10%; animation-duration: 15s; animation-delay: 0s; }
+        .paw:nth-child(2) { left: 30%; animation-duration: 18s; animation-delay: 2s; }
+        .paw:nth-child(3) { left: 50%; animation-duration: 22s; animation-delay: 4s; }
+        .paw:nth-child(4) { left: 70%; animation-duration: 16s; animation-delay: 6s; }
+        .paw:nth-child(5) { left: 90%; animation-duration: 20s; animation-delay: 8s; }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes floatPaw {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.7) 0%, rgba(118, 75, 162, 0.7) 50%, rgba(240, 147, 251, 0.7) 100%);
+            z-index: 1;
+            mix-blend-mode: multiply;
+        }
+
+        .video-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: white;
+            padding: 2rem;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .video-content h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 4rem;
+            font-weight: 400;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 1s ease-out 0.2s backwards;
+        }
+
+        .video-content p {
+            font-size: 1.5rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.95;
+            font-weight: 300;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            animation: fadeInUp 1s ease-out 0.4s backwards;
+        }
+
+        .cta-button {
+            background: white;
+            color: var(--purple);
+            padding: 1rem 3rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 1s ease-out 0.6s backwards;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 4rem 0 3rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        /* Inspirational Photos Section */
+        .inspiration-section {
+            padding: 4rem 0;
+            background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+        }
+
+        /* Pricing Section */
+        .pricing-section {
+            padding: 5rem 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pricing-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .pricing-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+
+        .pricing-header h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .pricing-header p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s ease;
+            animation: fadeInScale 0.8s ease-out backwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pricing-card:nth-child(1) { animation-delay: 0.3s; }
+        .pricing-card:nth-child(2) { 
+            animation-delay: 0.4s;
+            border: 3px solid var(--yellow);
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: 20px;
+            right: -35px;
+            background: var(--yellow);
+            color: #1a1a1a;
+            padding: 0.5rem 3rem;
+            transform: rotate(45deg);
+            font-weight: 700;
+            font-size: 0.85rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .plan-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .plan-price {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .price-value {
+            font-family: 'DM Serif Display', serif;
+            font-size: 3.5rem;
+            color: var(--accent);
+            font-weight: 400;
+            line-height: 1;
+        }
+
+        .price-currency {
+            font-size: 1.5rem;
+            vertical-align: super;
+        }
+
+        .price-period {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .plan-features li {
+            padding: 0.75rem 0;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .plan-features li::before {
+            content: '✓';
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--green) 0%, #34d399 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .plan-cta {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--pink) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Outfit', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        .plan-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        .pix-note {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #fff5ed;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .pix-note strong {
+            color: var(--accent);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Animated Pet Carousel */
+        .pet-carousel {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .carousel-track {
+            display: flex;
+            gap: 2rem;
+            animation: scroll 20s linear infinite;
+            width: max-content;
+        }
+
+        .carousel-item {
+            width: 180px;
+            height: 180px;
+            border-radius: 20px;
+            overflow: hidden;
+            flex-shrink: 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: jump 2s ease-in-out infinite;
+        }
+
+        .carousel-item:nth-child(1) { animation-delay: 0s; }
+        .carousel-item:nth-child(2) { animation-delay: 0.3s; }
+        .carousel-item:nth-child(3) { animation-delay: 0.6s; }
+        .carousel-item:nth-child(4) { animation-delay: 0.9s; }
+        .carousel-item:nth-child(5) { animation-delay: 1.2s; }
+
+        .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        @keyframes scroll {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(calc(-180px * 5 - 10rem));
+            }
+        }
+
+        @keyframes jump {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-title p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .photo-gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .inspiration-photo {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            aspect-ratio: 4/5;
+            box-shadow: 0 8px 24px var(--shadow);
+            transition: all 0.4s ease;
+            animation: fadeInScale 0.8s ease-out backwards;
+        }
+
+        .inspiration-photo:nth-child(1) { animation-delay: 0.1s; }
+        .inspiration-photo:nth-child(2) { animation-delay: 0.2s; }
+        .inspiration-photo:nth-child(3) { animation-delay: 0.3s; }
+        .inspiration-photo:nth-child(4) { 
+            animation-delay: 0.4s;
+            display: none;
+        }
+
+        .inspiration-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+            display: block;
+        }
+
+        .inspiration-photo:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 12px 40px var(--shadow-md);
+        }
+
+        .inspiration-photo:hover img {
+            transform: scale(1.1);
+        }
+
+        .photo-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem;
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+            color: white;
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+        }
+
+        .inspiration-photo:hover .photo-caption {
+            transform: translateY(0);
+        }
+
+        .photo-caption h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+
+        .photo-caption p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Hero Section */
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-text h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 3.5rem;
+            font-weight: 400;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.03em;
+        }
+
+        .hero-text p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .pet-profile-card {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-accent) 100%);
+            border-radius: 24px;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px var(--shadow);
+            animation: fadeInScale 0.8s ease-out 0.2s backwards;
+        }
+
+        .pet-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--pink) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 8px 24px var(--shadow-md);
+            animation: float 3s ease-in-out infinite;
+            position: relative;
+        }
+
+        .pet-avatar::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--yellow), var(--purple), var(--blue));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .pet-avatar:hover::after {
+            opacity: 1;
+            animation: rotate 3s linear infinite;
+        }
+
+        .pet-info h2 {
+            text-align: center;
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pet-info p {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Dashboard Grid */
+        .dashboard {
+            padding: 3rem 0;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 2px solid var(--border);
+            box-shadow: 0 4px 16px var(--shadow);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease-out backwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--purple), var(--blue));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(1)::before { background: linear-gradient(90deg, var(--accent), var(--pink)); }
+        
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .card:nth-child(2)::before { background: linear-gradient(90deg, var(--purple), var(--blue)); }
+        
+        .card:nth-child(3) { animation-delay: 0.3s; }
+        .card:nth-child(3)::before { background: linear-gradient(90deg, var(--green), var(--blue)); }
+        
+        .card:nth-child(4) { animation-delay: 0.4s; }
+        .card:nth-child(4)::before { background: linear-gradient(90deg, var(--yellow), var(--accent)); }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 32px var(--shadow-md);
+            border-color: var(--accent);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        .card:nth-child(1) .card-icon {
+            animation-delay: 0.5s;
+        }
+        .card:nth-child(2) .card-icon {
+            animation-delay: 0.7s;
+        }
+        .card:nth-child(3) .card-icon {
+            animation-delay: 0.9s;
+        }
+        .card:nth-child(4) .card-icon {
+            animation-delay: 1.1s;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+            font-family: 'Outfit', sans-serif;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+            position: relative;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-accent);
+        }
+
+        /* Lists */
+        .item-list {
+            list-style: none;
+        }
+
+        .item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .item:last-child {
+            border-bottom: none;
+        }
+
+        .item:hover {
+            background: var(--bg-accent);
+        }
+
+        .item-info h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+        }
+
+        .item-info p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .item-status {
+            padding: 0.35rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-upcoming {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-done {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-overdue {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Weight Chart */
+        .weight-chart {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: var(--bg-accent);
+            border-radius: 12px;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.5rem;
+            height: 120px;
+            margin-top: 1rem;
+        }
+
+        .bar {
+            flex: 1;
+            background: linear-gradient(to top, var(--accent) 0%, var(--accent-light) 50%, var(--yellow) 100%);
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            transition: all 0.3s;
+            animation: growUp 0.8s ease-out backwards;
+            box-shadow: 0 -2px 10px rgba(255, 107, 53, 0.3);
+        }
+
+        .bar:nth-child(1) { 
+            animation-delay: 0.1s;
+            background: linear-gradient(to top, #f59e0b 0%, #fbbf24 100%);
+        }
+        .bar:nth-child(2) { 
+            animation-delay: 0.2s;
+            background: linear-gradient(to top, var(--accent) 0%, var(--pink) 100%);
+        }
+        .bar:nth-child(3) { 
+            animation-delay: 0.3s;
+            background: linear-gradient(to top, var(--purple) 0%, var(--purple-light) 100%);
+        }
+        .bar:nth-child(4) { 
+            animation-delay: 0.4s;
+            background: linear-gradient(to top, var(--blue) 0%, #60a5fa 100%);
+        }
+        .bar:nth-child(5) { 
+            animation-delay: 0.5s;
+            background: linear-gradient(to top, var(--green) 0%, #34d399 100%);
+        }
+        .bar:nth-child(6) { 
+            animation-delay: 0.6s;
+            background: linear-gradient(to top, var(--pink) 0%, #f472b6 100%);
+        }
+
+        .bar:hover {
+            opacity: 0.8;
+            transform: scaleY(1.08);
+            filter: brightness(1.1);
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
+            white-space: nowrap;
+        }
+
+        /* Photo Gallery */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .photo-placeholder {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, var(--bg-accent) 0%, var(--border) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: fadeInScale 0.6s ease-out backwards;
+            border: 2px dashed var(--border);
+        }
+
+        .photo-placeholder:nth-child(1) { 
+            animation-delay: 0.1s;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        }
+        .photo-placeholder:nth-child(2) { 
+            animation-delay: 0.2s;
+            background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%);
+        }
+        .photo-placeholder:nth-child(3) { 
+            animation-delay: 0.3s;
+            background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+        }
+
+        .photo-placeholder:hover {
+            transform: scale(1.05) rotate(2deg);
+            box-shadow: 0 8px 20px var(--shadow-md);
+        }
+
+        .photo-upload {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--pink) 100%);
+            color: white;
+            font-size: 3rem;
+            font-weight: 300;
+            border: 2px solid var(--accent);
+        }
+
+        .photo-upload:hover {
+            transform: scale(1.1) rotate(-2deg);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 2.5rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: scaleIn 0.3s ease-out;
+        }
+
+        .pet-photo-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .pet-photo-option {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .pet-photo-option img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .pet-photo-option:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px var(--shadow-md);
+        }
+
+        .pet-photo-option.selected {
+            border-color: var(--accent);
+            transform: scale(1.05);
+            box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.2);
+        }
+
+        .pet-photo-option::after {
+            content: '✓';
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            width: 28px;
+            height: 28px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s ease;
+        }
+
+        .pet-photo-option.selected::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .photo-label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: block;
+        }
+
+        /* PIX Payment Modal */
+        .pix-payment-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .pix-payment-modal.active {
+            display: flex;
+        }
+
+        .pix-modal-content {
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 2rem 2.5rem 2.5rem 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            animation: scaleIn 0.3s ease-out;
+            text-align: center;
+            position: relative;
+        }
+
+        /* Custom scrollbar for PIX modal */
+        .pix-modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .pix-modal-content::-webkit-scrollbar-track {
+            background: var(--bg-accent);
+            border-radius: 10px;
+        }
+
+        .pix-modal-content::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+
+        .pix-modal-content::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-dark);
+        }
+
+        .pix-modal-header {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .pix-modal-header h3 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            padding-right: 2rem;
+        }
+
+        .pix-modal-header .close-btn {
+            position: absolute;
+            top: -0.5rem;
+            right: -0.5rem;
+        }
+
+        .pix-plan-info {
+            background: var(--bg-accent);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .pix-plan-info .plan-selected {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .pix-plan-info .amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            font-family: 'DM Serif Display', serif;
+        }
+
+        .qr-code-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .qr-code-container img {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .qr-placeholder {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .qr-placeholder-icon {
+            font-size: 3rem;
+        }
+
+        .qr-placeholder-text {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 0 1rem;
+        }
+
+        .pix-copy-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .pix-copy-label {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .pix-copy-container {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--bg-accent);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 2px dashed var(--border);
+        }
+
+        .pix-code-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            background: white;
+            color: var(--text-primary);
+        }
+
+        .copy-button {
+            padding: 0.75rem 1.5rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        .copy-button:hover {
+            background: var(--accent-dark);
+            transform: translateY(-2px);
+        }
+
+        .copy-button.copied {
+            background: var(--green);
+        }
+
+        .pix-instructions {
+            background: #e0f2fe;
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .pix-instructions h4 {
+            color: var(--blue);
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .pix-instructions ol {
+            padding-left: 1.25rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .pix-instructions li {
+            margin-bottom: 0.4rem;
+        }
+
+        .pix-modal-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .pix-modal-actions .btn {
+            flex: 1;
+        }
+
+        .btn-close-pix {
+            background: var(--bg-accent);
+            color: var(--text-primary);
+        }
+
+        .btn-close-pix:hover {
+            background: var(--border);
+        }
+
+        .pix-warning {
+            background: #fff5ed;
+            border-left: 4px solid var(--warning);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+            text-align: left;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .pix-warning strong {
+            color: var(--warning);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Login/Register Modal */
+        .auth-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 4000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .auth-modal.active {
+            display: flex;
+        }
+
+        .auth-container {
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: scaleIn 0.3s ease-out;
+            position: relative;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-header h2 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .auth-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .auth-submit {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--pink) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .auth-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        /* Password Strength Indicator */
+        .strength-bar {
+            flex: 1;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .strength-bar.weak {
+            background: #ef4444;
+        }
+
+        .strength-bar.medium {
+            background: #f59e0b;
+        }
+
+        .strength-bar.good {
+            background: #10b981;
+        }
+
+        .strength-bar.strong {
+            background: #10b981;
+        }
+
+        /* Profile Section */
+        .profile-section {
+            display: none;
+            padding: 3rem 0;
+        }
+
+        .profile-section.active {
+            display: block;
+        }
+
+        .profile-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--pink) 100%);
+            border-radius: 24px;
+            padding: 3rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .profile-name {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-email {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .profile-card {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .profile-card h3 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .profile-info {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        /* Home Section */
+        .home-section {
+            display: block;
+        }
+
+        .home-section.hidden {
+            display: none;
+        }
+
+        /* Payment Wall/Lock System */
+        .payment-wall {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .payment-wall.hidden {
+            display: none;
+        }
+
+        .payment-wall-content {
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 2rem 1.5rem;
+            max-width: 450px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        .lock-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        .payment-wall-content h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .payment-wall-content p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .unlock-section {
+            background: var(--bg-accent);
+            padding: 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+        }
+
+        .unlock-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .unlock-input {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            text-align: center;
+            font-family: monospace;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            margin-bottom: 0.875rem;
+            text-transform: uppercase;
+        }
+
+        .unlock-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .unlock-button {
+            width: 100%;
+            padding: 0.875rem;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--pink) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Outfit', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .unlock-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        .unlock-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s;
+        }
+
+        .payment-options {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-option-btn {
+            width: 100%;
+            padding: 1.25rem;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-align: left;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .payment-option-btn:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .payment-option-icon {
+            font-size: 3rem;
+            flex-shrink: 0;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-accent);
+            border-radius: 12px;
+        }
+
+        .payment-option-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .payment-option-info h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .payment-option-info p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        .payment-option-price {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--accent);
+            font-family: 'DM Serif Display', serif;
+            text-align: right;
+            line-height: 1;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: var(--text-tertiary);
+            font-size: 0.85rem;
+        }
+            color: var(--accent);
+            font-family: 'DM Serif Display', serif;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 2rem 0;
+            color: var(--text-tertiary);
+            font-size: 0.9rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .divider span {
+            padding: 0 1rem;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* Blur effect for locked content */
+        .content-locked {
+            filter: blur(8px);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+            padding: 0.5rem;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.875rem;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: var(--bg-primary);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(45, 45, 45, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .form-actions .btn {
+            flex: 1;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: scaleX(0);
+            }
+            to {
+                transform: scaleX(1);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes growUp {
+            from {
+                transform: scaleY(0);
+            }
+            to {
+                transform: scaleY(1);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes scrollDot {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(0);
+            }
+            40% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        
+        /* Desktop - Pricing section optimization */
+        @media (min-width: 1024px) {
+            .pricing-section {
+                padding: 5rem 0;
+            }
+            
+            .pricing-card {
+                max-width: 750px !important;
+                margin: 0 auto !important;
+                padding: 3.5rem !important;
+            }
+            
+            .pricing-card .plan-price .price-value {
+                font-size: 5.5rem !important;
+            }
+            
+            .pricing-card .plan-features {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+                text-align: left;
+                margin: 2rem 0;
+            }
+            
+            .pricing-card .plan-features li {
+                font-size: 1.15rem;
+            }
+            
+            .pricing-card .plan-cta {
+                font-size: 1.5rem !important;
+                padding: 1.5rem !important;
+            }
+        }
+        
+        @media (max-width: 1400px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 968px) {
+            .video-hero {
+                height: 60vh;
+                min-height: 400px;
+            }
+
+            .video-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .video-content p {
+                font-size: 1.2rem;
+            }
+
+            .pricing-header h2 {
+                font-size: 2.5rem;
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+                max-width: 500px;
+            }
+
+            .photo-gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+
+            .inspiration-photo:nth-child(4) {
+                display: block;
+            }
+
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .video-hero {
+                height: 50vh;
+                min-height: 350px;
+            }
+
+            .video-content h1 {
+                font-size: 2rem;
+                line-height: 1.2;
+            }
+
+            .video-content p {
+                font-size: 1rem;
+                padding: 0 1rem;
+            }
+
+            .cta-button {
+                padding: 0.875rem 2rem;
+                font-size: 1rem;
+            }
+
+            .pricing-header h2 {
+                font-size: 2rem;
+            }
+
+            .pricing-header p {
+                font-size: 1rem;
+                padding: 0 1rem;
+            }
+
+            .price-value {
+                font-size: 2.5rem;
+            }
+
+            .pricing-grid {
+                gap: 1.5rem;
+            }
+
+            .pricing-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .carousel-item {
+                width: 140px;
+                height: 140px;
+            }
+
+            .pix-modal-content {
+                padding: 1.5rem;
+                max-height: 90vh;
+                width: 95%;
+                border-radius: 20px;
+            }
+
+            .pix-modal-header h3 {
+                font-size: 1.5rem;
+            }
+
+            .amount {
+                font-size: 2rem;
+            }
+
+            .qr-placeholder {
+                width: 180px;
+                height: 180px;
+            }
+
+            .qr-code-container img {
+                width: 180px;
+                height: 180px;
+            }
+
+            .pix-code-input {
+                font-size: 0.75rem;
+            }
+
+            .pix-modal-actions {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .pix-modal-actions .btn {
+                width: 100%;
+                padding: 1rem;
+                font-size: 1rem;
+            }
+
+            .photo-gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            nav {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .nav-links {
+                flex-direction: row;
+                justify-content: center;
+                width: 100%;
+            }
+
+            .hero-text h1 {
+                font-size: 2rem;
+            }
+
+            .hero-text p {
+                font-size: 1rem;
+            }
+
+            .section-title h2 {
+                font-size: 2rem;
+            }
+
+            .section-title p {
+                font-size: 1rem;
+                padding: 0 1rem;
+            }
+
+            .photo-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .dashboard-grid {
+                gap: 1.5rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo" onclick="scrollToTop()" style="cursor: pointer;">PetCare</div>
+            <ul class="nav-links">
+                <li><a href="#home" class="nav-link active" onclick="showSection('home')">🏠 Início</a></li>
+                <li><a href="#profile" class="nav-link" onclick="showSection('profile')">👤 Perfil</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="mainContent">
+        <!-- Home Section (All existing content) -->
+        <div class="home-section" id="homeSection">
+        <!-- Video Hero Section -->
+        <section class="video-hero">
+            <div class="video-background">
+                <div class="floating-paws">
+                    <div class="paw">🐾</div>
+                    <div class="paw">🐾</div>
+                    <div class="paw">🐾</div>
+                    <div class="paw">🐾</div>
+                    <div class="paw">🐾</div>
+                </div>
+            </div>
+            <div class="video-overlay"></div>
+            <div class="video-content">
+                <h1>Amor, Cuidado e Felicidade</h1>
+                <p>Cada momento com seu pet é precioso. Mantenha a saúde e bem-estar dele em dia com carinho e organização.</p>
+                <button class="cta-button" onclick="document.querySelector('.hero').scrollIntoView({ behavior: 'smooth' })">
+                    Começar Agora ✨
+                </button>
+            </div>
+        </section>
+
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <h1>Cuide do seu melhor amigo</h1>
+                        <p>Acompanhe vacinas, consultas, alimentação e todos os momentos especiais do seu pet em um só lugar.</p>
+                        <button class="btn" id="addPetBtn" type="button">Adicionar Meu Pet 🐾</button>
+                    </div>
+                    <div class="pet-profile-card">
+                        <div class="pet-avatar">🐕</div>
+                        <div class="pet-info">
+                            <h2 id="petName">Seu Pet</h2>
+                            <p id="petDetails">Clique em "Adicionar Pet" para começar</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Inspirational Photos Section -->
+        <section class="inspiration-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Momentos que Importam</h2>
+                    <p>A conexão entre você e seu pet é única e especial</p>
+                </div>
+                <div class="photo-gallery-grid">
+                    <div class="inspiration-photo">
+                        <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=600&q=80" alt="Mulher brincando com cachorro no parque" loading="lazy">
+                        <div class="photo-caption">
+                            <h3>Diversão ao Ar Livre</h3>
+                            <p>Momentos de alegria e brincadeira</p>
+                        </div>
+                    </div>
+                    <div class="inspiration-photo">
+                        <img src="https://images.unsplash.com/photo-1581888227599-779811939961?w=600&q=80" alt="Pessoa abraçando cachorro feliz" loading="lazy">
+                        <div class="photo-caption">
+                            <h3>Amor Verdadeiro</h3>
+                            <p>Conexão que aquece o coração</p>
+                        </div>
+                    </div>
+                    <div class="inspiration-photo">
+                        <img src="https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=600&q=80" alt="Homem e cachorro se divertindo" loading="lazy">
+                        <div class="photo-caption">
+                            <h3>Companheirismo</h3>
+                            <p>Juntos em cada aventura</p>
+                        </div>
+                    </div>
+                    <div class="inspiration-photo">
+                        <img src="https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=600&q=80" alt="Criança brincando com cachorro" loading="lazy">
+                        <div class="photo-caption">
+                            <h3>Crescendo Juntos</h3>
+                            <p>Amizade que dura para sempre</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="dashboard">
+            <div class="container">
+                <div class="dashboard-grid">
+                    <!-- Vacinas e Consultas -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <span class="card-icon">💉</span>
+                                Vacinas & Consultas
+                            </h3>
+                            <button class="btn-secondary" id="addVaccineBtn">+ Adicionar</button>
+                        </div>
+                        <ul class="item-list" id="vaccineList">
+                            <li class="empty-state">
+                                <div class="empty-state-icon">📋</div>
+                                <p>Nenhum registro ainda</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Medicamentos -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <span class="card-icon">💊</span>
+                                Medicamentos
+                            </h3>
+                            <button class="btn-secondary" id="addMedicineBtn">+ Adicionar</button>
+                        </div>
+                        <ul class="item-list" id="medicineList">
+                            <li class="empty-state">
+                                <div class="empty-state-icon">⏰</div>
+                                <p>Nenhum lembrete configurado</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Peso e Alimentação -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <span class="card-icon">⚖️</span>
+                                Peso & Alimentação
+                            </h3>
+                            <button class="btn-secondary" id="addWeightBtn">+ Registrar</button>
+                        </div>
+                        <div class="weight-chart">
+                            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Últimos 6 meses</p>
+                            <div class="chart-bars" id="weightChart">
+                                <div class="bar" style="height: 60%;">
+                                    <span class="bar-label">Set</span>
+                                </div>
+                                <div class="bar" style="height: 65%;">
+                                    <span class="bar-label">Out</span>
+                                </div>
+                                <div class="bar" style="height: 70%;">
+                                    <span class="bar-label">Nov</span>
+                                </div>
+                                <div class="bar" style="height: 75%;">
+                                    <span class="bar-label">Dez</span>
+                                </div>
+                                <div class="bar" style="height: 80%;">
+                                    <span class="bar-label">Jan</span>
+                                </div>
+                                <div class="bar" style="height: 85%;">
+                                    <span class="bar-label">Fev</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Galeria de Fotos -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <span class="card-icon">📸</span>
+                                Galeria
+                            </h3>
+                        </div>
+                        <div class="photo-grid">
+                            <div class="photo-placeholder photo-upload" id="uploadPhotoBtn">+</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section class="pricing-section" id="pricingSection">
+            <div class="container pricing-content">
+                <div class="pricing-header">
+                    <h2>Desbloqueie Todos os Recursos</h2>
+                    <p>Acesso completo e vitalício por apenas</p>
+                </div>
+                <div class="pricing-grid">
+                    <!-- Single Pricing Card -->
+                    <div class="pricing-card" style="max-width: 500px; margin: 0 auto; border: 3px solid #10b981;">
+                        <div class="popular-badge" style="background: #ef4444;">🔥 OFERTA ESPECIAL</div>
+                        <h3 class="plan-name">Acesso Vitalício</h3>
+                        <div class="plan-price">
+                            <div class="price-value">
+                                <span class="price-currency">R$</span>
+                                <span style="text-decoration: line-through; opacity: 0.5; font-size: 0.6em; display: block; margin-bottom: 0.5rem;">45,90</span>
+                                <span style="color: #10b981;">25,90</span>
+                            </div>
+                            <span class="price-period">pagamento único</span>
+                        </div>
+                        <div style="background: rgba(16, 185, 129, 0.1); padding: 1rem; border-radius: 12px; margin: 1.5rem 0;">
+                            <p style="color: #10b981; font-weight: 700; font-size: 1.2rem; margin: 0;">
+                                💰 Economize R$ 20,00
+                            </p>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
+                                De R$ 45,90 por apenas R$ 25,90
+                            </p>
+                        </div>
+                        <ul class="plan-features">
+                            <li>✅ Acesso completo e vitalício</li>
+                            <li>✅ Registro ilimitado de vacinas</li>
+                            <li>✅ Controle de medicamentos</li>
+                            <li>✅ Acompanhamento de peso</li>
+                            <li>✅ Galeria de fotos ilimitada</li>
+                            <li>✅ Lembretes automáticos</li>
+                            <li>✅ Sem mensalidades</li>
+                            <li>✅ Atualizações gratuitas para sempre</li>
+                        </ul>
+                        <button class="plan-cta" onclick="openPixPayment('unico', '25,90')" style="font-size: 1.3rem; padding: 1.25rem;">
+                            🚀 Garantir por R$ 25,90
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Animated Pet Carousel -->
+            <div class="pet-carousel">
+                <div class="carousel-track">
+                    <div class="carousel-item">
+                        <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=300&q=80" alt="Cachorro feliz">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?w=300&q=80" alt="Gato fofo">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://images.unsplash.com/photo-1560807707-8cc77767d783?w=300&q=80" alt="Golden Retriever">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://images.unsplash.com/photo-1574158622682-e40e69881006?w=300&q=80" alt="Cachorro sorrindo">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=300&q=80" alt="Cachorro brincando">
+                    </div>
+                    <!-- Duplicate for seamless loop -->
+                    <div class="carousel-item">
+                        <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=300&q=80" alt="Cachorro feliz">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?w=300&q=80" alt="Gato fofo">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://images.unsplash.com/photo-1560807707-8cc77767d783?w=300&q=80" alt="Golden Retriever">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://images.unsplash.com/photo-1574158622682-e40e69881006?w=300&q=80" alt="Cachorro sorrindo">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=300&q=80" alt="Cachorro brincando">
+                    </div>
+                </div>
+            </div>
+        </section>
+        </div>
+        <!-- End Home Section -->
+
+        <!-- Profile Section -->
+        <div class="profile-section" id="profileSection">
+            <div class="profile-container">
+                <div class="profile-header">
+                    <div class="profile-avatar" id="profileAvatar" onclick="uploadProfilePhoto()" style="cursor: pointer; position: relative;" title="Clique para alterar foto">
+                        👤
+                        <div style="position: absolute; bottom: 0; right: 0; background: var(--accent); border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 3px solid white;">
+                            📸
+                        </div>
+                    </div>
+                    <input type="file" id="profilePhotoInput" accept="image/*" style="display: none;">
+                    <div class="profile-name" id="profileName">Visitante</div>
+                    <div class="profile-email" id="profileEmail">Faça login para salvar seus dados</div>
+                </div>
+
+                <!-- Guest Mode - Login Prompt -->
+                <div class="profile-card" id="guestPrompt">
+                    <h3>🔐 Entre ou Cadastre-se</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.6;">
+                        Crie sua conta para salvar os dados do seu pet, receber lembretes e aproveitar todos os recursos do PetCare!
+                    </p>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <button class="btn" onclick="openAuthModal('login')" style="flex: 1; min-width: 200px;">
+                            🔑 Fazer Login
+                        </button>
+                        <button class="btn" onclick="openAuthModal('register')" style="flex: 1; min-width: 200px; background: linear-gradient(135deg, var(--purple) 0%, var(--pink) 100%);">
+                            ✨ Criar Conta Grátis
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Logged In Content - Hidden by default -->
+                <div id="loggedInContent" style="display: none;">
+                    <div class="profile-card">
+                        <h3>📋 Informações Pessoais</h3>
+                        <div class="profile-info">
+                            <div class="info-item">
+                                <span class="info-label">Nome Completo</span>
+                                <span class="info-value" id="infoName">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Email</span>
+                                <span class="info-value" id="infoEmail">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Telefone</span>
+                                <span class="info-value" id="infoPhone">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">CPF</span>
+                                <span class="info-value" id="infoCpf">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-card">
+                        <h3>💳 Assinatura</h3>
+                        <div class="profile-info">
+                            <div class="info-item">
+                                <span class="info-label">Plano Atual</span>
+                                <span class="info-value" id="infoPlan">Gratuito</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Status</span>
+                                <span class="info-value" id="infoStatus">
+                                    <span style="color: #10b981;">✓ Ativo</span>
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Código de Acesso</span>
+                                <span class="info-value" id="infoCode">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-card">
+                        <h3>🐾 Meus Pets</h3>
+                        <div class="profile-info" id="userPets">
+                            <div class="info-item">
+                                <span class="info-value" style="color: var(--text-secondary);">Nenhum pet cadastrado ainda</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="logout-btn" onclick="logout()">
+                        🚪 Sair da Conta
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- End Profile Section -->
+    </main>
+
+    <!-- Payment Wall Modal (Shows when trying to use premium features) -->
+    <div class="payment-wall hidden" id="paymentWall">
+        <div class="payment-wall-content">
+            <div class="lock-icon">🔒</div>
+            <h2>Desbloqueie o PetCare</h2>
+            <p>Acesso completo e vitalício por apenas R$ 25,90</p>
+
+            <div class="payment-options">
+                <button class="payment-option-btn" onclick="selectPlan('unico')" style="border: 3px solid #10b981;">
+                    <div class="payment-option-icon" style="background: #10b981; color: white;">🔥</div>
+                    <div class="payment-option-info">
+                        <h4>Oferta Especial</h4>
+                        <p>Acesso vitalício • Sem mensalidades</p>
+                    </div>
+                    <div class="payment-option-price" style="color: #10b981;">
+                        <span style="text-decoration: line-through; font-size: 0.6em; opacity: 0.5; display: block;">R$ 45,90</span>
+                        R$<br>25,90
+                    </div>
+                </button>
+            </div>
+
+            <div class="divider">
+                <span>Já pagou?</span>
+            </div>
+
+            <div class="unlock-section">
+                <h3>Digite seu código de acesso</h3>
+                <input 
+                    type="text" 
+                    class="unlock-input" 
+                    id="unlockCode" 
+                    placeholder="CÓDIGO"
+                    maxlength="12"
+                >
+                <button class="unlock-button" onclick="unlockApp()">
+                    🔓 Desbloquear Acesso
+                </button>
+                <div class="error-message" id="errorMessage">
+                    ❌ Código inválido. Tente novamente.
+                </div>
+            </div>
+
+            <button class="btn btn-close-pix" onclick="closePaymentWall()" style="margin-top: 1.5rem; width: 100%;">
+                Voltar
+            </button>
+
+            <p style="font-size: 0.85rem; color: var(--text-tertiary); margin-top: 1.5rem;">
+                Após o pagamento, você receberá o código de acesso por email
+            </p>
+        </div>
+    </div>
+
+    <!-- PIX Payment Modal -->
+    <div class="pix-payment-modal" id="pixPaymentModal">
+        <div class="pix-modal-content">
+            <div class="pix-modal-header">
+                <h3>Pagamento via PIX</h3>
+                <button class="close-btn" onclick="closePixPayment()">&times;</button>
+            </div>
+
+            <div class="pix-plan-info">
+                <div class="plan-selected" id="selectedPlanName">Plano Mensal</div>
+                <div class="amount" id="pixAmount">R$ 34,90</div>
+            </div>
+
+            <div class="qr-code-container">
+                <div class="qr-placeholder">
+                    <div class="qr-placeholder-icon">📱</div>
+                    <div class="qr-placeholder-text">Escaneie o QR Code<br>com o app do seu banco</div>
+                </div>
+                <!-- Substitua a div acima por uma imagem real do QR Code quando disponível -->
+                <!-- <img src="seu-qr-code.png" alt="QR Code PIX"> -->
+            </div>
+
+            <div class="pix-copy-section">
+                <div class="pix-copy-label">Ou use o PIX Copia e Cola:</div>
+                <div class="pix-copy-container">
+                    <input 
+                        type="text" 
+                        class="pix-code-input" 
+                        id="pixCode" 
+                        value="00020126580014br.gov.bcb.pix0136sua-chave-pix-aqui@example.com520400005303986540514.905802BR5925SEU NOME OU EMPRESA6009SAO PAULO62070503***63041234"
+                        readonly
+                    >
+                    <button class="copy-button" onclick="copyPixCode()">
+                        <span id="copyButtonText">Copiar</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="pix-instructions">
+                <h4>📋 Como pagar:</h4>
+                <ol>
+                    <li>Abra o app do seu banco</li>
+                    <li>Escolha a opção PIX</li>
+                    <li>Escaneie o QR Code ou cole o código</li>
+                    <li>Confirme o pagamento de <strong id="instructionAmount">R$ 34,90</strong></li>
+                    <li>Pronto! Seu acesso será liberado automaticamente</li>
+                </ol>
+            </div>
+
+            <div class="pix-warning" id="pixWarning" style="display: none;">
+                <strong>⚠️ Lembre-se:</strong>
+                Este é o plano mensal. Para continuar usando após 30 dias, você precisará fazer um novo pagamento de R$ 34,90 via PIX.
+            </div>
+
+            <div class="pix-modal-actions">
+                <button class="btn btn-close-pix" onclick="closePixPayment()">← Voltar aos Planos</button>
+                <button class="btn" onclick="confirmPayment()">✓ Confirmar Pagamento</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal - Adicionar Vacina/Consulta -->
+    <div class="modal" id="vaccineModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Adicionar Vacina/Consulta</h3>
+                <button class="close-btn" onclick="closeModal('vaccineModal')">&times;</button>
+            </div>
+            <form id="vaccineForm">
+                <div class="form-group">
+                    <label>Tipo</label>
+                    <select id="vaccineType" required>
+                        <option value="">Selecione...</option>
+                        <option value="vaccine">Vacina</option>
+                        <option value="checkup">Consulta</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Nome</label>
+                    <input type="text" id="vaccineName" placeholder="Ex: V10, Consulta de rotina" required>
+                </div>
+                <div class="form-group">
+                    <label>Data</label>
+                    <input type="date" id="vaccineDate" required max="2099-12-31">
+                </div>
+                <div class="form-group">
+                    <label>Observações</label>
+                    <textarea id="vaccineNotes" placeholder="Informações adicionais..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('vaccineModal')">Cancelar</button>
+                    <button type="submit" class="btn">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal - Adicionar Medicamento -->
+    <div class="modal" id="medicineModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Adicionar Medicamento</h3>
+                <button class="close-btn" onclick="closeModal('medicineModal')">&times;</button>
+            </div>
+            <form id="medicineForm">
+                <div class="form-group">
+                    <label>Nome do Medicamento</label>
+                    <input type="text" id="medicineName" placeholder="Ex: Vermífugo" required>
+                </div>
+                <div class="form-group">
+                    <label>Dosagem</label>
+                    <input type="text" id="medicineDosage" placeholder="Ex: 1 comprimido" required>
+                </div>
+                <div class="form-group">
+                    <label>Frequência</label>
+                    <select id="medicineFrequency" required>
+                        <option value="">Selecione...</option>
+                        <option value="daily">Diário</option>
+                        <option value="weekly">Semanal</option>
+                        <option value="monthly">Mensal</option>
+                        <option value="custom">Personalizado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Próxima Dose</label>
+                    <input type="datetime-local" id="medicineNextDose" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('medicineModal')">Cancelar</button>
+                    <button type="submit" class="btn">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal - Adicionar Peso -->
+    <div class="modal" id="weightModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Registrar Peso</h3>
+                <button class="close-btn" onclick="closeModal('weightModal')">&times;</button>
+            </div>
+            <form id="weightForm">
+                <div class="form-group">
+                    <label>Peso (kg)</label>
+                    <input type="number" id="weightValue" step="0.1" placeholder="Ex: 12.5" required>
+                </div>
+                <div class="form-group">
+                    <label>Data</label>
+                    <input type="date" id="weightDate" required max="2099-12-31">
+                </div>
+                <div class="form-group">
+                    <label>Alimentação Diária</label>
+                    <input type="text" id="foodAmount" placeholder="Ex: 200g de ração, 2x ao dia">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('weightModal')">Cancelar</button>
+                    <button type="submit" class="btn">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal - Adicionar Pet -->
+    <div class="modal" id="petModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Adicionar Pet</h3>
+                <button class="close-btn" onclick="closeModal('petModal')">&times;</button>
+            </div>
+            <form id="petForm" novalidate>
+  <div class="form-group">
+    <label class="photo-label">Escolha uma foto que represente seu pet</label>
+    <div class="pet-photo-selector">
+      <div class="pet-photo-option" data-photo="dog1">
+        <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=300&q=80" alt="Cachorro feliz" loading="lazy">
+      </div>
+      <div class="pet-photo-option" data-photo="dog2">
+        <img src="https://images.unsplash.com/photo-1560807707-8cc77767d783?w=300&q=80" alt="Golden Retriever" loading="lazy">
+      </div>
+      <div class="pet-photo-option" data-photo="dog3">
+        <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?w=300&q=80" alt="Cachorro sorrindo" loading="lazy">
+      </div>
+      <div class="pet-photo-option" data-photo="cat1">
+        <img src="https://images.unsplash.com/photo-1574158622682-e40e69881006?w=300&q=80" alt="Gato fofo" loading="lazy">
+      </div>
+      <div class="pet-photo-option" data-photo="cat2">
+        <img src="https://images.unsplash.com/photo-1615789591457-74a63395c990?w=300&q=80" alt="Gato branco" loading="lazy">
+      </div>
+      <div class="pet-photo-option" data-photo="cat3">
+        <img src="https://images.unsplash.com/photo-1606214174585-fe31582dc6ee?w=300&q=80" alt="Gato laranja" loading="lazy">
+      </div>
+      <div class="pet-photo-option" id="customPetPhoto" style="background: linear-gradient(135deg, var(--accent) 0%, var(--pink) 100%); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: white;">
+        📸
+      </div>
+    </div>
+    <small style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem; display: block;">Clique em 📸 para enviar sua própria foto</small>
+    <input type="file" id="customPetPhotoInput" accept="image/*" style="display: none;">
+    <input type="hidden" id="petPhoto" name="petPhoto">
+  </div>
+
+  <div class="form-group">
+    <label>Nome</label>
+    <input type="text" id="petNameInput" placeholder="Ex: Rex">
+  </div>
+
+  <div class="form-group">
+    <label>Espécie</label>
+    <select id="petSpecies">
+      <option value="">Selecione...</option>
+      <option value="dog">Cachorro 🐕</option>
+      <option value="cat">Gato 🐱</option>
+      <option value="bird">Pássaro 🐦</option>
+      <option value="other">Outro 🐾</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>Raça</label>
+    <input type="text" id="petBreed" placeholder="Ex: Labrador">
+  </div>
+
+  <div class="form-group">
+    <label>Data de Nascimento</label>
+    <input type="date" id="petBirthdate" max="2099-12-31">
+  </div>
+
+  <div class="form-actions">
+    <button type="button" class="btn btn-secondary" onclick="closeModal('petModal')">Cancelar</button>
+    <button type="button" class="btn" id="petSaveBtn" onclick="salvarPet()">Salvar</button>
+  </div>
+</form>
+        </div>
+    </div>
+
+    <!-- Login/Register Modal -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-container">
+            <button class="close-btn" onclick="closeAuthModal()" style="position: absolute; top: 1.5rem; right: 1.5rem;">&times;</button>
+            
+            <div class="auth-header">
+                <h2>Bem-vindo ao PetCare! 🐾</h2>
+                <p>Faça login ou crie sua conta</p>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="showAuthTab('login')">Entrar</button>
+                <button class="auth-tab" onclick="showAuthTab('register')">Cadastrar</button>
+            </div>
+
+            <!-- Login Form -->
+            <form class="auth-form active" id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" required placeholder="seu@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <div style="position: relative;">
+                        <input type="password" id="loginPassword" required placeholder="••••••••">
+                        <button type="button" onclick="togglePassword('loginPassword', this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.2rem;">👁️</button>
+                    </div>
+                </div>
+                <button type="submit" class="auth-submit">Entrar</button>
+                <div style="margin: 1rem 0; text-align: center; color: var(--text-secondary);">
+    ou
+</div>
+
+<button type="button" onclick="loginWithGoogle()" 
+    style="width: 100%; padding: 0.9rem; border-radius: 12px; border: none; 
+    font-weight: 600; cursor: pointer; background: white; color: #333; 
+    display: flex; align-items: center; justify-content: center; gap: 10px;">
+    
+    <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="20">
+    Entrar com Google
+</button>
+
+            </form>
+
+            <!-- Register Form -->
+            <form class="auth-form" id="registerForm" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" id="registerName" required placeholder="Seu nome completo">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="registerEmail" required placeholder="seu@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Telefone</label>
+                    <input type="tel" id="registerPhone" required placeholder="(00) 00000-0000" maxlength="15">
+                    <small style="color: var(--text-secondary); font-size: 0.85rem;">Formato: (12) 34567-8900</small>
+                </div>
+                <div class="form-group">
+                    <label>CPF</label>
+                    <input type="text" id="registerCpf" required placeholder="000.000.000-00" maxlength="14">
+                    <small style="color: var(--text-secondary); font-size: 0.85rem;">Apenas números</small>
+                    <div id="cpfError" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.5rem; display: none;">
+                        ❌ CPF inválido
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <div style="position: relative;">
+                        <input type="password" id="registerPassword" required placeholder="••••••••" minlength="8">
+                        <button type="button" onclick="togglePassword('registerPassword', this)" style="position: absolute; right: 10px; top: 15px; background: none; border: none; cursor: pointer; font-size: 1.2rem; z-index: 10;">👁️</button>
+                    </div>
+                    <div id="passwordStrength" style="margin-top: 0.75rem;">
+                        <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                            <div class="strength-bar" id="strength1"></div>
+                            <div class="strength-bar" id="strength2"></div>
+                            <div class="strength-bar" id="strength3"></div>
+                            <div class="strength-bar" id="strength4"></div>
+                        </div>
+                        <small id="strengthText" style="color: var(--text-secondary); font-size: 0.85rem;">
+                            Mínimo 8 caracteres, letra maiúscula, minúscula e número
+                        </small>
+                    </div>
+                </div>
+                <button type="submit" class="auth-submit">Criar Conta</button>
+                <div style="margin: 1rem 0; text-align: center; color: var(--text-secondary);">
+    ou
+</div>
+
+<button type="button" onclick="loginWithGoogle()" 
+    style="width: 100%; padding: 0.9rem; border-radius: 12px; border: none; 
+    font-weight: 600; cursor: pointer; background: white; color: #333; 
+    display: flex; align-items: center; justify-content: center; gap: 10px;">
+    
+    <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="20">
+    Cadastrar com Google
+</button>
+
+            </form>
+        </div>
+    </div>
+
+    
+<script>
+/** =========================
+ *  PetCare - JS principal
+ *  (corrigido: sem erros de sintaxe e sem depender de window.event)
+ *  ========================= */
+
+function safeEvent(evt){ return evt || window.event || null; }
+function setBtnLoading(btn, loading, loadingText = 'Salvando...') {
+  if (!btn) return;
+  if (loading) {
+    btn.dataset.originalText = btn.dataset.originalText || btn.textContent;
+    btn.textContent = loadingText;
+    btn.disabled = true;
+    btn.style.opacity = '0.75';
+    btn.style.cursor = 'not-allowed';
+  } else {
+    btn.textContent = btn.dataset.originalText || 'Salvar';
+    btn.disabled = false;
+    btn.style.opacity = '';
+    btn.style.cursor = '';
+  }
+}
+
+function requireField(value, message, elToFocus) {
+  const v = (value ?? '').toString().trim();
+  if (!v) {
+    showToast(message);
+    elToFocus?.focus?.();
+    return false;
+  }
+  return true;
+}
+
+// -------------------------
+// Estado (UI) do Pet
+// -------------------------
+let petData = {
+  name: '',
+  species: '',
+  breed: '',
+  birth_date: '',
+  photo: '',
+  vaccines: [],
+  medicines: [],
+  weights: []
+};
+
+let petsList = [];        // lista de pets do usuário logado
+let currentPetId = null;  // pet atualmente aberto
+
+// -------------------------
+// Auth helper (sessão real do Supabase)
+// -------------------------
+async function getAuthUserOrNull({ syncLocal = true } = {}) {
+  if (typeof supabaseClient === 'undefined') return null;
+  try {
+    const { data: sData, error: sErr } = await supabaseClient.auth.getSession();
+    if (sErr) console.warn('getAuthUserOrNull: getSession erro:', sErr);
+
+    let user = sData?.session?.user || null;
+
+    if (!user) {
+      const { data: uData, error: uErr } = await supabaseClient.auth.getUser();
+      if (uErr) console.warn('getAuthUserOrNull: getUser erro:', uErr);
+      user = uData?.user || null;
+    }
+
+    if (user && syncLocal && typeof syncLocalUserFromSupabase === 'function') {
+      try { syncLocalUserFromSupabase(user); } catch (e) {}
+    }
+
+    return user;
+  } catch (e) {
+    console.warn('getAuthUserOrNull:', e);
+    return null;
+  }
+}
+
+// -------------------------
+// Supabase (dados multi-dispositivo)
+// OBS: o supabaseClient é definido mais abaixo no HTML.
+// Estas funções só rodam quando o usuário já está logado.
+// -------------------------
+async function loadData() {
+  if (typeof supabaseClient === 'undefined') return;
+  if (window._loadingData) return; // evita chamadas simultâneas
+  window._loadingData = true;
+  try {
+
+  // getSession é síncrono com o storage local — mais confiável no reload
+  // do que getUser() que faz round-trip ao servidor
+  let user = null;
+  try {
+    const { data: sessionData } = await supabaseClient.auth.getSession();
+    user = sessionData?.session?.user || null;
+
+    // Se getSession não retornou user, tenta getUser como fallback
+    if (!user) {
+      const { data: userData } = await supabaseClient.auth.getUser();
+      user = userData?.user || null;
+    }
+  } catch (err) {
+    console.error('loadData: erro ao buscar sessão:', err);
+  }
+
+  if (!user) {
+    petsList = [];
+    currentPetId = null;
+    petData = { name:'', species:'', breed:'', birth_date:'', photo:'', vaccines:[], medicines:[], weights:[] };
+    updatePetProfile();
+    renderVaccines();
+    renderMedicines();
+    renderWeights();
+    return;
+  }
+
+  const { data: pets, error: petsError } = await supabaseClient
+    .from('pets')
+    .select('id, name, species, breed, birth_date, photo_url, created_at')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: true });
+
+  if (petsError) {
+    console.error("Erro ao buscar pets:", petsError);
+    return;
+  }
+
+  petsList = pets || [];
+
+  if (petsList.length === 0) {
+    currentPetId = null;
+    petData = { name:'', species:'', breed:'', birth_date:'', photo:'', vaccines:[], medicines:[], weights:[] };
+    updatePetProfile();
+    renderVaccines();
+    renderMedicines();
+    renderWeights();
+    return;
+  }
+
+  currentPetId = currentPetId || petsList[0].id;
+
+  const [vaccRes, medRes, weiRes] = await Promise.all([
+    supabaseClient
+      .from('vacinas')
+      .select('id, name, applied_date, next_due_date, created_at')
+      .eq('user_id', user.id)
+      .eq('pet_id', currentPetId)
+      .order('applied_date', { ascending: false }),
+
+    supabaseClient
+      .from('medicamentos')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('pet_id', currentPetId)
+      .order('created_at', { ascending: false }),
+
+    supabaseClient
+      .from('pesos')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('pet_id', currentPetId)
+      .order('date', { ascending: false }),
+  ]);
+
+  if (vaccRes.error) console.error("Erro vaccines:", vaccRes.error);
+  if (medRes.error) console.error("Erro medicines:", medRes.error);
+  if (weiRes.error) console.error("Erro weights:", weiRes.error);
+
+  const pet = petsList.find(p => p.id === currentPetId);
+
+  petData = {
+    name: pet?.name || '',
+    species: pet?.species || '',
+    breed: pet?.breed || '',
+    birth_date: pet?.birth_date || '',
+    photo: pet?.photo_url || '',
+    vaccines: (vaccRes.data || []).map(v => ({
+      id: v.id,
+      type: 'vaccine',
+      name: v.name,
+      date: v.applied_date,
+      next_due_date: v.next_due_date || null
+    })),
+    medicines: medRes.data || [],
+    weights: weiRes.data || []
+  };
+
+  updatePetProfile();
+  renderVaccines();
+  renderMedicines();
+  renderWeights();
+  window._loadingData = false;
+  } catch(err) {
+    console.error('loadData erro:', err);
+  } finally {
+    window._loadingData = false;
+  }
+}
+async function saveData() {
+  // Garante que o Supabase está carregado
+  if (typeof supabaseClient === 'undefined') {
+    console.error('saveData: supabaseClient não disponível');
+    return { ok: false };
+  }
+
+  // Sempre usa sessão real do Supabase (operações no banco exigem auth)
+  let user = null;
+  try {
+    const { data: sessionData, error: sessionErr } = await supabaseClient.auth.getSession();
+    if (sessionErr) console.warn('saveData: getSession erro:', sessionErr);
+    user = sessionData?.session?.user || null;
+
+    if (!user) {
+      const { data: userData, error: userErr } = await supabaseClient.auth.getUser();
+      if (userErr) console.warn('saveData: getUser erro:', userErr);
+      user = userData?.user || null;
+    }
+  } catch (err) {
+    console.error('saveData: erro ao buscar sessão:', err);
+  }
+
+  if (!user) {
+    // Se o usuário estava "logado" só no localStorage, limpa para não ficar em estado inconsistente
+    localStorage.removeItem('petcare_user');
+    showToast('⚠️ Sua sessão expirou. Faça login novamente.');
+    openAuthModal('login');
+    return { ok: false };
+  }
+
+  const payload = {
+    user_id: user.id,
+    name: petData.name,
+    species: petData.species || null,
+    breed: petData.breed || null,
+    birth_date: petData.birth_date || null,
+    photo_url: petData.photo || null
+  };
+
+  try {
+    if (currentPetId) {
+      const { error } = await supabaseClient
+        .from('pets')
+        .update(payload)
+        .eq('id', currentPetId)
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Erro update pet:', error);
+        showToast('❌ Erro ao atualizar pet: ' + (error.message || error.code));
+        return { ok: false };
+      }
+      return { ok: true, petId: currentPetId };
+    }
+
+    const { data, error } = await supabaseClient
+      .from('pets')
+      .insert(payload)
+      .select('id')
+      .single();
+
+    if (error) {
+      console.error('Erro insert pet:', error);
+      showToast('❌ Erro ao criar pet: ' + (error.message || error.code));
+      return { ok: false };
+    }
+
+    if (!data?.id) {
+      console.error('saveData: insert retornou sem id', data);
+      showToast('❌ Erro inesperado ao criar pet.');
+      return { ok: false };
+    }
+
+    currentPetId = data.id;
+    return { ok: true, petId: currentPetId };
+  } catch (err) {
+    console.error('saveData: erro inesperado:', err);
+    showToast('❌ Erro de conexão ao salvar. Tente novamente.');
+    return { ok: false };
+  }
+}
+
+
+// -------------------------
+// Helpers de Modal
+// -------------------------
+function openModal(modalId) {
+  const el = document.getElementById(modalId);
+  if (!el) return;
+  el.classList.add('active');
+}
+
+function closeModal(modalId) {
+  const el = document.getElementById(modalId);
+  if (!el) return;
+  el.classList.remove('active');
+}
+
+// -------------------------
+// UI: Perfil do Pet (card)
  // -------------------------
- // Supabase (dados multi-dispositivo)
- // OBS: o supabaseClient é definido mais abaixo no HTML.
- // Estas funções só rodam quando o usuário já está logado.
+function updatePetProfile() {
+  const nameEl = document.getElementById('petName');
+  const detailsEl = document.getElementById('petDetails');
+  const avatarEl = document.querySelector('.pet-avatar');
+
+  if (!nameEl || !detailsEl || !avatarEl) return;
+
+  if (!petData.name) {
+    nameEl.textContent = 'Seu Pet';
+    detailsEl.textContent = 'Clique em "Adicionar Pet" para começar';
+    avatarEl.style.backgroundImage = 'none';
+    avatarEl.textContent = '🐾';
+    return;
+  }
+
+  const speciesEmoji = { dog:'🐕', cat:'🐱', bird:'🐦', other:'🐾' };
+  const photoUrls = {
+    dog1:'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=300&q=80',
+    dog2:'https://images.unsplash.com/photo-1560807707-8cc77767d783?w=300&q=80',
+    dog3:'https://images.unsplash.com/photo-1552053831-71594a27632d?w=300&q=80',
+    cat1:'https://images.unsplash.com/photo-1574158622682-e40e69881006?w=300&q=80',
+    cat2:'https://images.unsplash.com/photo-1615789591457-74a63395c990?w=300&q=80',
+    cat3:'https://images.unsplash.com/photo-1606214174585-fe31582dc6ee?w=300&q=80'
+  };
+
+  nameEl.textContent = petData.name;
+
+  // Foto (custom base64 ou opção)
+  if (petData.photo && typeof petData.photo === 'string' && petData.photo.startsWith('custom:')) {
+    const photoData = petData.photo.replace('custom:', '');
+    avatarEl.style.backgroundImage = `url(${photoData})`;
+    avatarEl.style.backgroundSize = 'cover';
+    avatarEl.style.backgroundPosition = 'center';
+    avatarEl.textContent = '';
+  } else if (petData.photo && photoUrls[petData.photo]) {
+    avatarEl.style.backgroundImage = `url(${photoUrls[petData.photo]})`;
+    avatarEl.style.backgroundSize = 'cover';
+    avatarEl.style.backgroundPosition = 'center';
+    avatarEl.textContent = '';
+  } else {
+    avatarEl.style.backgroundImage = 'none';
+    avatarEl.textContent = speciesEmoji[petData.species] || '🐾';
+  }
+
+  // Idade
+  let ageText = '';
+  if (petData.birth_date) {
+    const birth = new Date(petData.birth_date);
+    if (!isNaN(birth.getTime())) {
+      const age = Math.floor((Date.now() - birth.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+      if (age >= 0) ageText = ` • ${age} ${age === 1 ? 'ano' : 'anos'}`;
+    }
+  }
+
+  detailsEl.textContent = `${petData.breed || petData.species || 'Pet'}${ageText}`.trim();
+}
+
+// -------------------------
+// Render: Vacinas
+// -------------------------
+function renderVaccines() {
+  const list = document.getElementById('vaccineList');
+  if (!list) return;
+
+  if (!petData.vaccines || petData.vaccines.length === 0) {
+    list.innerHTML = `
+      <li class="empty-state">
+        <div class="empty-state-icon">📋</div>
+        <p>Nenhum registro ainda</p>
+      </li>`;
+    return;
+  }
+
+  list.innerHTML = petData.vaccines.map(v => {
+    const d = new Date(v.date || v.applied_date);
+    const today = new Date();
+    const isPast = !isNaN(d.getTime()) && d < today;
+    const status = isPast ? 'status-done' : 'status-upcoming';
+    const statusText = isPast ? 'Realizado' : 'Agendado';
+    const dateText = !isNaN(d.getTime()) ? d.toLocaleDateString('pt-BR') : (v.date || '');
+
+    return `
+      <li class="item">
+        <div class="item-info">
+          <h4>${escapeHtml(v.name || '')}</h4>
+          <p>${dateText} • ${v.type === 'checkup' ? 'Consulta' : 'Vacina'}</p>
+        </div>
+        <span class="item-status ${status}">${statusText}</span>
+      </li>
+    `;
+  }).join('');
+}
+
+// -------------------------
+// Render: Medicamentos
+// -------------------------
+function renderMedicines() {
+  const list = document.getElementById('medicineList');
+  if (!list) return;
+
+  if (!petData.medicines || petData.medicines.length === 0) {
+    list.innerHTML = `
+      <li class="empty-state">
+        <div class="empty-state-icon">⏰</div>
+        <p>Nenhum lembrete configurado</p>
+      </li>`;
+    return;
+  }
+
+  list.innerHTML = petData.medicines.map(m => {
+    const nextDose = new Date(m.next_dose_at || '');
+    const today = new Date();
+    const isOverdue = !isNaN(nextDose.getTime()) && nextDose < today;
+    const status = isOverdue ? 'status-overdue' : 'status-upcoming';
+    const statusText = isOverdue ? 'Atrasado' : 'Próximo';
+    const nextDoseText = !isNaN(nextDose.getTime()) ? nextDose.toLocaleDateString('pt-BR') : '';
+
+    return `
+      <li class="item">
+        <div class="item-info">
+          <h4>${escapeHtml(m.name || '')}</h4>
+          <p>${escapeHtml(m.dosage || '')}${nextDoseText ? ' • ' + nextDoseText : ''}</p>
+        </div>
+        <span class="item-status ${status}">${statusText}</span>
+      </li>
+    `;
+  }).join('');
+}
+
+// -------------------------
+// Render: Pesos (placeholder)
  // -------------------------
- async function loadData() {
-   if (typeof supabaseClient === 'undefined') return;
-   if (window._loadingData) return; // evita chamadas simultâneas
-   window._loadingData = true;
-   try {
- 
--  // getSession é síncrono com o storage local — mais confiável no reload
--  // do que getUser() que faz round-trip ao servidor
-+  // getSession lê do storage local (mais rápido no reload)
-   let user = null;
-   try {
-     const { data: sessionData } = await supabaseClient.auth.getSession();
-     user = sessionData?.session?.user || null;
- 
--    // Se getSession não retornou user, tenta getUser como fallback
-+    // fallback para getUser, mas com timeout para evitar travas
-     if (!user) {
--      const { data: userData } = await supabaseClient.auth.getUser();
--      user = userData?.user || null;
-+      const userResp = await Promise.race([
-+        supabaseClient.auth.getUser(),
-+        new Promise((_, reject) => setTimeout(() => reject(new Error('getUser timeout')), 4000))
-+      ]);
-+      user = userResp?.data?.user || null;
-     }
-   } catch (err) {
-     console.error('loadData: erro ao buscar sessão:', err);
-   }
- 
-   if (!user) {
-     petsList = [];
-     currentPetId = null;
-     petData = { name:'', species:'', breed:'', birth_date:'', photo:'', vaccines:[], medicines:[], weights:[] };
-     updatePetProfile();
-     renderVaccines();
-     renderMedicines();
-     renderWeights();
-     return;
-   }
- 
-   const { data: pets, error: petsError } = await supabaseClient
-     .from('pets')
-     .select('id, name, species, breed, birth_date, photo_url, created_at')
-     .eq('user_id', user.id)
-     .order('created_at', { ascending: true });
- 
-   if (petsError) {
-     console.error("Erro ao buscar pets:", petsError);
-     return;
-@@ -3207,79 +3209,81 @@ async function loadData() {
-   if (weiRes.error) console.error("Erro weights:", weiRes.error);
- 
-   const pet = petsList.find(p => p.id === currentPetId);
- 
-   petData = {
-     name: pet?.name || '',
-     species: pet?.species || '',
-     breed: pet?.breed || '',
-     birth_date: pet?.birth_date || '',
-     photo: pet?.photo_url || '',
-     vaccines: (vaccRes.data || []).map(v => ({
-       id: v.id,
-       type: 'vaccine',
-       name: v.name,
-       date: v.applied_date,
-       next_due_date: v.next_due_date || null
-     })),
-     medicines: medRes.data || [],
-     weights: weiRes.data || []
-   };
- 
-   updatePetProfile();
-   renderVaccines();
-   renderMedicines();
-   renderWeights();
--  window._loadingData = false;
-   } catch(err) {
-     console.error('loadData erro:', err);
-   } finally {
-     window._loadingData = false;
-   }
- }
- async function saveData() {
-   // Garante que o Supabase está carregado
-   if (typeof supabaseClient === 'undefined') {
-     console.error('saveData: supabaseClient não disponível');
-     return { ok: false };
-   }
- 
--  // Busca sessão com timeout de 5s para não travar
-+  // Busca sessão primeiro pelo storage local e depois pelo servidor
-   let user = null;
-   try {
--    const sessionData = await Promise.race([
--      supabaseClient.auth.getUser(),
--      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
--    ]);
--    user = sessionData?.data?.user || null;
-+    const { data: sessionData } = await supabaseClient.auth.getSession();
-+    user = sessionData?.session?.user || null;
-+
-+    if (!user) {
-+      const userResp = await Promise.race([
-+        supabaseClient.auth.getUser(),
-+        new Promise((_, reject) => setTimeout(() => reject(new Error('getUser timeout')), 5000))
-+      ]);
-+      user = userResp?.data?.user || null;
-+    }
-   } catch (err) {
-     console.error('saveData: erro ao buscar sessão:', err);
--    // Tenta via localStorage como fallback
-+    // fallback somente para UI; sem sessão válida, a escrita pode falhar por RLS
-     const localUser = JSON.parse(localStorage.getItem('petcare_user') || 'null');
--    if (localUser?.id) {
--      user = localUser;
--    }
-+    if (localUser?.id) user = localUser;
-   }
- 
-   if (!user) {
-     showToast('⚠️ Sessão expirada. Faça login novamente.');
-     openAuthModal('login');
-     return { ok: false };
-   }
- 
-   const payload = {
-     user_id: user.id,
-     name: petData.name,
-     species: petData.species || null,
-     breed: petData.breed || null,
-     birth_date: petData.birth_date || null,
-     photo_url: petData.photo || null
-   };
- 
-   try {
-     if (currentPetId) {
-       const { error } = await supabaseClient
-         .from('pets')
-         .update(payload)
-         .eq('id', currentPetId)
-         .eq('user_id', user.id);
- 
-@@ -4351,50 +4355,66 @@ function syncLocalUserFromSupabase(user) {
- }
- 
- supabaseClient.auth.onAuthStateChange(async (event, session) => {
-   // Só age em eventos reais — evita loop com TOKEN_REFRESHED
-   if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
-     if (session?.user) {
-       syncLocalUserFromSupabase(session.user);
-       checkUserSession();
-       loadUserProfile();
-       await loadData();
-     }
-   } else if (event === 'SIGNED_OUT') {
-     localStorage.removeItem('petcare_user');
-     petsList = [];
-     currentPetId = null;
-     petData = { name:'', species:'', breed:'', birth_date:'', photo:'', vaccines:[], medicines:[], weights:[] };
-     updatePetProfile();
-     renderVaccines();
-     renderMedicines();
-     renderWeights();
-     checkUserSession();
-     loadUserProfile();
-   }
- });
- 
-+(async function hydrateSessionOnReload() {
-+  try {
-+    const { data: sessionData } = await supabaseClient.auth.getSession();
-+    const user = sessionData?.session?.user || null;
-+
-+    if (user) {
-+      syncLocalUserFromSupabase(user);
-+      checkUserSession();
-+      loadUserProfile();
-+      await loadData();
-+    }
-+  } catch (err) {
-+    console.error('hydrateSessionOnReload erro:', err);
-+  }
-+})();
-+
-     async function loginWithGoogle() {
-         const { error } = await supabaseClient.auth.signInWithOAuth({
-             provider: "google",
-             options: {
-                 redirectTo: "https://petcarenew.vercel.app"
-             }
-         });
- 
-         if (error) {
-             alert("Erro: " + error.message);
-         }
-     }
- 
- 
-     // ✅ Login com Email/Senha (Supabase)
-     async function handleLogin(e) {
-         e.preventDefault();
- 
-         const email = document.getElementById('loginEmail')?.value?.trim();
-         const password = document.getElementById('loginPassword')?.value;
- 
-         if (!email || !password) {
-             alert("Preencha email e senha.");
-             return;
-         }
- 
-EOF
-)
+function renderWeights() {
+  // Você pode evoluir depois para desenhar o gráfico com dados reais
+  // Por enquanto não quebra nada.
+}
+
+// -------------------------
+// Escape básico para evitar quebrar HTML em listagens
+// -------------------------
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'","&#039;");
+}
+
+// -------------------------
+// Seleção de foto do pet (opções + custom)
+ // -------------------------
+function setupPetPhotoSelectors() {
+  document.querySelectorAll('.pet-photo-option').forEach(option => {
+    option.addEventListener('click', function() {
+      if (this.id === 'customPetPhoto') {
+        const input = document.getElementById('customPetPhotoInput');
+        if (input) input.click();
+        return;
+      }
+
+      document.querySelectorAll('.pet-photo-option').forEach(opt => opt.classList.remove('selected'));
+      this.classList.add('selected');
+
+      const hidden = document.getElementById('petPhoto');
+      if (hidden) hidden.value = this.dataset.photo || '';
+    });
+  });
+
+  const customInput = document.getElementById('customPetPhotoInput');
+  if (customInput) {
+    customInput.addEventListener('change', function(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      if (file.size > 5 * 1024 * 1024) {
+        alert('❌ A foto é muito grande! Máximo 5MB.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        const customPhoto = document.getElementById('customPetPhoto');
+        if (!customPhoto) return;
+
+        customPhoto.style.backgroundImage = `url(${ev.target.result})`;
+        customPhoto.style.backgroundSize = 'cover';
+        customPhoto.style.backgroundPosition = 'center';
+        customPhoto.textContent = '';
+
+        document.querySelectorAll('.pet-photo-option').forEach(opt => opt.classList.remove('selected'));
+        customPhoto.classList.add('selected');
+
+        const hidden = document.getElementById('petPhoto');
+        if (hidden) hidden.value = 'custom:' + ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+}
+
+// -------------------------
+// Premium (localStorage) - mantido como está no seu app
+// -------------------------
+function hasPremiumAccess() {
+  return localStorage.getItem('petcare_paid') === 'true';
+}
+
+function updatePricingVisibility() {
+  const pricingSection = document.getElementById('pricingSection');
+  if (!pricingSection) return;
+  pricingSection.style.display = hasPremiumAccess() ? 'none' : 'block';
+}
+
+// -------------------------
+// Payment Wall
+// -------------------------
+function showPaymentWall() {
+  const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+
+  if (!user) {
+    showToast('⚠️ Você precisa criar uma conta para usar este recurso!');
+    openAuthModal('register');
+    return;
+  }
+
+  const wall = document.getElementById('paymentWall');
+  if (wall) wall.classList.remove('hidden');
+}
+function closePaymentWall() {
+  const wall = document.getElementById('paymentWall');
+  if (wall) wall.classList.add('hidden');
+}
+
+// -------------------------
+// Navegação (Home/Perfil) - sem depender de "event" global
+// -------------------------
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showSection('home');
+}
+
+function showSection(section, evt) {
+  const e = safeEvent(evt);
+
+  // atualiza nav highlight
+  document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+  if (e && e.target) {
+    const a = e.target.closest && e.target.closest('.nav-link');
+    if (a) a.classList.add('active');
+  } else {
+    // fallback: marcar pelo href
+    const link = document.querySelector(`.nav-link[href="#${section}"]`);
+    if (link) link.classList.add('active');
+  }
+
+  if (section === 'home') {
+    document.getElementById('homeSection')?.classList.remove('hidden');
+    document.getElementById('profileSection')?.classList.remove('active');
+  } else if (section === 'profile') {
+    document.getElementById('homeSection')?.classList.add('hidden');
+    document.getElementById('profileSection')?.classList.add('active');
+    loadUserProfile();
+  }
+}
+
+// -------------------------
+// Auth modal (Login/Cadastro) UI
+// -------------------------
+function openAuthModal(tab = 'login') {
+  document.getElementById('authModal')?.classList.add('active');
+
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+
+  if (tab === 'login') {
+    document.querySelector('.auth-tab:first-child')?.classList.add('active');
+    document.getElementById('loginForm')?.classList.add('active');
+  } else {
+    document.querySelector('.auth-tab:last-child')?.classList.add('active');
+    document.getElementById('registerForm')?.classList.add('active');
+  }
+}
+
+function showAuthTab(tab, evt) {
+  const e = safeEvent(evt);
+
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+
+  // Se veio evento, marca o botão clicado. Se não veio, marca pelo "tab".
+  if (e && e.target) {
+    e.target.classList.add('active');
+  } else {
+    if (tab === 'login') document.querySelector('.auth-tab:first-child')?.classList.add('active');
+    else document.querySelector('.auth-tab:last-child')?.classList.add('active');
+  }
+
+  document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+  if (tab === 'login') document.getElementById('loginForm')?.classList.add('active');
+  else document.getElementById('registerForm')?.classList.add('active');
+}
+
+function closeAuthModal() {
+  document.getElementById('authModal')?.classList.remove('active');
+}
+
+// -------------------------
+// Perfil do usuário (usa localStorage petcare_user p/ UI)
+ // -------------------------
+function showGuestMode() {
+  document.getElementById('guestPrompt')?.style && (document.getElementById('guestPrompt').style.display = 'block');
+  document.getElementById('loggedInContent')?.style && (document.getElementById('loggedInContent').style.display = 'none');
+
+  document.getElementById('profileName').textContent = 'Visitante';
+  document.getElementById('profileEmail').textContent = 'Faça login para salvar seus dados';
+
+  const avatar = document.getElementById('profileAvatar');
+  if (avatar) {
+    avatar.style.backgroundImage = 'none';
+    avatar.textContent = '👤';
+  }
+}
+
+function loadUserProfile() {
+  const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+
+  if (!user) {
+    showGuestMode();
+    return;
+  }
+
+  document.getElementById('guestPrompt')?.style && (document.getElementById('guestPrompt').style.display = 'none');
+  document.getElementById('loggedInContent')?.style && (document.getElementById('loggedInContent').style.display = 'block');
+
+  document.getElementById('profileName').textContent = user.name || 'Usuário';
+  document.getElementById('profileEmail').textContent = user.email || '';
+
+  const avatar = document.getElementById('profileAvatar');
+  if (avatar) {
+    if (user.profilePhoto) {
+      avatar.style.backgroundImage = `url(${user.profilePhoto})`;
+      avatar.style.backgroundSize = 'cover';
+      avatar.style.backgroundPosition = 'center';
+      avatar.innerHTML = '<div style="position: absolute; bottom: 0; right: 0; background: var(--accent); border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 3px solid white;">📸</div>';
+    } else {
+      avatar.style.backgroundImage = 'none';
+      avatar.innerHTML = (user.name ? user.name.charAt(0).toUpperCase() : '👤') +
+        '<div style="position: absolute; bottom: 0; right: 0; background: var(--accent); border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 3px solid white;">📸</div>';
+    }
+  }
+
+  document.getElementById('infoName').textContent = user.name || '-';
+  document.getElementById('infoEmail').textContent = user.email || '-';
+  document.getElementById('infoPhone').textContent = user.phone || '-';
+  document.getElementById('infoCpf').textContent = user.cpf || '-';
+
+  const isPaid = hasPremiumAccess();
+  const code = localStorage.getItem('petcare_code') || '';
+
+  if (isPaid && code) {
+    document.getElementById('infoPlan').innerHTML = '<span style="color: #10b981;">Premium</span>';
+    document.getElementById('infoCode').textContent = code;
+  } else {
+    document.getElementById('infoPlan').textContent = 'Gratuito';
+    document.getElementById('infoCode').innerHTML =
+      `<a href="#pricing" onclick="showSection('home'); setTimeout(() => document.querySelector('.pricing-section')?.scrollIntoView({behavior:'smooth'}), 100)" style="color: var(--accent); cursor: pointer;">Assinar agora</a>`;
+  }
+
+  // pets (mostra 1 por enquanto)
+  const userPets = document.getElementById('userPets');
+  if (userPets) {
+    if (petData.name) {
+      userPets.innerHTML = `
+        <div class="info-item">
+          <span class="info-label">🐾 ${escapeHtml(petData.name)}</span>
+          <span class="info-value">${escapeHtml(petData.species || '')} • ${escapeHtml(petData.breed || 'Sem raça definida')}</span>
+        </div>`;
+    } else {
+      userPets.innerHTML = `
+        <div class="info-item">
+          <span class="info-value" style="color: var(--text-secondary);">Nenhum pet cadastrado ainda</span>
+        </div>`;
+    }
+  }
+}
+
+// -------------------------
+// Upload de foto de perfil (LOCAL — você pode migrar p/ Supabase depois)
+ // -------------------------
+function uploadProfilePhoto() {
+  const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+  if (!user) {
+    alert('⚠️ Você precisa estar logado para alterar sua foto!');
+    return;
+  }
+  document.getElementById('profilePhotoInput')?.click();
+}
+
+function setupProfilePhotoInput() {
+  const input = document.getElementById('profilePhotoInput');
+  if (!input) return;
+
+  input.addEventListener('change', function(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('❌ A foto é muito grande! Máximo 5MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+      if (!user) return;
+
+      user.profilePhoto = ev.target.result;
+      localStorage.setItem('petcare_user', JSON.stringify(user));
+
+      const avatar = document.getElementById('profileAvatar');
+      if (avatar) {
+        avatar.style.backgroundImage = `url(${ev.target.result})`;
+        avatar.style.backgroundSize = 'cover';
+        avatar.style.backgroundPosition = 'center';
+        avatar.innerHTML = '<div style="position: absolute; bottom: 0; right: 0; background: var(--accent); border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 3px solid white;">📸</div>';
+      }
+
+      showToast('✅ Foto atualizada com sucesso!');
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// -------------------------
+// Toast
+// -------------------------
+function showToast(message) {
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--pink) 100%);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    z-index: 6000;
+    animation: slideInRight 0.3s ease-out;
+  `;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.animation = 'slideOutRight 0.3s ease-out';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// -------------------------
+// Galeria de fotos (LOCAL)
+ // -------------------------
+let photoGallery = JSON.parse(localStorage.getItem('petcare_photos') || '[]');
+
+function displayPhotos() {
+  const grid = document.querySelector('.photo-grid');
+  if (!grid) return;
+
+  // remove fotos existentes (mantém botão "+")
+  grid.querySelectorAll('.photo-item').forEach(el => el.remove());
+
+  // insere antes do botão upload
+  const uploadBtn = document.getElementById('uploadPhotoBtn');
+
+  photoGallery.forEach(photo => {
+    const el = document.createElement('div');
+    el.className = 'photo-placeholder photo-item';
+    el.style.backgroundImage = `url(${photo.data})`;
+    el.style.backgroundSize = 'cover';
+    el.style.backgroundPosition = 'center';
+    el.style.cursor = 'pointer';
+    el.onclick = () => viewPhoto(photo);
+
+    if (uploadBtn) grid.insertBefore(el, uploadBtn);
+    else grid.appendChild(el);
+  });
+}
+
+function viewPhoto(photo) {
+  const modal = document.createElement('div');
+  modal.className = 'modal active';
+  modal.style.zIndex = '5000';
+  modal.innerHTML = `
+    <div class="modal-content" style="max-width: 800px; padding: 0; background: transparent;">
+      <div style="position: relative;">
+        <img src="${photo.data}" style="width: 100%; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
+        <button type="button" style="position: absolute; top: 1rem; right: 1rem; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.7); color: white; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+        <button type="button" style="position: absolute; bottom: 1rem; right: 1rem; padding: 0.75rem 1.5rem; background: #ef4444; color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer;">🗑️ Excluir</button>
+      </div>
+    </div>
+  `;
+
+  const [closeBtn, delBtn] = modal.querySelectorAll('button');
+  closeBtn.onclick = () => modal.remove();
+  delBtn.onclick = () => deletePhoto(photo.id, modal);
+
+  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+  document.body.appendChild(modal);
+}
+
+function deletePhoto(photoId, modalEl) {
+  if (!confirm('Tem certeza que deseja excluir esta foto?')) return;
+  photoGallery = photoGallery.filter(p => p.id !== photoId);
+  localStorage.setItem('petcare_photos', JSON.stringify(photoGallery));
+  displayPhotos();
+  if (modalEl) modalEl.remove();
+  showToast('🗑️ Foto excluída!');
+}
+
+// -------------------------
+// PIX / Pagamento (mantido)
+ // -------------------------
+function openPixPayment(planType, amount) {
+  const modal = document.getElementById('pixPaymentModal');
+  const warning = document.getElementById('pixWarning');
+
+  document.getElementById('selectedPlanName').textContent = 'Acesso Vitalício - Oferta Especial';
+  document.getElementById('pixAmount').textContent = 'R$ ' + amount;
+  document.getElementById('instructionAmount').textContent = 'R$ ' + amount;
+
+  if (warning) warning.style.display = 'none';
+  modal?.classList.add('active');
+}
+
+function closePixPayment() {
+  document.getElementById('pixPaymentModal')?.classList.remove('active');
+  const copyBtn = document.getElementById('copyButtonText');
+  if (copyBtn) copyBtn.textContent = 'Copiar';
+  copyBtn?.parentElement?.classList.remove('copied');
+}
+
+function copyPixCode() {
+  const pixCode = document.getElementById('pixCode');
+  const copyBtnText = document.getElementById('copyButtonText');
+  if (!pixCode || !copyBtnText) return;
+
+  pixCode.select();
+  pixCode.setSelectionRange(0, 99999);
+
+  navigator.clipboard.writeText(pixCode.value);
+
+  copyBtnText.textContent = '✓ Copiado!';
+  copyBtnText.parentElement?.classList.add('copied');
+
+  setTimeout(() => {
+    copyBtnText.textContent = 'Copiar';
+    copyBtnText.parentElement?.classList.remove('copied');
+  }, 3000);
+}
+
+function confirmPayment() {
+  const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+  if (!user) {
+    alert('⚠️ Você precisa estar logado para confirmar o pagamento!');
+    return;
+  }
+
+  const ok = confirm(
+    'Você confirmou que realizou o pagamento via PIX?\n\n' +
+    '✅ Após a confirmação, o código de acesso será enviado para seu email cadastrado:\n\n' +
+    user.email
+  );
+
+  if (!ok) return;
+
+  // Demo local (em produção: servidor)
+  const accessCode = generateAccessCode();
+  localStorage.setItem('petcare_paid', 'true');
+  localStorage.setItem('petcare_code', accessCode);
+
+  closePixPayment();
+  updatePricingVisibility();
+  loadUserProfile();
+
+  alert(`✅ Pagamento Confirmado!\n\n📧 Seu código de acesso foi enviado para:\n${user.email}\n\n(DEV: código gerado: ${accessCode})`);
+  showToast('📧 Código enviado para seu email!');
+}
+
+function generateAccessCode() {
+  const prefix = 'PETCARE';
+  const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+  return `${prefix}-${random}`;
+}
+
+// Unlock (demo)
+function unlockApp() {
+  const codeInput = document.getElementById('unlockCode');
+  const errorMessage = document.getElementById('errorMessage');
+  const code = (codeInput?.value || '').toUpperCase().trim();
+
+  const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+  if (!user) {
+    alert('⚠️ Você precisa estar logado para usar um código de acesso!');
+    return;
+  }
+
+  const validCodes = ['TESTE-2024', 'PETCARE-DEMO', 'MENSAL-ABC123', 'UNICO-XYZ789'];
+
+  if (validCodes.includes(code)) {
+    localStorage.setItem('petcare_paid', 'true');
+    localStorage.setItem('petcare_code', code);
+    closePaymentWall();
+    updatePricingVisibility();
+    loadUserProfile();
+    alert('✅ Acesso Premium liberado com sucesso!');
+    if (codeInput) codeInput.value = '';
+    errorMessage?.classList.remove('show');
+  } else {
+    errorMessage?.classList.add('show');
+    if (codeInput) {
+      codeInput.value = '';
+      codeInput.focus();
+    }
+    setTimeout(() => errorMessage?.classList.remove('show'), 3000);
+  }
+}
+
+function selectPlan(planType) {
+  closePaymentWall();
+  openPixPayment('unico', '25,90');
+}
+
+// -------------------------
+// Login local session check (mantido compatível)
+ // -------------------------
+async function checkUserSession() {
+  const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+  if (user) loadUserProfile();
+  else showGuestMode();
+}
+
+// -------------------------
+// Bind de eventos (botões + forms)
+ // -------------------------
+function setupEventHandlers() {
+  // Botões principais
+document.getElementById('addPetBtn')?.addEventListener('click', async (e) => {
+  e.preventDefault(); e.stopPropagation();
+
+  const user = await getAuthUserOrNull();
+  if (!user) {
+    localStorage.removeItem('petcare_user');
+    showToast('⚠️ Faça login novamente para adicionar seu pet.');
+    openAuthModal('login');
+    return;
+  }
+
+  // Exige premium para adicionar pet
+  if (!hasPremiumAccess()) {
+    showPaymentWall();
+    return;
+  }
+
+  // Limpa o formulário antes de abrir
+  const form = document.getElementById('petForm');
+  form?.reset?.();
+  document.getElementById('petPhoto') && (document.getElementById('petPhoto').value = '');
+  document.querySelectorAll('.pet-photo-option').forEach(opt => opt.classList.remove('selected'));
+
+  currentPetId = null; // reset para forçar insert (novo pet)
+  openModal('petModal');
+});
+// -------------------------
+
+document.getElementById('addVaccineBtn')?.addEventListener('click', async (e) => {
+    e.preventDefault(); e.stopPropagation();
+
+    const user = await getAuthUserOrNull();
+    if (!user) {
+      localStorage.removeItem('petcare_user');
+      showToast('⚠️ Faça login novamente para usar este recurso.');
+      openAuthModal('login');
+      return;
+    }
+
+    if (!currentPetId) {
+      showToast('⚠️ Adicione/Selecione um pet antes de registrar vacinas.');
+      return;
+    }
+
+    if (hasPremiumAccess()) openModal('vaccineModal');
+    else showPaymentWall();
+  });
+
+document.getElementById('addMedicineBtn')?.addEventListener('click', async (e) => {
+    e.preventDefault(); e.stopPropagation();
+
+    const user = await getAuthUserOrNull();
+    if (!user) {
+      localStorage.removeItem('petcare_user');
+      showToast('⚠️ Faça login novamente para usar este recurso.');
+      openAuthModal('login');
+      return;
+    }
+
+    if (!currentPetId) {
+      showToast('⚠️ Adicione/Selecione um pet antes de registrar medicamentos.');
+      return;
+    }
+
+    if (hasPremiumAccess()) openModal('medicineModal');
+    else showPaymentWall();
+  });
+
+document.getElementById('addWeightBtn')?.addEventListener('click', async (e) => {
+    e.preventDefault(); e.stopPropagation();
+
+    const user = await getAuthUserOrNull();
+    if (!user) {
+      localStorage.removeItem('petcare_user');
+      showToast('⚠️ Faça login novamente para usar este recurso.');
+      openAuthModal('login');
+      return;
+    }
+
+    if (!currentPetId) {
+      showToast('⚠️ Adicione/Selecione um pet antes de registrar o peso.');
+      return;
+    }
+
+    if (hasPremiumAccess()) openModal('weightModal');
+    else showPaymentWall();
+  });
+
+  // Upload de foto da galeria
+  document.getElementById('uploadPhotoBtn')?.addEventListener('click', (e) => {
+    e.preventDefault(); e.stopPropagation();
+
+    if (!hasPremiumAccess()) {
+      showPaymentWall();
+      return;
+    }
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.multiple = true;
+
+    input.onchange = (ev) => {
+      const files = ev.target.files;
+      if (!files || files.length === 0) return;
+
+      Array.from(files).forEach(file => {
+        if (file.size > 5 * 1024 * 1024) {
+          alert(`❌ A foto ${file.name} é muito grande! Máximo 5MB.`);
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (re) => {
+          const photo = {
+            id: Date.now() + Math.random(),
+            data: re.target.result,
+            name: file.name,
+            date: new Date().toISOString()
+          };
+          photoGallery.push(photo);
+          localStorage.setItem('petcare_photos', JSON.stringify(photoGallery));
+          displayPhotos();
+          showToast('✅ Foto adicionada com sucesso!');
+        };
+        reader.readAsDataURL(file);
+      });
+    };
+
+    input.click();
+  });
+
+  // Fechar modais clicando fora
+  document.querySelectorAll('.modal').forEach(modal => {
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(modal.id); });
+  });
+
+  // Forms
+
+  document.getElementById('vaccineForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    setBtnLoading(btn, true);
+
+    const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+    if (!user || !currentPetId) {
+      showToast('⚠️ Selecione um pet antes de adicionar vacina.');
+      setBtnLoading(btn, false);
+      return;
+    }
+
+    const payload = {
+      user_id: user.id,
+      pet_id: currentPetId,
+      name: document.getElementById('vaccineName')?.value || '',
+      applied_date: document.getElementById('vaccineDate')?.value || null,
+      next_due_date: null
+    };
+
+    try {
+      const { error } = await supabaseClient.from('vacinas').insert(payload);
+      if (error) { showToast('❌ Erro ao salvar vacina: ' + error.message); return; }
+      showToast('✅ Vacina salva!');
+      await loadData();
+      closeModal('vaccineModal');
+      e.target.reset();
+    } catch(err) {
+      showToast('❌ Erro inesperado.');
+    } finally {
+      setBtnLoading(btn, false);
+    }
+  });
+
+  document.getElementById('medicineForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    setBtnLoading(btn, true);
+
+    const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+    if (!user || !currentPetId) {
+      showToast('⚠️ Selecione um pet antes de adicionar medicamento.');
+      setBtnLoading(btn, false);
+      return;
+    }
+
+    const payload = {
+      user_id: user.id,
+      pet_id: currentPetId,
+      name: document.getElementById('medicineName')?.value || '',
+      dosage: document.getElementById('medicineDosage')?.value || '',
+      frequency: document.getElementById('medicineFrequency')?.value || '',
+      next_dose_at: document.getElementById('medicineNextDose')?.value || null,
+      notes: ''
+    };
+
+    try {
+      const { error } = await supabaseClient.from('medicamentos').insert(payload);
+      if (error) { showToast('❌ Erro ao salvar medicamento: ' + error.message); return; }
+      showToast('✅ Medicamento salvo!');
+      await loadData();
+      closeModal('medicineModal');
+      e.target.reset();
+    } catch(err) {
+      showToast('❌ Erro inesperado.');
+    } finally {
+      setBtnLoading(btn, false);
+    }
+  });
+
+  document.getElementById('weightForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    setBtnLoading(btn, true);
+
+    const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+    if (!user || !currentPetId) {
+      showToast('⚠️ Selecione um pet antes de registrar peso.');
+      setBtnLoading(btn, false);
+      return;
+    }
+
+    const payload = {
+      user_id: user.id,
+      pet_id: currentPetId,
+      date: document.getElementById('weightDate')?.value || null,
+      value: parseFloat(document.getElementById('weightValue')?.value || '0'),
+      notes: document.getElementById('foodAmount')?.value || ''
+    };
+
+    try {
+      const { error } = await supabaseClient.from('pesos').insert(payload);
+      if (error) { showToast('❌ Erro ao salvar peso: ' + error.message); return; }
+      showToast('✅ Peso registrado!');
+      await loadData();
+      closeModal('weightModal');
+      e.target.reset();
+    } catch(err) {
+      showToast('❌ Erro inesperado.');
+    } finally {
+      setBtnLoading(btn, false);
+    }
+  });
+
+  // Payment wall: fechar clicando fora + enter
+  document.getElementById('paymentWall')?.addEventListener('click', (e) => {
+    if (e.target && e.target.id === 'paymentWall') closePaymentWall();
+  });
+
+  document.getElementById('unlockCode')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') unlockApp();
+  });
+
+  // Pix modal: fechar clicando fora + ESC
+  document.getElementById('pixPaymentModal')?.addEventListener('click', (e) => {
+    if (e.target && e.target.id === 'pixPaymentModal') closePixPayment();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const pix = document.getElementById('pixPaymentModal');
+      if (pix && pix.classList.contains('active')) closePixPayment();
+    }
+  });
+}
+// Salvar Pet (função global — chamada pelo onclick do botão)
+// -------------------------
+async function salvarPet() {
+  const saveBtn = document.getElementById('petSaveBtn');
+  const form = document.getElementById('petForm');
+
+  const nameEl = document.getElementById('petNameInput');
+  const speciesEl = document.getElementById('petSpecies');
+  const breedEl = document.getElementById('petBreed');
+  const birthEl = document.getElementById('petBirthdate');
+  const photoEl = document.getElementById('petPhoto');
+
+  const name = nameEl?.value?.trim() || '';
+  const species = speciesEl?.value || '';
+  const birth_date = birthEl?.value || '';
+
+  if (!requireField(name, '⚠️ Informe o nome do pet.', nameEl)) return;
+  if (!requireField(species, '⚠️ Selecione a espécie do pet.', speciesEl)) return;
+  if (!requireField(birth_date, '⚠️ Informe a data de nascimento.', birthEl)) return;
+
+  const supaUser = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+  if (!supaUser) {
+    showToast('⚠️ Sua sessão expirou. Faça login novamente.');
+    openAuthModal('login');
+    return;
+  }
+
+  petData.name = name;
+  petData.species = species;
+  petData.breed = breedEl?.value?.trim() || '';
+  petData.birth_date = birth_date;
+  petData.photo = photoEl?.value || '';
+
+  setBtnLoading(saveBtn, true);
+
+  try {
+    const result = await saveData();
+
+    if (result?.ok) {
+      await loadData();
+      updatePetProfile();
+      showToast('✅ Pet salvo com sucesso!');
+      closeModal('petModal');
+      form?.reset();
+      document.querySelectorAll('.pet-photo-option').forEach(opt => opt.classList.remove('selected'));
+    }
+
+  } catch (err) {
+    console.error('Erro inesperado ao salvar pet:', err);
+    showToast('❌ Erro inesperado. Tente novamente.');
+  } finally {
+    setBtnLoading(saveBtn, false);
+  }
+}
+
+// -------------------------
+// Init
+// -------------------------
+function bootstrapApp() {
+  try { setupPetPhotoSelectors(); } catch (e) { console.error('setupPetPhotoSelectors erro:', e); }
+  try { setupProfilePhotoInput(); } catch (e) { console.error('setupProfilePhotoInput erro:', e); }
+  try { setupEventHandlers(); } catch (e) { console.error('setupEventHandlers erro:', e); }
+
+  // Não bloqueia o app se sessão falhar
+  Promise.resolve()
+    .then(() => checkUserSession?.())
+    .catch((e) => console.error('checkUserSession erro:', e))
+    .finally(() => {
+      try { updatePricingVisibility?.(); } catch (e) { console.error('updatePricingVisibility erro:', e); }
+      try { displayPhotos?.(); } catch (e) { console.error('displayPhotos erro:', e); }
+      try { updatePetProfile?.(); } catch (e) { console.error('updatePetProfile erro:', e); }
+      try { renderVaccines?.(); } catch (e) { console.error('renderVaccines erro:', e); }
+      try { renderMedicines?.(); } catch (e) { console.error('renderMedicines erro:', e); }
+      try { renderWeights?.(); } catch (e) { console.error('renderWeights erro:', e); }
+    });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootstrapApp);
+} else {
+  bootstrapApp();
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+    const supabaseClient = window.supabase.createClient(
+        
+        "https://chblwbctbkqolymbrqvh.supabase.co",
+        "sb_publishable_WT_rpILQTaihVpghi1MQ5A_C62NVvTL"
+    );
+
+    async function getUsuarioLogado() {
+  const { data, error } = await supabaseClient.auth.getUser();
+  if (error) {
+    console.error("getUser erro:", error);
+    return null;
+  }
+  return data?.user ?? null;
+}
+function syncLocalUserFromSupabase(user) {
+  if (!user) return;
+
+  const userData = {
+    id: user.id,
+    name: user.user_metadata?.full_name || user.email,
+    email: user.email,
+    phone: user.user_metadata?.phone || '',
+    cpf: user.user_metadata?.cpf || '',
+    createdAt: new Date().toISOString(),
+    plan: 'Gratuito',
+    code: null,
+    profilePhoto: user.user_metadata?.avatar_url || null
+  };
+
+  localStorage.setItem('petcare_user', JSON.stringify(userData));
+}
+
+// Disponibiliza para debug no console (opcional)
+    window.supabaseClient = supabaseClient;
+
+    // Bootstrap: garante que, ao recarregar a página, a sessão é lida do storage
+    // e os dados são carregados sem depender apenas do onAuthStateChange.
+    async function bootstrapAuthAndData() {
+        try {
+            const { data: sessionData, error: sessionErr } = await supabaseClient.auth.getSession();
+            if (sessionErr) console.warn('bootstrapAuthAndData: getSession erro:', sessionErr);
+
+            const user = sessionData?.session?.user || null;
+
+            if (user) {
+                syncLocalUserFromSupabase(user);
+                checkUserSession?.();
+                loadUserProfile?.();
+                await loadData?.();
+            } else {
+                // Evita ficar "logado" só no localStorage quando a sessão expirou
+                localStorage.removeItem('petcare_user');
+                checkUserSession?.();
+                loadUserProfile?.();
+            }
+        } catch (err) {
+            console.error('bootstrapAuthAndData erro:', err);
+        }
+    }
+
+    let _lastLoadDataAt = 0;
+
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+      // Inclui TOKEN_REFRESHED para casos em que INITIAL_SESSION venha sem sessão
+      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') {
+        if (session?.user) {
+          syncLocalUserFromSupabase(session.user);
+          checkUserSession?.();
+          loadUserProfile?.();
+
+          const now = Date.now();
+          if (event !== 'TOKEN_REFRESHED' || (now - _lastLoadDataAt) > 1500) {
+            _lastLoadDataAt = now;
+            await loadData?.();
+          }
+        } else if (event === 'INITIAL_SESSION') {
+          localStorage.removeItem('petcare_user');
+          checkUserSession?.();
+          loadUserProfile?.();
+        }
+      } else if (event === 'SIGNED_OUT') {
+        localStorage.removeItem('petcare_user');
+        petsList = [];
+        currentPetId = null;
+        petData = { name:'', species:'', breed:'', birth_date:'', photo:'', vaccines:[], medicines:[], weights:[] };
+        updatePetProfile();
+        renderVaccines();
+        renderMedicines();
+        renderWeights();
+        checkUserSession?.();
+        loadUserProfile?.();
+      }
+    });
+
+    // roda no load/reload
+    bootstrapAuthAndData();
+
+
+    async function loginWithGoogle() {
+        const { error } = await supabaseClient.auth.signInWithOAuth({
+            provider: "google",
+            options: {
+                redirectTo: "https://petcarenew.vercel.app"
+            }
+        });
+
+        if (error) {
+            alert("Erro: " + error.message);
+        }
+    }
+
+
+    // ✅ Login com Email/Senha (Supabase)
+    async function handleLogin(e) {
+        e.preventDefault();
+
+        const email = document.getElementById('loginEmail')?.value?.trim();
+        const password = document.getElementById('loginPassword')?.value;
+
+        if (!email || !password) {
+            alert("Preencha email e senha.");
+            return;
+        }
+
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+        if (error) {
+            alert("Erro ao entrar: " + error.message);
+            return;
+        }
+
+        // Atualiza perfil local só para UI
+        if (data?.user) {
+            syncLocalUserFromSupabase(data.user);
+        }
+
+        closeAuthModal();
+        document.getElementById('loginForm')?.reset();
+
+        checkUserSession();
+        loadUserProfile();
+        await loadData();
+    }
+
+    // ✅ Cadastro com Email/Senha (Supabase)
+    async function handleRegister(e) {
+        e.preventDefault();
+
+        const name = document.getElementById('registerName')?.value?.trim();
+        const email = document.getElementById('registerEmail')?.value?.trim();
+        const phone = document.getElementById('registerPhone')?.value?.trim();
+        const cpf = document.getElementById('registerCpf')?.value?.trim();
+        const password = document.getElementById('registerPassword')?.value;
+
+        if (!name || !email || !password) {
+            alert("Preencha nome, email e senha.");
+            return;
+        }
+
+        const { data, error } = await supabaseClient.auth.signUp({
+            email,
+            password,
+            options: { data: { full_name: name, phone, cpf } }
+        });
+
+        if (error) {
+            alert("Erro ao cadastrar: " + error.message);
+            return;
+        }
+
+        // Se seu Supabase exigir confirmação por email, NÃO vem session agora.
+        if (!data?.session?.user) {
+            alert("Conta criada! Agora confirme no seu email e depois faça login.");
+            // volta pra aba Entrar
+            openAuthModal('login');
+            document.getElementById('registerForm')?.reset();
+            return;
+        }
+
+        // Se veio session, já está logado
+        syncLocalUserFromSupabase(data.session.user);
+
+        closeAuthModal();
+        document.getElementById('registerForm')?.reset();
+
+        checkUserSession();
+        loadUserProfile();
+        await loadData();
+    }
+
+
+    async function usuarioEstaLogado() {
+    const { data } = await supabaseClient.auth.getUser();
+    return data.user !== null;
+}
+async function showTab(tabName) {
+
+    // 🔐 Proteção para abas que precisam de login
+    if (tabName === "perfil") {
+        const { data } = await supabaseClient.auth.getUser();
+
+        if (!data.user) {
+            alert("Você precisa estar logado para acessar essa área.");
+            tabName = "login";
+        }
+    }
+
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+
+    document.getElementById(tabName).classList.add('active');
+}
+</script>
+
+</body>
+</html>
