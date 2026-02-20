@@ -3500,7 +3500,6 @@ function updatePricingVisibility() {
 // Payment Wall
 // -------------------------
 function showPaymentWall() {
-  // aqui seu app ainda usa localStorage para "user"; manteremos compatível
   const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
 
   if (!user) {
@@ -3942,11 +3941,7 @@ function setupEventHandlers() {
     return;
   }
 
-  // Mantém o paywall premium (como está no seu app)
-  if (!hasPremiumAccess()) {
-    showPaymentWall();
-    return;
-  }
+  // Qualquer conta logada pode adicionar pet — sem paywall aqui
 
   // Limpa o formulário antes de abrir
   const form = document.getElementById('petForm');
@@ -4021,12 +4016,12 @@ function setupEventHandlers() {
   }
 });
 
-  document.getElementById('addVaccineBtn')?.addEventListener('click', (e) => {
+  document.getElementById('addVaccineBtn')?.addEventListener('click', async (e) => {
     e.preventDefault(); e.stopPropagation();
 
-    const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
-    if (!user) {
-      alert('⚠️ Você precisa criar uma conta para usar este recurso!\n\nCrie sua conta gratuitamente agora! 🐾');
+    const supaUser = (typeof getUsuarioLogado === 'function') ? await getUsuarioLogado() : null;
+    if (!supaUser) {
+      showToast('⚠️ Faça login para usar este recurso.');
       openAuthModal('register');
       return;
     }
@@ -4035,12 +4030,12 @@ function setupEventHandlers() {
     else showPaymentWall();
   });
 
-  document.getElementById('addMedicineBtn')?.addEventListener('click', (e) => {
+  document.getElementById('addMedicineBtn')?.addEventListener('click', async (e) => {
     e.preventDefault(); e.stopPropagation();
 
-    const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
-    if (!user) {
-      alert('⚠️ Você precisa criar uma conta para usar este recurso!\n\nCrie sua conta gratuitamente agora! 🐾');
+    const supaUser = (typeof getUsuarioLogado === 'function') ? await getUsuarioLogado() : null;
+    if (!supaUser) {
+      showToast('⚠️ Faça login para usar este recurso.');
       openAuthModal('register');
       return;
     }
@@ -4049,12 +4044,12 @@ function setupEventHandlers() {
     else showPaymentWall();
   });
 
-  document.getElementById('addWeightBtn')?.addEventListener('click', (e) => {
+  document.getElementById('addWeightBtn')?.addEventListener('click', async (e) => {
     e.preventDefault(); e.stopPropagation();
 
-    const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
-    if (!user) {
-      alert('⚠️ Você precisa criar uma conta para usar este recurso!\n\nCrie sua conta gratuitamente agora! 🐾');
+    const supaUser = (typeof getUsuarioLogado === 'function') ? await getUsuarioLogado() : null;
+    if (!supaUser) {
+      showToast('⚠️ Faça login para usar este recurso.');
       openAuthModal('register');
       return;
     }
