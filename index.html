@@ -3124,7 +3124,22 @@ let currentPetId = null;  // pet atualmente aberto
 async function loadData() {
   if (typeof supabaseClient === 'undefined') return;
 
-  const { data: { user } = {} } = (typeof supabaseClient !== 'undefined') ? await supabaseClient.auth.getUser() : {};
+  // getSession é síncrono com o storage local — mais confiável no reload
+  // do que getUser() que faz round-trip ao servidor
+  let user = null;
+  try {
+    const { data: sessionData } = await supabaseClient.auth.getSession();
+    user = sessionData?.session?.user || null;
+
+    // Se getSession não retornou user, tenta getUser como fallback
+    if (!user) {
+      const { data: userData } = await supabaseClient.auth.getUser();
+      user = userData?.user || null;
+    }
+  } catch (err) {
+    console.error('loadData: erro ao buscar sessão:', err);
+  }
+
   if (!user) {
     petsList = [];
     currentPetId = null;
@@ -3144,7 +3159,6 @@ async function loadData() {
 
   if (petsError) {
     console.error("Erro ao buscar pets:", petsError);
-    alert("Erro ao carregar seus pets.");
     return;
   }
 
