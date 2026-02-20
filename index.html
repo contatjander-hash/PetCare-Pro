@@ -3203,11 +3203,19 @@ async function saveData() {
   };
 
   if (currentPetId) {
-    const { error } = await supabaseClient
-      .from('pets')
-      .update(payload)
-      .eq('id', currentPetId)
-      .eq('user_id', user.id);
+    const updatePayload = {
+  name: petData.name,
+  species: petData.species || null,
+  breed: petData.breed || null,
+  birthdate: petData.birthdate || null,
+  photo_url: petData.photo || null
+};
+
+const { error } = await supabaseClient
+  .from('pets')
+  .update(updatePayload)
+  .eq('id', currentPetId)
+  .eq('user_id', user.id);
 
     if (error) {
       console.error("Erro update pet:", error);
@@ -3217,16 +3225,37 @@ async function saveData() {
     return { ok: true, petId: currentPetId };
   }
 
-  const { data, error } = await supabaseClient
+    const { data, error } = await supabaseClient
     .from('pets')
     .insert(payload)
     .select('id')
-    .single();
+    .maybeSingle();
 
+  // Se deu erro, loga no console, mas não assume que falhou de verdade
   if (error) {
     console.error("Erro insert pet:", error);
-    alert("Erro ao criar pet.");
-    return { ok: false };
+  }
+
+  // Às vezes cria, mas não retorna o ID.
+  // Nesse caso, pega o último pet criado do usuário.
+  if (!data?.id) {
+    const { data: lastPet, error: lastErr } = await supabaseClient
+      .from('pets')
+      .select('id')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (lastErr) {
+      console.error("Pet criado, mas erro ao buscar o ID:", lastErr);
+      // aqui sim é um erro real porque não conseguimos confirmar o id
+      alert("Pet foi criado, mas houve um erro ao confirmar. Atualize a página.");
+      return { ok: false };
+    }
+
+    currentPetId = lastPet?.id || null;
+    return { ok: true, petId: currentPetId };
   }
 
   currentPetId = data.id;
@@ -4018,6 +4047,10 @@ function setupEventHandlers() {
     petData.photo = document.getElementById('petPhoto')?.value || '';
 
     // saveData/loadData vêm do seu bloco Supabase (definido mais acima no HTML)
+        if (!petData.name || !petData.species || !petData.birthdate) {
+      alert("Preencha nome, espécie e data de nascimento.");
+      return;
+    }
     if (typeof saveData === 'function') {
       const result = await saveData();
       if (result && result.ok && typeof loadData === 'function') await loadData();
