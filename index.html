@@ -2357,7 +2357,7 @@
                     <div class="hero-text">
                         <h1>Cuide do seu melhor amigo</h1>
                         <p>Acompanhe vacinas, consultas, alimentação e todos os momentos especiais do seu pet em um só lugar.</p>
-                        <button class="btn" id="addPetBtn" type="button" onclick="handleAddPetClick(event)">Adicionar Meu Pet 🐾</button>
+                        <button class="btn" id="addPetBtn" type="button">Adicionar Meu Pet 🐾</button>
                     </div>
                     <div class="pet-profile-card">
                         <div class="pet-avatar">🐕</div>
@@ -3499,12 +3499,14 @@ function updatePricingVisibility() {
 // -------------------------
 // Payment Wall
 // -------------------------
-function showPaymentWall() {
-  // aqui seu app ainda usa localStorage para "user"; manteremos compatível
-  const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+async function showPaymentWall() {
+  // Checa sessão real do Supabase primeiro
+  const supaUser = (typeof getUsuarioLogado === 'function') ? await getUsuarioLogado() : null;
+  // Fallback para localStorage
+  const localUser = JSON.parse(localStorage.getItem('petcare_user') || 'null');
 
-  if (!user) {
-    alert('⚠️ Você precisa criar uma conta para usar os recursos premium!\n\nCrie sua conta gratuitamente agora! 🐾');
+  if (!supaUser && !localUser) {
+    showToast('⚠️ Você precisa criar uma conta para usar este recurso!');
     openAuthModal('register');
     return;
   }
@@ -3929,29 +3931,20 @@ async function checkUserSession() {
 // -------------------------
 // Bind de eventos (botões + forms)
  // -------------------------
+function setupEventHandlers() {
+  // Botões principais
+  document.getElementById('addPetBtn')?.addEventListener('click', async (e) => {
+  e.preventDefault(); e.stopPropagation();
 
-// -------------------------
-// Fluxo: Clique em "Adicionar Meu Pet" (robusto)
-// -------------------------
-async function handleAddPetClick(evt) {
-  const e = evt || window.event || null;
-  try { e?.preventDefault?.(); e?.stopPropagation?.(); } catch(_) {}
-
-  // Fecha auth modal se ainda estiver aberto
-  try { closeAuthModal?.(); } catch(_) {}
-
-  // Sessão rápida (evita travar com getUser em rede)
+  // Checa sessão real do Supabase (evita depender só do localStorage)
   const supaUser = (typeof getUsuarioLogado === 'function') ? await getUsuarioLogado() : null;
-
-  // Garante compatibilidade com partes do app que ainda leem localStorage
-  try { if (typeof syncLocalUserFromSupabase === 'function' && supaUser) syncLocalUserFromSupabase(supaUser); } catch(_) {}
-
   if (!supaUser) {
     showToast('⚠️ Faça login para adicionar seu pet.');
     openAuthModal('login');
     return;
   }
 
+  // Mantém o paywall premium (como está no seu app)
   if (!hasPremiumAccess()) {
     showPaymentWall();
     return;
@@ -3960,17 +3953,12 @@ async function handleAddPetClick(evt) {
   // Limpa o formulário antes de abrir
   const form = document.getElementById('petForm');
   form?.reset?.();
-  const hiddenPhoto = document.getElementById('petPhoto');
-  if (hiddenPhoto) hiddenPhoto.value = '';
+  document.getElementById('petPhoto') && (document.getElementById('petPhoto').value = '');
   document.querySelectorAll('.pet-photo-option').forEach(opt => opt.classList.remove('selected'));
 
   openModal('petModal');
-}
-
-function setupEventHandlers() {
-  // Botões principais
-  document.getElementById('addPetBtn')?.addEventListener('click', handleAddPetClick);
-document.getElementById('petForm')?.addEventListener('submit', async (e) => {
+});
+  document.getElementById('petForm')?.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const form = e.target;
@@ -4035,46 +4023,46 @@ document.getElementById('petForm')?.addEventListener('submit', async (e) => {
   }
 });
 
-  document.getElementById('addVaccineBtn')?.addEventListener('click', (e) => {
+  document.getElementById('addVaccineBtn')?.addEventListener('click', async (e) => {
     e.preventDefault(); e.stopPropagation();
 
-    const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
-    if (!user) {
-      alert('⚠️ Você precisa criar uma conta para usar este recurso!\n\nCrie sua conta gratuitamente agora! 🐾');
-      openAuthModal('register');
+    const supaUser = (typeof getUsuarioLogado === 'function') ? await getUsuarioLogado() : null;
+    if (!supaUser) {
+      showToast('⚠️ Faça login para usar este recurso.');
+      openAuthModal('login');
       return;
     }
 
     if (hasPremiumAccess()) openModal('vaccineModal');
-    else showPaymentWall();
+    else await showPaymentWall();
   });
 
-  document.getElementById('addMedicineBtn')?.addEventListener('click', (e) => {
+  document.getElementById('addMedicineBtn')?.addEventListener('click', async (e) => {
     e.preventDefault(); e.stopPropagation();
 
-    const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
-    if (!user) {
-      alert('⚠️ Você precisa criar uma conta para usar este recurso!\n\nCrie sua conta gratuitamente agora! 🐾');
-      openAuthModal('register');
+    const supaUser = (typeof getUsuarioLogado === 'function') ? await getUsuarioLogado() : null;
+    if (!supaUser) {
+      showToast('⚠️ Faça login para usar este recurso.');
+      openAuthModal('login');
       return;
     }
 
     if (hasPremiumAccess()) openModal('medicineModal');
-    else showPaymentWall();
+    else await showPaymentWall();
   });
 
-  document.getElementById('addWeightBtn')?.addEventListener('click', (e) => {
+  document.getElementById('addWeightBtn')?.addEventListener('click', async (e) => {
     e.preventDefault(); e.stopPropagation();
 
-    const user = JSON.parse(localStorage.getItem('petcare_user') || 'null');
-    if (!user) {
-      alert('⚠️ Você precisa criar uma conta para usar este recurso!\n\nCrie sua conta gratuitamente agora! 🐾');
-      openAuthModal('register');
+    const supaUser = (typeof getUsuarioLogado === 'function') ? await getUsuarioLogado() : null;
+    if (!supaUser) {
+      showToast('⚠️ Faça login para usar este recurso.');
+      openAuthModal('login');
       return;
     }
 
     if (hasPremiumAccess()) openModal('weightModal');
-    else showPaymentWall();
+    else await showPaymentWall();
   });
 
   // Upload de foto da galeria
@@ -4234,26 +4222,12 @@ if (document.readyState === 'loading') {
     );
 
     async function getUsuarioLogado() {
-  // Preferir sessão local (rápida) para não travar ações do usuário
-  try {
-    const { data: sessData, error: sessErr } = await supabaseClient.auth.getSession();
-    if (!sessErr && sessData?.session?.user) return sessData.session.user;
-  } catch (e) {
-    console.warn("getSession erro:", e);
-  }
-
-  // Fallback: validação via rede
-  try {
-    const { data, error } = await supabaseClient.auth.getUser();
-    if (error) {
-      console.error("getUser erro:", error);
-      return null;
-    }
-    return data?.user ?? null;
-  } catch (e) {
-    console.error("getUser exceção:", e);
+  const { data, error } = await supabaseClient.auth.getUser();
+  if (error) {
+    console.error("getUser erro:", error);
     return null;
   }
+  return data?.user ?? null;
 }
 function syncLocalUserFromSupabase(user) {
   if (!user) return;
