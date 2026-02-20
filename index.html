@@ -4195,6 +4195,85 @@ supabaseClient.auth.onAuthStateChange(async (_event, session) => {
         }
     }
 
+
+    // ✅ Login com Email/Senha (Supabase)
+    async function handleLogin(e) {
+        e.preventDefault();
+
+        const email = document.getElementById('loginEmail')?.value?.trim();
+        const password = document.getElementById('loginPassword')?.value;
+
+        if (!email || !password) {
+            alert("Preencha email e senha.");
+            return;
+        }
+
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+        if (error) {
+            alert("Erro ao entrar: " + error.message);
+            return;
+        }
+
+        // Atualiza perfil local só para UI
+        if (data?.user) {
+            syncLocalUserFromSupabase(data.user);
+        }
+
+        closeAuthModal();
+        document.getElementById('loginForm')?.reset();
+
+        checkUserSession();
+        loadUserProfile();
+        await loadData();
+    }
+
+    // ✅ Cadastro com Email/Senha (Supabase)
+    async function handleRegister(e) {
+        e.preventDefault();
+
+        const name = document.getElementById('registerName')?.value?.trim();
+        const email = document.getElementById('registerEmail')?.value?.trim();
+        const phone = document.getElementById('registerPhone')?.value?.trim();
+        const cpf = document.getElementById('registerCpf')?.value?.trim();
+        const password = document.getElementById('registerPassword')?.value;
+
+        if (!name || !email || !password) {
+            alert("Preencha nome, email e senha.");
+            return;
+        }
+
+        const { data, error } = await supabaseClient.auth.signUp({
+            email,
+            password,
+            options: { data: { full_name: name, phone, cpf } }
+        });
+
+        if (error) {
+            alert("Erro ao cadastrar: " + error.message);
+            return;
+        }
+
+        // Se seu Supabase exigir confirmação por email, NÃO vem session agora.
+        if (!data?.session?.user) {
+            alert("Conta criada! Agora confirme no seu email e depois faça login.");
+            // volta pra aba Entrar
+            openAuthModal('login');
+            document.getElementById('registerForm')?.reset();
+            return;
+        }
+
+        // Se veio session, já está logado
+        syncLocalUserFromSupabase(data.session.user);
+
+        closeAuthModal();
+        document.getElementById('registerForm')?.reset();
+
+        checkUserSession();
+        loadUserProfile();
+        await loadData();
+    }
+
     async function checkSupabaseUser() {
         const { data } = await supabaseClient.auth.getUser()
 ;
