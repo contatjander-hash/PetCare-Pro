@@ -3990,60 +3990,6 @@ function setupEventHandlers() {
   openModal('petModal');
 });
 // -------------------------
-// Salvar Pet (função global — chamada pelo onclick do botão)
-// -------------------------
-async function salvarPet() {
-  const saveBtn = document.getElementById('petSaveBtn');
-  const form = document.getElementById('petForm');
-
-  const nameEl = document.getElementById('petNameInput');
-  const speciesEl = document.getElementById('petSpecies');
-  const breedEl = document.getElementById('petBreed');
-  const birthEl = document.getElementById('petBirthdate');
-  const photoEl = document.getElementById('petPhoto');
-
-  const name = nameEl?.value?.trim() || '';
-  const species = speciesEl?.value || '';
-  const birth_date = birthEl?.value || '';
-
-  if (!requireField(name, '⚠️ Informe o nome do pet.', nameEl)) return;
-  if (!requireField(species, '⚠️ Selecione a espécie do pet.', speciesEl)) return;
-  if (!requireField(birth_date, '⚠️ Informe a data de nascimento.', birthEl)) return;
-
-  const supaUser = JSON.parse(localStorage.getItem('petcare_user') || 'null');
-  if (!supaUser) {
-    showToast('⚠️ Sua sessão expirou. Faça login novamente.');
-    openAuthModal('login');
-    return;
-  }
-
-  petData.name = name;
-  petData.species = species;
-  petData.breed = breedEl?.value?.trim() || '';
-  petData.birth_date = birth_date;
-  petData.photo = photoEl?.value || '';
-
-  setBtnLoading(saveBtn, true);
-
-  try {
-    const result = await saveData();
-
-    if (result?.ok) {
-      await loadData();
-      updatePetProfile();
-      showToast('✅ Pet salvo com sucesso!');
-      closeModal('petModal');
-      form?.reset();
-      document.querySelectorAll('.pet-photo-option').forEach(opt => opt.classList.remove('selected'));
-    }
-
-  } catch (err) {
-    console.error('Erro inesperado ao salvar pet:', err);
-    showToast('❌ Erro inesperado. Tente novamente.');
-  } finally {
-    setBtnLoading(saveBtn, false);
-  }
-}
 
   document.getElementById('addVaccineBtn')?.addEventListener('click', async (e) => {
     e.preventDefault(); e.stopPropagation();
@@ -4203,6 +4149,60 @@ async function salvarPet() {
       if (pix && pix.classList.contains('active')) closePixPayment();
     }
   });
+}
+// Salvar Pet (função global — chamada pelo onclick do botão)
+// -------------------------
+async function salvarPet() {
+  const saveBtn = document.getElementById('petSaveBtn');
+  const form = document.getElementById('petForm');
+
+  const nameEl = document.getElementById('petNameInput');
+  const speciesEl = document.getElementById('petSpecies');
+  const breedEl = document.getElementById('petBreed');
+  const birthEl = document.getElementById('petBirthdate');
+  const photoEl = document.getElementById('petPhoto');
+
+  const name = nameEl?.value?.trim() || '';
+  const species = speciesEl?.value || '';
+  const birth_date = birthEl?.value || '';
+
+  if (!requireField(name, '⚠️ Informe o nome do pet.', nameEl)) return;
+  if (!requireField(species, '⚠️ Selecione a espécie do pet.', speciesEl)) return;
+  if (!requireField(birth_date, '⚠️ Informe a data de nascimento.', birthEl)) return;
+
+  const supaUser = JSON.parse(localStorage.getItem('petcare_user') || 'null');
+  if (!supaUser) {
+    showToast('⚠️ Sua sessão expirou. Faça login novamente.');
+    openAuthModal('login');
+    return;
+  }
+
+  petData.name = name;
+  petData.species = species;
+  petData.breed = breedEl?.value?.trim() || '';
+  petData.birth_date = birth_date;
+  petData.photo = photoEl?.value || '';
+
+  setBtnLoading(saveBtn, true);
+
+  try {
+    const result = await saveData();
+
+    if (result?.ok) {
+      await loadData();
+      updatePetProfile();
+      showToast('✅ Pet salvo com sucesso!');
+      closeModal('petModal');
+      form?.reset();
+      document.querySelectorAll('.pet-photo-option').forEach(opt => opt.classList.remove('selected'));
+    }
+
+  } catch (err) {
+    console.error('Erro inesperado ao salvar pet:', err);
+    showToast('❌ Erro inesperado. Tente novamente.');
+  } finally {
+    setBtnLoading(saveBtn, false);
+  }
 }
 
 // -------------------------
